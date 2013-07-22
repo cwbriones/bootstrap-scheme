@@ -16,6 +16,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+// TODO: Use more C++-style code to read in single character input,
+//       like cin >> c; instead of checking against EOF
+//       then I'd only need iostream and string
+
 #include "Object.h"
 #include "Scheme.h"
 
@@ -36,14 +40,14 @@ void Scheme::print_welcome_message(){
 
 
 Object* Scheme::alloc_object(){
-	Object* obj;
+	// Object* obj;
 
-	obj = new Object();
-	if (obj == 0){
-		std::cerr << "Out of memory" << std::endl;
-		exit(1);
- 	}
- 	return obj;
+	// obj = new Object();
+	// if (obj == 0){
+	// 	std::cerr << "Out of memory" << std::endl;
+	// 	exit(1);
+ 	// }
+ 	return new Object();
 }
 
 Object* Scheme::make_fixnum(long value){
@@ -85,6 +89,16 @@ Object* Scheme::make_empty_list(){
     return &Object::empty_list_obj;
 }
 
+Object* Scheme::make_pair(Object* car, Object* cdr){
+    Object* obj = alloc_object();
+    obj->type = Object::PAIR;
+    obj->data.pair.car = car;
+    obj->data.pair.cdr = cdr;
+
+    return obj;
+}
+
+
 /************************ READ *******************************/
 
 bool Scheme::is_delimiter(char c){
@@ -125,14 +139,15 @@ Object* Scheme::read(){
     }
     else if (c == '('){
         // Read in the empty list.
-        eat_whitespace();
-        c = instream_.get();
-        if (c == ')'){
-            return make_empty_list();
-        } else {
-            std::cerr << "unexpected character \'" << c << "\', expected ')'" << std::endl;
-            exit(1);
-        }
+        return read_pair();
+        // eat_whitespace();
+        // c = instream_.get();
+        // if (c == ')'){
+        //     return make_empty_list();
+        // } else {
+        //     std::cerr << "unexpected character \'" << c << "\', expected ')'" << std::endl;
+        //     exit(1);
+        // }
     }
     else if (c == '#'){
         c = instream_.get();
@@ -181,6 +196,46 @@ Object* Scheme::read(){
 	}
 	std::cerr << "read illegal state." << std::endl;
 	exit(1);
+}
+
+Object* Scheme::read_pair(){
+    Object* car_obj = nullptr;
+    Object* cdr_obj = nullptr;
+
+    eat_whitespace();
+    char c = instream_.get();
+    if (c == ')'){
+        return make_empty_list();
+    }
+    instream_.unget();
+
+    car_obj = read();
+
+    eat_whitespace();
+    c = instream_.get();
+    if (c == '.'){
+        // Dot notation, cons cell
+        c = instream_.peek();
+        if (!is_delimiter(c)){
+            std::cerr << "Unexpected character \"" << c << ". Was expecting delimeter." << std::endl;
+            exit(1);
+        }
+
+        cdr_obj = read();
+
+        eat_whitespace();
+        c = instream_.get();
+
+        if (c != ')'){
+            std::cerr << "Unexpected character \"" << c << ". Was expecting closing ')'" << std::endl;
+            exit(1);
+        }
+    } else {
+        instream_.unget();
+        cdr_obj = read_pair();
+    }
+
+    return make_pair(car_obj, cdr_obj);
 }
 
 Object* Scheme::read_character(){
@@ -274,6 +329,10 @@ Object* Scheme::eval(Object* exp){
 	return exp;
 }
 
+Object* Scheme::cons(Object* exp1, Object* exp2){
+    return make_pair( eval(exp1), eval(exp2) );
+}
+
 /*********************** PRINT *******************************/
 
 void Scheme::write(Object* obj){
@@ -303,6 +362,11 @@ void Scheme::write(Object* obj){
         case Object::STRING:
             write_string(obj->data.string.value);
             break;
+        case Object::PAIR:
+            std::cout << "(";
+            write_pair(obj);
+            std::cout << ")";
+            break;
         case Object::EMPTY_LIST:
             std::cout << "()";
             break;
@@ -310,6 +374,26 @@ void Scheme::write(Object* obj){
 			std::cerr << "unknown type, cannot write." << std::endl;
 			exit(1);
 	}
+}
+
+void Scheme::write_pair(Object* pair){
+    Object* car_obj = pair->data.pair.car;
+    Object* cdr_obj = pair->data.pair.cdr;
+
+    write(car_obj);
+
+    if (cdr_obj->is_pair()){
+        std::cout << " ";
+        write_pair(cdr_obj);
+        return;
+    } 
+    else if (cdr_obj->is_empty_list()){
+        return;
+    } 
+    else {
+        std::cout << " . ";
+        write(cdr_obj);
+    }
 }
 
 void Scheme::write_string(std::string str){

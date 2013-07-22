@@ -32,6 +32,10 @@ bool Object::is_string(){
     return type == STRING;
 }
 
+bool Object::is_pair(){
+    return type == PAIR;
+}
+
 void Object::init_statics(){
     false_obj.type = BOOLEAN;
     false_obj.data.boolean.value = 0;

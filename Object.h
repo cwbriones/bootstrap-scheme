@@ -11,7 +11,8 @@ struct Object {
         BOOLEAN,
         CHARACTER,
         STRING,
-        EMPTY_LIST
+        EMPTY_LIST,
+        PAIR
 	} type;
 
 	union {
@@ -27,6 +28,10 @@ struct Object {
         struct {
             char* value;
         } string;
+        struct {
+            Object* car;
+            Object* cdr;
+        } pair;
 	} data;
 
     bool is_false();
@@ -36,6 +41,7 @@ struct Object {
     bool is_boolean();
     bool is_character();
     bool is_string();
+    bool is_pair();
 
     static void init_statics();
 };

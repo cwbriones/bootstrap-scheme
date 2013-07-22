@@ -18,11 +18,15 @@ private:
 	Object* read();
     Object* read_character();
     Object* read_string();
+    Object* read_pair();
 
     Object* eval(Object* exp);
+    Object* cons(Object* exp1, Object* exp2);
 
 	void write(Object*);
+    void write_pair(Object*);
     void write_string(std::string);
+
 	Object* alloc_object();
 public:
 	Scheme(std::istream&);
@@ -31,6 +35,7 @@ public:
     Object* make_character(char);
     Object* make_string(std::string);
     Object* make_boolean(bool value);
+    Object* make_pair(Object* car, Object* cdr);
     Object* make_empty_list();
 
 	bool is_delimiter(char);
