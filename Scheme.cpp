@@ -28,6 +28,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 
 Scheme::Scheme(std::istream& instream) : cursor_(">>>"), instream_(instream){}
 
@@ -66,7 +67,8 @@ Object* Scheme::make_string(std::string value){
 
     obj = alloc_object();
     obj->type = Object::STRING;
-    obj->data.string.value = const_cast<char*>(value.c_str());
+    obj->data.string.value = new char[value.size() + 1];
+    std::strcpy(obj->data.string.value, value.c_str()); 
 
     return obj;
 }
@@ -194,8 +196,7 @@ Object* Scheme::read_pair(){
     c = instream_.get();
     if (c == '.'){
         // Dot notation, cons cell
-        c = instream_.peek();
-        if (!is_delimiter(c)){
+        if (!is_delimiter( instream_.peek() )){
             std::cerr << "Unexpected character \"" << c << ". Was expecting delimeter." << std::endl;
             exit(1);
         }
@@ -275,7 +276,7 @@ Object* Scheme::read_string(){
 
         buffer += c;
     }
-
+    
     return make_string(buffer);
 }
 

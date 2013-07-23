@@ -1,6 +1,8 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <string>
+
 struct Object {
     static Object true_obj;
     static Object false_obj;
