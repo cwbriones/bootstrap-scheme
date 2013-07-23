@@ -29,7 +29,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-Scheme::Scheme(std::istream& instream) : cursor_(">>"), instream_(instream){}
+Scheme::Scheme(std::istream& instream) : cursor_(">>>"), instream_(instream){}
 
 void Scheme::print_welcome_message(){
 	std::cout << "Welcome to Bootstrap Scheme. " << std::endl;
@@ -40,13 +40,6 @@ void Scheme::print_welcome_message(){
 
 
 Object* Scheme::alloc_object(){
-	// Object* obj;
-
-	// obj = new Object();
-	// if (obj == 0){
-	// 	std::cerr << "Out of memory" << std::endl;
-	// 	exit(1);
- 	// }
  	return new Object();
 }
 
@@ -108,20 +101,15 @@ bool Scheme::is_delimiter(char c){
 }
 
 void Scheme::eat_whitespace(){
-	int c;
+    char c;
+    std::string tmp;
 
-	while ( (c = instream_.get()) != EOF ){
-		if (isspace(c)){
-			continue;
-		}
-		else if (c == ';'){ // Comments are also whitespace
-
-			//Error here?
-			while (((c = instream_.get()) != EOF) && (c != '\n'));
-			continue;
-		}
-		instream_.unget();
-		break;
+	while (c = (instream_ >> std::ws).peek()){
+		if (c == ';'){ // Comments are also whitespace
+            std::getline(instream_, tmp);
+		} else {
+            break;
+        }
 	}
 }
 
@@ -138,16 +126,7 @@ Object* Scheme::read(){
         return read_string();
     }
     else if (c == '('){
-        // Read in the empty list.
         return read_pair();
-        // eat_whitespace();
-        // c = instream_.get();
-        // if (c == ')'){
-        //     return make_empty_list();
-        // } else {
-        //     std::cerr << "unexpected character \'" << c << "\', expected ')'" << std::endl;
-        //     exit(1);
-        // }
     }
     else if (c == '#'){
         c = instream_.get();
@@ -203,11 +182,11 @@ Object* Scheme::read_pair(){
     Object* cdr_obj = nullptr;
 
     eat_whitespace();
-    char c = instream_.get();
+    char c = instream_.peek();
     if (c == ')'){
+        instream_.get();
         return make_empty_list();
     }
-    instream_.unget();
 
     car_obj = read();
 
@@ -417,6 +396,10 @@ void Scheme::write_string(std::string str){
         iter++;
     }
     std::cout << '\"';
+}
+
+void Scheme::write_continue_marker(){
+    std::cout << "...";
 }
 
 /************************ REPL *******************************/

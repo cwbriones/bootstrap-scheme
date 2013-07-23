@@ -23,6 +23,7 @@ private:
     Object* eval(Object* exp);
     Object* cons(Object* exp1, Object* exp2);
 
+    void write_continue_marker();
 	void write(Object*);
     void write_pair(Object*);
     void write_string(std::string);
