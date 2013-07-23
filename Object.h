@@ -14,7 +14,8 @@ struct Object {
         CHARACTER,
         STRING,
         EMPTY_LIST,
-        PAIR
+        PAIR,
+        SYMBOL
 	} type;
 
 	union {
@@ -30,6 +31,9 @@ struct Object {
         struct {
             char* value;
         } string;
+        struct {
+            char* value;
+        } symbol;
         struct {
             Object* car;
             Object* cdr;

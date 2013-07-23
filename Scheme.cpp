@@ -30,6 +30,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include <unordered_set>
+
 Scheme::Scheme(std::istream& instream) : cursor_(">>>"), instream_(instream){}
 
 void Scheme::print_welcome_message(){
@@ -93,6 +95,24 @@ Object* Scheme::make_pair(Object* car, Object* cdr){
     return obj;
 }
 
+Object* Scheme::make_symbol(std::string value){
+    // Check that the symbol isn't already in the table
+    auto iter = symbols_.find(value);
+    if (iter != symbols_.end()){
+        return symbols_[value];
+    } else {
+        // Create the symbol and add it to the table
+        Object* obj = alloc_object();
+        obj->type = Object::SYMBOL;
+
+        obj->data.symbol.value = new char[value.size() + 1]; 
+        std::strcpy(obj->data.symbol.value, value.c_str());
+
+        symbols_[value] = obj;
+
+        return obj;
+    }
+}
 
 /************************ READ *******************************/
 
@@ -148,8 +168,7 @@ Object* Scheme::read(){
                     exit(1);
             }
         } 
-    }
-    else if (isdigit(c) || (c == '-' && isdigit(instream_.peek())) ){
+    } else if (isdigit(c) || (c == '-' && isdigit(instream_.peek())) ){
 		// Read in a fixnum.
 		if (c == '-'){
 			sign = -1;
@@ -170,13 +189,48 @@ Object* Scheme::read(){
 			std::cerr << "number not followed by delimiter" << std::endl;
 			exit(1);
 		}
-	}
-	else {
+	} else if (!is_delimiter(c)){
+        // Read in a symbol
+        instream_.unget();
+        return read_symbol();
+    } else {
 		std::cerr << "bad input. unexpected character '" << c << "'." << std::endl;
 		exit(1);
 	}
 	std::cerr << "read illegal state." << std::endl;
 	exit(1);
+}
+
+Object* Scheme::read_symbol(){
+    // Allowable Symbol characters:
+    // a-z A-Z + - . * / < = > ! ? : $ % _ & ~ ^ .
+    std::string buffer;
+    instream_ >> buffer; // Read in the symbol without whitespace
+
+    std::unordered_set<char> allowed_chars = { '+', '-', '.', '*', '/', '<', '=', 
+        '>', '!', '?', ':', '$', '%', '_', '&', '~', '^', '.' };
+    
+    // Ensure validity
+    int i = 0;
+    for (auto c : buffer){
+        if (c == ';'){
+            // Remove trailing comment if there was no space
+            buffer = buffer.substr(0, i);
+            std::string tmp;
+            std::getline(instream_, tmp);
+            break;
+        } 
+        if (is_delimiter(c)){
+            std::cerr << "Unexpected delimeter \"" << c << "\"" << std::endl;
+            exit(1);
+        } else if (!isalpha(c) && allowed_chars.find(c) == allowed_chars.end()){
+            std::cerr << "Unexpected character \'" << c << "\' not allowed in symbol." << std::endl;
+            exit(1);
+        }
+        i++;
+    }
+
+    return make_symbol(buffer);
 }
 
 Object* Scheme::read_pair(){
@@ -349,6 +403,9 @@ void Scheme::write(Object* obj){
             break;
         case Object::EMPTY_LIST:
             std::cout << "()";
+            break;
+        case Object::SYMBOL:
+            std::cout << symbols_[obj->data.symbol.value]->data.symbol.value;
             break;
 		default:
 			std::cerr << "unknown type, cannot write." << std::endl;
