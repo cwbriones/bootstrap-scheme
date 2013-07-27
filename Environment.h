@@ -2,6 +2,7 @@
 #define ENVIRONMENT_H
 
 #include <unordered_map>
+#include <string>
 
 class Object;
 

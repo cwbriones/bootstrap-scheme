@@ -1,13 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include <string>
-
 struct Object {
-    static Object true_obj;
-    static Object false_obj;
-    static Object empty_list_obj;
-
 	enum {
 		FIXNUM,
         BOOLEAN,
@@ -40,18 +34,23 @@ struct Object {
         } pair;
 	} data;
 
-    bool is_false();
-    bool is_true();
-    bool is_empty_list();
     bool is_fixnum();
     bool is_boolean();
     bool is_character();
     bool is_string();
     bool is_pair();
     bool is_symbol();
-    bool is_tagged_list(Object* tag);
 
-    static void init_statics();
+    bool is_false_obj();
+    bool is_true_obj();
+    bool is_empty_list();
+
+    bool is_tagged_list(Object* tag);
+    bool is_self_evaluating();
+
+    Object* car();
+    Object* cdr();
+    Object* cadr();
 };
 
 #endif // OBJECT_H
