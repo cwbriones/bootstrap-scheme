@@ -32,7 +32,17 @@
 
 #include <unordered_set>
 
-Scheme::Scheme(std::istream& instream) : cursor_(">>>"), instream_(instream){}
+Scheme::Scheme(std::istream& instream) : cursor_(">>>"), instream_(instream){
+    quote_symbol = make_symbol("quote");
+
+    set_symbol = make_symbol("set!");
+    ok_symbol = make_symbol("ok");
+    define_symbol = make_symbol("define");
+
+    cond_symbol = make_symbol("cond");
+    cons_symbol = make_symbol("cons");
+    if_symbol = make_symbol("if");
+}
 
 void Scheme::print_welcome_message(){
 	std::cout << "Welcome to Bootstrap Scheme. " << std::endl;

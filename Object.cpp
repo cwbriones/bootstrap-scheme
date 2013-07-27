@@ -36,7 +36,18 @@ bool Object::is_pair(){
     return type == PAIR;
 }
 
+bool Object::is_symbol(){
+    return type == SYMBOL;
+}
+
+bool Object::is_tagged_list(Object* tag){
+    return is_pair() && 
+        data.pair.car->is_symbol() &&
+        data.pair.car == tag;
+}
+
 void Object::init_statics(){
+    // Singletons
     false_obj.type = BOOLEAN;
     false_obj.data.boolean.value = 0;
 

@@ -48,6 +48,8 @@ struct Object {
     bool is_character();
     bool is_string();
     bool is_pair();
+    bool is_symbol();
+    bool is_tagged_list(Object* tag);
 
     static void init_statics();
 };

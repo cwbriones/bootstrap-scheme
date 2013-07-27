@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
+#include "Environment.h"
 
 class Object;
 
@@ -15,7 +16,16 @@ private:
 	const std::string cursor_;
 	std::istream& instream_;
     std::unordered_map<std::string, Object*> symbols_;
+    Environment global_env_;
 
+    Object* quote_symbol = nullptr;
+    Object* define_symbol = nullptr;
+    Object* ok_symbol = nullptr;
+    Object* set_symbol = nullptr;
+    Object* cond_symbol = nullptr;
+    Object* cons_symbol = nullptr;
+    Object* if_symbol  = nullptr;
+    //
     // Model
 	Object* alloc_object();
 	Object* make_fixnum(long value);
