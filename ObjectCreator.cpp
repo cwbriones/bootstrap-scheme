@@ -1,6 +1,7 @@
 #include "ObjectCreator.h"
 #include "Object.h"
 
+#include <string>
 #include <cstring>
 
 ObjectCreator::ObjectCreator(){
@@ -107,4 +108,11 @@ Object* ObjectCreator::make_symbol(std::string value){
 
 Object* ObjectCreator::make_empty_list(){
     return empty_list_obj;
+}
+
+Object* ObjectCreator::make_special_form(std::string tag, Object* cdr){
+    if (tag == "quote"){
+        return make_pair(quote_symbol, make_pair(cdr, empty_list_obj));
+    }
+    return nullptr;
 }

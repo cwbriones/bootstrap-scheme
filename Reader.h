@@ -25,7 +25,9 @@ class SchemeReader {
         void eat_expected_word(std::string word);
         void peek_expecting_delimiter();
         void print_welcome_message();
+
         bool is_delimiter(char c);
+        bool is_start_of_symbol(char c);
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "Object.h"
+#include <string>
 
 bool Object::is_fixnum(){
     return type == FIXNUM;
@@ -34,6 +35,12 @@ bool Object::is_false_obj(){
 
 bool Object::is_empty_list(){
     return type == EMPTY_LIST;
+}
+
+bool Object::is_tagged_list(std::string tag){
+    return is_pair() &&
+        data.pair.car->is_symbol() &&
+        data.pair.car->data.symbol.value == tag;
 }
 
 bool Object::is_tagged_list(Object* tag){

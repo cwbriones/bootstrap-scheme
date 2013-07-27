@@ -16,6 +16,8 @@ public:
     Object* make_character(char value);
     Object* make_symbol(std::string value);
     Object* make_empty_list();
+
+    Object* make_special_form(std::string tag, Object* cdr);
 private:
     void init_singletons();
     void init_symbols();

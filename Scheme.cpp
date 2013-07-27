@@ -49,9 +49,9 @@ Object* Scheme::eval(Object* exp){
     if (exp->is_self_evaluating()){
         return exp;
     } 
-    // else if (exp->is_tagged_list(quote_symbol)){
-    //     return exp->cadr();
-    // } 
+    else if (exp->is_tagged_list("quote")){
+        return exp->cadr();
+    } 
     else {
         std::cerr << "Error: cannot evaluate unknown expression type." << std::endl;
         exit(1);

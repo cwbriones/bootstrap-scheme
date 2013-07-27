@@ -1,6 +1,8 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <string>
+
 struct Object {
 	enum {
 		FIXNUM,
@@ -45,6 +47,7 @@ struct Object {
     bool is_true_obj();
     bool is_empty_list();
 
+    bool is_tagged_list(std::string tag);
     bool is_tagged_list(Object* tag);
     bool is_self_evaluating();
 

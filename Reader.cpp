@@ -45,6 +45,13 @@ bool SchemeReader::is_delimiter(char c){
 			c == '"'  || c == ';';
 }
 
+bool SchemeReader::is_start_of_symbol(char c){
+    return isdigit(c) || isalpha(c) ||
+        ( (c != '#') && (c != '\\') &&
+          (c != '`') && !is_delimiter(c) &&
+          (c != '\'') );
+}
+
 void SchemeReader::peek_expecting_delimiter(){
     if (!is_delimiter(instream_.peek())){
         std::cerr << "character not followed by delimiter." << std::endl;
@@ -58,10 +65,9 @@ Object* SchemeReader::read(){
 	long num = 0;
 
 	eat_whitespace();
-
 	c = instream_.get();
+
     if (c == '\"'){
-        // Read in a string.
         return read_string();
     }
     else if (c == '('){
@@ -71,7 +77,6 @@ Object* SchemeReader::read(){
         c = instream_.get();
 
         if (c == '\\'){
-            // Read in a character literal.
             return read_character();
         } else {
             // Read in a boolean.
@@ -85,7 +90,8 @@ Object* SchemeReader::read(){
                     exit(1);
             }
         } 
-    } else if (isdigit(c) || (c == '-' && isdigit(instream_.peek())) ){
+    } 
+    else if (isdigit(c) || (c == '-' && isdigit(instream_.peek())) ){
 		// Read in a fixnum.
 		if (c == '-'){
 			sign = -1;
@@ -106,11 +112,15 @@ Object* SchemeReader::read(){
 			std::cerr << "number not followed by delimiter" << std::endl;
 			exit(1);
 		}
-	} else if (!is_delimiter(c)){
+	} 
+    else if (is_start_of_symbol(c)){
         // Read in a symbol
         instream_.unget();
         return read_symbol();
-    } 
+    }
+    else if (c == '\'' || c == '`'){
+        return objcreator_->make_special_form("quote", read());
+    }
     else {
 		std::cerr << "bad input. unexpected character '" << c << "'." << std::endl;
 		exit(1);
@@ -224,26 +234,29 @@ Object* SchemeReader::read_symbol(){
     // Allowable Symbol characters:
     // a-z A-Z + - . * / < = > ! ? : $ % _ & ~ ^ .
     std::string buffer;
-    instream_ >> buffer; // Read in the symbol without whitespace
-
     std::unordered_set<char> allowed_chars = { '+', '-', '.', '*', '/', '<', '=', 
-        '>', '!', '?', ':', '$', '%', '_', '&', '~', '^', '.' };
+        '>', '!', '?', ':', '$', '%', '_', '&', '~', '^', '.' , '#' };
     
+    char c;
+    while ( (c = instream_.get()) && !is_delimiter(c) ){
+        buffer += c;
+    }
+    if (is_delimiter(c)){
+        instream_.unget();
+    }
+
     // Ensure validity
+    // Also note that # is allowed anywhere so long as it is not preceded by %
     int i = 0;
     for (auto c : buffer){
-        if (c == ';'){
-            // Remove trailing comment if there was no space
-            buffer = buffer.substr(0, i);
-            std::string tmp;
-            std::getline(instream_, tmp);
-            break;
-        } 
-        if (is_delimiter(c)){
-            std::cerr << "Unexpected delimiter \"" << c << "\"" << std::endl;
+        if (!isalpha(c) && !isdigit(c) && (allowed_chars.find(c) == allowed_chars.end())){
+            std::cerr << "Unexpected character \'" << c 
+                      << "\' not allowed in symbol." << std::endl;
             exit(1);
-        } else if (!isalpha(c) && allowed_chars.find(c) == allowed_chars.end()){
-            std::cerr << "Unexpected character \'" << c << "\' not allowed in symbol." << std::endl;
+        }
+        else if (c == '#' && buffer[i - 1] == '%'){
+        // This check is okay because read_symbol can't be called if the first char is #
+            std::cerr << "# cannot follow a % in a symbol." << std::endl;
             exit(1);
         }
         i++;
