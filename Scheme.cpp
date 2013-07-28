@@ -34,6 +34,7 @@
 
 Scheme::Scheme(std::istream& instream) : objcreator_(), 
     reader_(&objcreator_, instream), cursor_(">>>"){ 
+        env_ = &global_env_;
 }
 
 void Scheme::print_welcome_message(){
@@ -45,13 +46,67 @@ void Scheme::print_welcome_message(){
 
 // For now we just echo until we have lists and symbols
 Object* Scheme::eval(Object* exp){
-    // Empty list sent here is an error
+
     if (exp->is_self_evaluating()){
         return exp;
-    } 
+    }
+    else if (exp->is_symbol()){
+        Object* val = env_->get_value_of_symbol(exp);
+        if (!val){
+            std::cerr << "Error: unbound variable " << exp->data.symbol.value
+                      << "." << std::endl;
+            exit(1);
+        }
+        return val;
+    }
+    else if (exp->is_tagged_list("if")){
+        if (exp->length_as_list() == 4){
+            exp = exp->cdr();
+            if (exp->car()->is_false_obj()){
+                return eval(exp->cdr()->cadr());
+            } else {
+                return eval(exp->cadr());
+            }
+        } else {
+            std::cerr << "Error: cannot evaluate if form" << std::endl;
+            exit(1);
+        }
+    }
     else if (exp->is_tagged_list("quote")){
         return exp->cadr();
-    } 
+    }
+    else if (exp->is_tagged_list("cons")){
+        if (exp->length_as_list() == 3){
+            return cons(eval(exp->cadr()), eval(exp->cdr()->cadr()));
+        } else {
+            std::cerr << "Error: cannot evaluate cons form" << std::endl;
+            exit(1);
+        }
+    }
+    else if (exp->is_tagged_list("define")){
+        if (exp->length_as_list() == 3){
+            env_->bind(exp->cadr(), eval(exp->cdr()->cadr()));
+            return objcreator_.make_symbol("ok");
+        } else {
+            std::cerr << "Error: cannot evaluate def form" << std::endl;
+            exit(1);
+        }
+    }
+    else if (exp->is_tagged_list("set!")){
+        if (exp->length_as_list() == 3){
+            if (env_->set(exp->cadr(), 
+                        eval(exp->cdr()->cadr()) )){
+                return objcreator_.make_symbol("ok");
+            } else {
+                std::cerr << "Error: unbound variable " << exp->cadr()->data.symbol.value
+                          << "." << std::endl;
+                exit(1);
+            }
+        } else {
+            std::cerr << "Error: cannot evaluate set! form" << std::endl;
+            exit(1);
+        }
+    }
     else {
         std::cerr << "Error: cannot evaluate unknown expression type." << std::endl;
         exit(1);

@@ -18,7 +18,7 @@ public:
 private:
 	const std::string cursor_;
     Environment global_env_;
-    
+    Environment* env_;    
     // Read
     SchemeReader reader_;
     

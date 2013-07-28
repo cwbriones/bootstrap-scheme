@@ -31,6 +31,9 @@ private:
     Object* set_symbol = nullptr;
     Object* ok_symbol = nullptr;
 
+    Object* if_symbol = nullptr;
+    Object* cons_symbol = nullptr;
+
     Object* alloc_obj();
     std::unordered_map<std::string, Object*> symbols_;
 };

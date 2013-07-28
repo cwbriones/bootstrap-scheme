@@ -57,6 +57,27 @@ bool Object::is_self_evaluating(){
            is_empty_list();
 }
 
+int Object::length_as_list(){
+    if (is_empty_list()){
+        return 0;
+    }
+
+    Object* obj = this;
+    int i = 1;
+
+    while (obj->is_pair() && obj->cdr()->is_pair()){
+        i++;
+        obj = obj->cdr();
+    }
+
+    if (!obj->is_pair()){
+        return -1;
+    }
+    else if (obj->cdr()->is_empty_list()){
+        return i;
+    }
+}
+
 Object* Object::car(){
     return this->data.pair.car;
 }

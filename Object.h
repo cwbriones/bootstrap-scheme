@@ -51,6 +51,8 @@ struct Object {
     bool is_tagged_list(Object* tag);
     bool is_self_evaluating();
 
+    int length_as_list();
+
     Object* car();
     Object* cdr();
     Object* cadr();

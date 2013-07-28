@@ -10,8 +10,11 @@ class Environment {
     public:
         Environment();
         void bind(Object* symbol, Object* value);
+        bool set(Object* symbol, Object* value);
+
         Environment extend();
         Environment* get_enclosing_env();
+
         Object* get_value_of_symbol(Object* symbol);
     private:
         Environment* enclosing_;

@@ -39,6 +39,12 @@ void ObjectCreator::init_symbols(){
     if (!set_symbol){
         set_symbol = make_symbol("set!");
     }
+    if (!if_symbol){
+        if_symbol = make_symbol("if");
+    }
+    if (!cons_symbol){
+        cons_symbol = make_symbol("cons");
+    }
 }
 
 Object* ObjectCreator::alloc_obj(){
