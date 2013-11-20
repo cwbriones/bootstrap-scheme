@@ -17,8 +17,10 @@ public:
 	void main_loop();
 private:
 	const std::string cursor_;
+
     Environment global_env_;
     Environment* env_;    
+    
     // Read
     SchemeReader reader_;
     
@@ -33,6 +35,7 @@ private:
 	void write(Object* obj);
     void write_pair(Object* obj);
     void write_string(std::string);
+
     void print_welcome_message();
 };
 

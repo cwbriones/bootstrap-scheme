@@ -76,6 +76,7 @@ Object* Scheme::eval(Object* exp){
         return exp->cadr();
     }
     else if (exp->is_tagged_list("cons")){
+        // Should probably reimplement this as a proper procedure
         if (exp->length_as_list() == 3){
             return cons(eval(exp->cadr()), eval(exp->cdr()->cadr()));
         } else {

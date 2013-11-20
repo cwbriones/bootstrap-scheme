@@ -47,6 +47,27 @@ void ObjectCreator::init_symbols(){
     }
 }
 
+void ObjectCreator::init_arithmetic_operators(){
+    if (!addition_symbol){
+        
+    }
+    if (!subtract_symbol){
+
+    }
+    if (!multiply_symbol){
+
+    }
+    if (!divide_symbol){
+
+    }
+}
+
+void ObjectCreator::init_type_predicates(){
+}
+
+void ObjectCreator::init_type_conversions(){
+}
+
 Object* ObjectCreator::alloc_obj(){
     return new Object();
 }

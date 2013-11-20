@@ -17,7 +17,7 @@ class Environment {
 
         Object* get_value_of_symbol(Object* symbol);
     private:
-        Environment* enclosing_;
+        Environment* enclosing_ = nullptr;
 
         std::unordered_map<std::string, Object*> bindings_;
 };
