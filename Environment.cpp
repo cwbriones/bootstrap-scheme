@@ -3,33 +3,64 @@
 
 Environment::Environment() {}
 
-bool Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
+void Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
+    Environment* env = this;
+
+    while (env) {
+        auto found = env->frame_bindings_.find(symbol->value());
+
+        /*
+         * Check if the symbol already exists.
+         *
+         * If the symbol is not found, we try to continue up
+         * and if there is no way up we create it
+         * in the initial frame
+         */
+
+        if (found == env->frame_bindings_.end()) {
+            // Try to go up
+            if (env->enclosing_) {
+                env = env->enclosing_;
+            } else {
+                // Relent and create the binding
+                this->frame_bindings_[symbol->value()] = value;
+                return;
+            }
+        } else {
+            found->second = value;
+            return;
+        }
+    }
+}
+
+bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
 
     Environment* env = this;
 
     while (env){
         auto found = env->frame_bindings_.find(symbol->value());
 
-        if (found == frame_bindings_.end()){
-            env = env->enclosing_;
+        /*
+         * Check if the symbol already exists.
+         *
+         * If the symbol is not found, we try to continue up
+         * and if there is no way up we relent and return failure
+         */
+        if (found == env->frame_bindings_.end()){
+
+            if (env->enclosing_) {
+                env = env->enclosing_;
+            }
+
+            break;
+
         } else {
-            set_variable_value(symbol, value);
+            found->second = value;
             return true;
         }
     }
 
     return false;
-}
-
-bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
-    auto found = frame_bindings_.find(symbol->value());
-    if (found == frame_bindings_.end()) {
-        return false;
-    }
-
-    found->second = value;
-
-    return true;
 }
 
 SchemeObject* Environment::lookup_variable_value(SchemeSymbol* symbol) {

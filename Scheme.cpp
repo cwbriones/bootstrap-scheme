@@ -60,6 +60,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
         return exp;
 
     } else if (exp->is_symbol()){
+
         SchemeObject* value = env_->lookup_variable_value(exp->to_symbol());
 
         if (!value){
@@ -77,11 +78,16 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
             exp = exp->cdr();
 
             if (exp->car()->is_false_obj()) {
+
                 return eval(exp->cdr()->cadr());
+
             } else {
+
                 return eval(exp->cadr());
             }
+
         } else {
+
             std::cerr << "Error: cannot evaluate if form" << std::endl;
             exit(1);
         }
@@ -94,7 +100,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
         // Should probably reimplement this as a proper procedure
         if (exp->length_as_list() == 3){
 
-            return cons(eval(exp->cadr()), eval(exp->cdr()->cadr()));
+            return cons(eval(exp->cadr()), eval(exp->caddr()));
 
         } else {
 
@@ -109,7 +115,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
 
             env_->define_variable_value(
                     exp->cadr()->to_symbol(), 
-                    eval(exp->cdr()->cadr()));
+                    eval(exp->caddr()));
 
             return objcreator_.make_symbol("ok");
 
@@ -124,11 +130,12 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
 
             if (env_->set_variable_value(
                         exp->cadr()->to_symbol(), 
-                        eval(exp->cdr()->cadr()))){
+                        eval(exp->caddr()))){
 
                 return objcreator_.make_symbol("ok");
 
             } else {
+
                 std::cerr << "Error: unbound variable " 
                           << exp->cadr()->to_symbol()->value()
                           << "." << std::endl;

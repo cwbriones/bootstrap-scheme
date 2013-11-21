@@ -125,15 +125,19 @@ SchemeObject* SchemeObject::caar() {
 }
 
 SchemeObject* SchemeObject::cdar() {
-    return cdr()->car();
+    return car()->cdr();
 }
 
 SchemeObject* SchemeObject::cadr() {
-    return car()->cdr();
+    return cdr()->car();
 }
 
 SchemeObject* SchemeObject::cddr() {
     return cdr()->cdr();
+}
+
+SchemeObject* SchemeObject::caddr() {
+    return cdr()->cdr()->car();
 }
 
 SchemeObject* SchemeObject::cdddr() {
@@ -205,4 +209,3 @@ SchemePair::SchemePair(SchemeObject* car, SchemeObject* cdr) :
 //==============================================================================
 // SchemeProcedure
 //==============================================================================
-

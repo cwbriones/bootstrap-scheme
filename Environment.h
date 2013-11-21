@@ -13,7 +13,7 @@ public:
     Environment();
     Environment extend();
 
-    bool define_variable_value(SchemeSymbol* symbol, SchemeObject* value);
+    void define_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool set_variable_value(SchemeSymbol* symbol, SchemeObject* value);
 
     SchemeObject* lookup_variable_value(SchemeSymbol* symbol);

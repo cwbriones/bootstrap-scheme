@@ -2,7 +2,7 @@
 #include "SchemeObject.h"
 
 SchemeObjectCreator::SchemeObjectCreator() {
-
+    init_symbols();
 }
 
 //============================================================================
@@ -57,7 +57,12 @@ SchemeObject* SchemeObjectCreator::make_procedure() {
 //============================================================================
 
 void SchemeObjectCreator::init_symbols() {
+    make_symbol("quote");
+    make_symbol("define");
+    make_symbol("set!");
 
+    make_symbol("ok");
+    make_symbol("if");
 }
 
 void SchemeObjectCreator::init_arithmetic_operators() {

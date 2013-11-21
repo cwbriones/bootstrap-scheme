@@ -73,6 +73,7 @@ public:
     SchemeObject* cdar();
     SchemeObject* cadr();
     SchemeObject* cddr();
+    SchemeObject* caddr();
 
     SchemeObject* cdddr();
     SchemeObject* cons(SchemeObject* cdr);
