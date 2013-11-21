@@ -4,22 +4,23 @@
 #include <unordered_map>
 #include <string>
 
-class Object;
+#include "SchemeObject.h"
+
+class SchemeObject;
 
 class Environment {
-    public:
-        Environment();
-        void bind(Object* symbol, Object* value);
-        bool set(Object* symbol, Object* value);
+public:
+    Environment();
+    Environment extend();
 
-        Environment extend();
-        Environment* get_enclosing_env();
+    bool define_variable_value(SchemeSymbol* symbol, SchemeObject* value);
+    bool set_variable_value(SchemeSymbol* symbol, SchemeObject* value);
 
-        Object* get_value_of_symbol(Object* symbol);
-    private:
-        Environment* enclosing_ = nullptr;
-
-        std::unordered_map<std::string, Object*> bindings_;
+    SchemeObject* lookup_variable_value(SchemeSymbol* symbol);
+    Environment* get_enclosing_env();
+private:
+    Environment* enclosing_ = nullptr;
+    std::unordered_map<std::string, SchemeObject*> frame_bindings_;
 };
 
 

@@ -1,20 +1,19 @@
-#include "Object.h"
 #include "Environment.h"
+#include "SchemeObject.h"
 
-Environment::Environment(){}
+Environment::Environment() {}
 
-void Environment::bind(Object* symbol, Object* value){
-    bindings_[ symbol->data.symbol.value ] = value;
-}
+bool Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
 
-bool Environment::set(Object* symbol, Object* value){
     Environment* env = this;
 
     while (env){
-        if (bindings_.find(symbol->data.symbol.value) == bindings_.end()){
+        auto found = env->frame_bindings_.find(symbol->value());
+
+        if (found == frame_bindings_.end()){
             env = env->enclosing_;
         } else {
-            bind(symbol, value);
+            set_variable_value(symbol, value);
             return true;
         }
     }
@@ -22,14 +21,28 @@ bool Environment::set(Object* symbol, Object* value){
     return false;
 }
 
-Object* Environment::get_value_of_symbol(Object* symbol){
+bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
+    auto found = frame_bindings_.find(symbol->value());
+    if (found == frame_bindings_.end()) {
+        return false;
+    }
+
+    found->second = value;
+
+    return true;
+}
+
+SchemeObject* Environment::lookup_variable_value(SchemeSymbol* symbol) {
+
     Environment* env = this;
 
     while (env){
-        if (env->bindings_.find(symbol->data.symbol.value) == env->bindings_.end()){
+        auto found = env->frame_bindings_.find(symbol->value());
+
+        if (found == env->frame_bindings_.end()){
             env = env->enclosing_;
         } else {
-            return env->bindings_[symbol->data.symbol.value];
+            return env->frame_bindings_[symbol->value()];
         }
     }
 

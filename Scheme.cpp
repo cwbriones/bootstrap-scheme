@@ -22,8 +22,8 @@
 
 #include "Scheme.h"
 #include "Reader.h"
-#include "Object.h"
-#include "ObjectCreator.h"
+#include "SchemeObject.h"
+#include "SchemeObjectCreator.h"
 #include "Environment.h"
 
 #include <iostream>
@@ -32,9 +32,12 @@
 #include <cstdlib>
 #include <cstring>
 
-Scheme::Scheme(std::istream& instream) : objcreator_(), 
-    reader_(&objcreator_, instream), cursor_(">>>"){ 
-        env_ = &global_env_;
+Scheme::Scheme(std::istream& instream) : 
+    cursor_(">>>"),
+    objcreator_(), 
+    reader_(&objcreator_, instream)
+{ 
+        env_ = &the_global_environment_;
 }
 
 void Scheme::print_welcome_message(){
@@ -42,27 +45,38 @@ void Scheme::print_welcome_message(){
 	std::cout << "Use ctrl-c to exit." << std::endl;
 }
 
-/********************** EVALUATE *****************************/
+//============================================================================
+// Evaluate
+//============================================================================
 
-// For now we just echo until we have lists and symbols
-Object* Scheme::eval(Object* exp){
+SchemeObject* Scheme::cons(SchemeObject* car, SchemeObject* cdr) {
+    return car->cons(cdr);
+}
+
+SchemeObject* Scheme::eval(SchemeObject* exp){
 
     if (exp->is_self_evaluating()){
+
         return exp;
-    }
-    else if (exp->is_symbol()){
-        Object* val = env_->get_value_of_symbol(exp);
-        if (!val){
-            std::cerr << "Error: unbound variable " << exp->data.symbol.value
+
+    } else if (exp->is_symbol()){
+        SchemeObject* value = env_->lookup_variable_value(exp->to_symbol());
+
+        if (!value){
+            std::cerr << "Error: unbound variable " << exp->to_symbol()->value()
                       << "." << std::endl;
             exit(1);
         }
-        return val;
-    }
-    else if (exp->is_tagged_list("if")){
-        if (exp->length_as_list() == 4){
+
+        return value;
+
+    } else if (exp->is_tagged_list("if")) {
+
+        if (exp->length_as_list() == 4) {
+
             exp = exp->cdr();
-            if (exp->car()->is_false_obj()){
+
+            if (exp->car()->is_false_obj()) {
                 return eval(exp->cdr()->cadr());
             } else {
                 return eval(exp->cadr());
@@ -71,35 +85,52 @@ Object* Scheme::eval(Object* exp){
             std::cerr << "Error: cannot evaluate if form" << std::endl;
             exit(1);
         }
-    }
-    else if (exp->is_tagged_list("quote")){
+
+    } else if (exp->is_tagged_list("quote")){
+
         return exp->cadr();
-    }
-    else if (exp->is_tagged_list("cons")){
+
+    } else if (exp->is_tagged_list("cons")){
         // Should probably reimplement this as a proper procedure
         if (exp->length_as_list() == 3){
+
             return cons(eval(exp->cadr()), eval(exp->cdr()->cadr()));
+
         } else {
+
             std::cerr << "Error: cannot evaluate cons form" << std::endl;
             exit(1);
+
         }
-    }
-    else if (exp->is_tagged_list("define")){
+
+    } else if (exp->is_tagged_list("define")){
+
         if (exp->length_as_list() == 3){
-            env_->bind(exp->cadr(), eval(exp->cdr()->cadr()));
+
+            env_->define_variable_value(
+                    exp->cadr()->to_symbol(), 
+                    eval(exp->cdr()->cadr()));
+
             return objcreator_.make_symbol("ok");
+
         } else {
             std::cerr << "Error: cannot evaluate def form" << std::endl;
             exit(1);
         }
-    }
-    else if (exp->is_tagged_list("set!")){
+
+    } else if (exp->is_tagged_list("set!")){
+
         if (exp->length_as_list() == 3){
-            if (env_->set(exp->cadr(), 
-                        eval(exp->cdr()->cadr()) )){
+
+            if (env_->set_variable_value(
+                        exp->cadr()->to_symbol(), 
+                        eval(exp->cdr()->cadr()))){
+
                 return objcreator_.make_symbol("ok");
+
             } else {
-                std::cerr << "Error: unbound variable " << exp->cadr()->data.symbol.value
+                std::cerr << "Error: unbound variable " 
+                          << exp->cadr()->to_symbol()->value()
                           << "." << std::endl;
                 exit(1);
             }
@@ -107,8 +138,7 @@ Object* Scheme::eval(Object* exp){
             std::cerr << "Error: cannot evaluate set! form" << std::endl;
             exit(1);
         }
-    }
-    else {
+    } else {
         std::cerr << "Error: cannot evaluate unknown expression type." << std::endl;
         exit(1);
     }
@@ -117,23 +147,22 @@ Object* Scheme::eval(Object* exp){
     exit(1);
 }
 
-Object* Scheme::cons(Object* exp1, Object* exp2){
-    return objcreator_.make_pair(exp1, exp2);
-}
+//============================================================================
+// Print
+//============================================================================
 
-/*********************** PRINT *******************************/
-
-void Scheme::write(Object* obj){
-	switch (obj->type){
-		case Object::FIXNUM:
-			std::cout << obj->data.fixnum.value;
+void Scheme::write(SchemeObject* obj){
+	switch (obj->type()){
+		case SchemeObject::FIXNUM:
+			std::cout << obj->to_fixnum()->value();
 			break;
-        case Object::BOOLEAN:
+        case SchemeObject::BOOLEAN:
             std::cout << '#' << ((obj->is_true_obj()) ? 't' : 'f');
             break;
-        case Object::CHARACTER:
+        case SchemeObject::CHARACTER:
             std::cout << "#\\";
-            switch(obj->data.character.value){
+
+            switch(obj->to_character()->value()){
                 case '\n':
                     std::cout << "newline";
                     break;
@@ -144,22 +173,22 @@ void Scheme::write(Object* obj){
                     std::cout << "tab";
                     break;
                 default:
-                    std::cout << obj->data.character.value;
+                    std::cout << obj->to_character()->value();
             }
             break;
-        case Object::STRING:
-            write_string(obj->data.string.value);
+        case SchemeObject::STRING:
+            write_string(obj->to_string()->value());
             break;
-        case Object::PAIR:
+        case SchemeObject::PAIR:
             std::cout << "(";
-            write_pair(obj);
+            write_pair(obj->to_pair());
             std::cout << ")";
             break;
-        case Object::EMPTY_LIST:
+        case SchemeObject::EMPTY_LIST:
             std::cout << "()";
             break;
-        case Object::SYMBOL:
-            std::cout << obj->data.symbol.value;
+        case SchemeObject::SYMBOL:
+            std::cout << obj->to_symbol()->value();
             break;
 		default:
 			std::cerr << "unknown type, cannot write." << std::endl;
@@ -167,15 +196,15 @@ void Scheme::write(Object* obj){
 	}
 }
 
-void Scheme::write_pair(Object* pair){
-    Object* car_obj = pair->data.pair.car;
-    Object* cdr_obj = pair->data.pair.cdr;
+void Scheme::write_pair(SchemePair* pair){
+    SchemeObject* car_obj = pair->car();
+    SchemeObject* cdr_obj = pair->cdr();
 
     write(car_obj);
 
     if (cdr_obj->is_pair()){
         std::cout << " ";
-        write_pair(cdr_obj);
+        write_pair(cdr_obj->to_pair());
         return;
     } 
     else if (cdr_obj->is_empty_list()){
@@ -210,14 +239,15 @@ void Scheme::write_string(std::string str){
     std::cout << '\"';
 }
 
-/************************ REPL *******************************/
+//============================================================================
+// REPL
+//============================================================================
 
 void Scheme::main_loop(){
 	print_welcome_message();
 	while (true) {
 		std::cout << cursor_ << ' ';
-		write(eval( reader_.read() ));
+		write(eval(reader_.read()));
 		std::cout << std::endl;
 	}
 }
-

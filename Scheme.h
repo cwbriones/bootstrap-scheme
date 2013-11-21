@@ -7,9 +7,9 @@
 
 #include "Environment.h"
 #include "Reader.h"
-#include "ObjectCreator.h"
+#include "SchemeObjectCreator.h"
 
-class Object;
+class SchemeObject;
 
 class Scheme {
 public:
@@ -18,22 +18,22 @@ public:
 private:
 	const std::string cursor_;
 
-    Environment global_env_;
-    Environment* env_;    
+    Environment the_global_environment_;
+    Environment* env_;
+    
+    // Model
+    SchemeObjectCreator objcreator_;
     
     // Read
     SchemeReader reader_;
-    
-    // Model
-    ObjectCreator objcreator_;
 
     // Evaluate
-    Object* eval(Object* exp);
-    Object* cons(Object* exp1, Object* exp2);
+    SchemeObject* cons(SchemeObject* car, SchemeObject* cdr);
+    SchemeObject* eval(SchemeObject* exp);
 
     // Print
-	void write(Object* obj);
-    void write_pair(Object* obj);
+	void write(SchemeObject* obj);
+    void write_pair(SchemePair* obj);
     void write_string(std::string);
 
     void print_welcome_message();

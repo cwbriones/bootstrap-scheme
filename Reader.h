@@ -4,22 +4,22 @@
 #include <string>
 #include <iostream>
 
-class Object;
-class ObjectCreator;
+class SchemeObject;
+class SchemeObjectCreator;
 
 class SchemeReader {
     public:
-        SchemeReader(ObjectCreator* objcreator);
-        SchemeReader(ObjectCreator* objcreator, std::istream& instream);
-        Object* read();
+        SchemeReader(SchemeObjectCreator* objcreator);
+        SchemeReader(SchemeObjectCreator* objcreator, std::istream& instream);
+        SchemeObject* read();
     private:
         std::istream& instream_ = std::cin;
-        ObjectCreator* objcreator_ = nullptr;
+        SchemeObjectCreator* objcreator_ = nullptr;
 
-        Object* read_pair();
-        Object* read_string();
-        Object* read_character();
-        Object* read_symbol();
+        SchemeObject* read_pair();
+        SchemeObject* read_string();
+        SchemeObject* read_character();
+        SchemeObject* read_symbol();
 
         void eat_whitespace();
         void eat_expected_word(std::string word);

@@ -1,9 +1,26 @@
 #ifndef SCHEMEOBJECT_H_
 #define SCHEMEOBJECT_H_
 
-#include <unordered_set>
+#include <unordered_map>
 #include <string>
 #include <memory>
+
+
+// Forward Declarations needed
+template <class T>
+class SchemePrimitive;
+
+typedef SchemePrimitive<int> SchemeFixnum;
+typedef SchemePrimitive<bool> SchemeBoolean;
+typedef SchemePrimitive<char> SchemeCharacter;
+typedef SchemePrimitive<std::string> SchemeString;
+
+class SchemePair;
+class SchemeSymbol;
+
+//============================================================================
+// SchemeObject
+//============================================================================
 
 class SchemeObject {
 public:
@@ -18,60 +35,109 @@ public:
         EMPTY_LIST,
         PAIR,
         SYMBOL,
-        PROCEDURE
+        PRIMPROCEDURE
     };
-    Type type();
+    Type type() const;
 
+    // Casts
+    SchemeFixnum* to_fixnum();
+    SchemeBoolean* to_boolean();
+    SchemeCharacter* to_character();
+    SchemeString* to_string();
+    SchemePair* to_pair();
+    SchemeSymbol* to_symbol();
+
+    // Boolean operations
     bool is_tagged_list(std::string tag);
     bool is_tagged_list(SchemeObject* tag);
     bool is_self_evaluating();
 
-    SchemeFixnum* as_fixnum();
-    SchemeBoolean* as_boolean();
-    SchemeCharacter* as_character();
-    SchemeString* as_string();
-    SchemePair* as_pair();
-    SchemeSymbol* as_symbol();
-private:
-    SchemeObject(Type type);
+    bool is_true_obj();
+    bool is_false_obj();
+    bool is_empty_list();
+
+    bool is_fixnum();
+    bool is_boolean();
+    bool is_character();
+    bool is_string();
+    bool is_pair();
+    bool is_symbol();
+
+    // Specific checks for object equality
+
+    // Pair Operations
+    SchemeObject* car();
+    SchemeObject* cdr();
+
+    SchemeObject* caar();
+    SchemeObject* cdar();
+    SchemeObject* cadr();
+    SchemeObject* cddr();
+
+    SchemeObject* cdddr();
+    SchemeObject* cons(SchemeObject* cdr);
+
+    int length_as_list();
+
+    // Environment related methods
+    // SchemeObject* first_frame();
+    // SchemeObject* make_frame(SchemeObject* obj);
+    // SchemeObject* frame_variables(SchemeObject* obj);
+    // SchemeObject* frame_values(SchemeObject* obj);
+    // SchemeObject* enclosing_enviroment();
+protected:
+    SchemeObject(SchemeObject::Type t);
     Type type_ = UNKNOWN;
+
+    // Singletons
+    static SchemeBoolean the_true_object_;
+    static SchemeBoolean the_false_object_;
+    static SchemePair the_empty_list_;
 
     friend class SchemeObjectCreator;
 };
 
-template <class T>
-class PrimitiveObject : public SchemeObject {
-public:
-    PrimitiveObject(T value) :
-        SchemeObject(type),
-        value_(value) {}
+//============================================================================
+// SchemePrimitive (int, bool, char, string), saves some typing
+//============================================================================
 
+template <class T>
+class SchemePrimitive : public SchemeObject {
+public:
     T value() const { return value_; }
 private:
+    SchemePrimitive(SchemeObject::Type t, T val) :
+        SchemeObject(t),
+        value_(val) {}
+
     T value_;
+
+    friend class SchemeObject;
+    friend class SchemeObjectCreator;
 };
 
-typedef PrimitiveObject<int> SchemeFixnum;
-typedef PrimitiveObject<bool> SchemeBoolean;
-typedef PrimitiveObject<char> SchemeCharacter;
-typedef PrimitiveObject<std::string> SchemeString;
+//============================================================================
+// SchemeSymbol
+//============================================================================
+
 
 class SchemeSymbol : public SchemeObject {
 public:
-    static const std::unordered_set<std::string>& all_symbols() {
+    static SchemeSymbol* make_symbol(std::string& val);
+    static const std::unordered_map<std::string, SchemeSymbol*>& all_symbols() {
         return symbols_;
     }
+    std::string value(){ return value_; }
 private:
-    SchemeSymbol(std::string value) :
-        SchemeObject(SchemeObject::SYMBOL),
-        value_(value)
-    {
-        symbols_.insert(value);
-    }
+    SchemeSymbol(std::string& value);
 
     std::string value_;
-    static std::unordered_set<std::string> symbols_;
+    static std::unordered_map<std::string, SchemeSymbol*> symbols_;
 };
+
+//============================================================================
+// SchemePair
+//============================================================================
 
 class SchemePair : public SchemeObject {
 public:
@@ -82,27 +148,46 @@ public:
     SchemeObject* cdr() {
         return cdr_;
     }
+    int length() {
+        return length_;
+    }
 
-    bool is_proper_list();
+    bool is_proper_list() {
+        return proper_list_;
+    }
 private:
+    SchemePair();
+    SchemePair(SchemeObject* car, SchemeObject* cdr);
+
     SchemeObject* car_;
     SchemeObject* cdr_;
 
     bool proper_list_;
+    int length_;
+
+    friend class SchemeObject;
+    friend class SchemeObjectCreator;
 };
+
+//============================================================================
+// SchemeProcedure
+//============================================================================
 
 typedef SchemeObject* (*Procedure)(SchemeObject*);
 
 class SchemePrimProcedure : public SchemeObject {
 public:
-    SchemeProcedure(Procedure fn) : func_(fn) {}
+    SchemePrimProcedure(Procedure fn) : 
+        SchemeObject(Type::PRIMPROCEDURE), 
+        func_(fn) {}
+
     int argc() {
         return argc_;
     }
 
     bool is_apply(){ return false; }
     bool is_eval(){ return false; }
-private:
+protected:
     int argc_;
     Procedure func_;
 };

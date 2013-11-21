@@ -1,13 +1,13 @@
 #include "Reader.h"
-#include "ObjectCreator.h"
+#include "SchemeObjectCreator.h"
 
 #include <unordered_set>
 
-SchemeReader::SchemeReader(ObjectCreator* objcreator){
+SchemeReader::SchemeReader(SchemeObjectCreator* objcreator){
     objcreator_ = objcreator;
 }
 
-SchemeReader::SchemeReader(ObjectCreator* objcreator, std::istream& instream) : 
+SchemeReader::SchemeReader(SchemeObjectCreator* objcreator, std::istream& instream) : 
     objcreator_(objcreator), instream_(instream) {
 }
 
@@ -59,7 +59,7 @@ void SchemeReader::peek_expecting_delimiter(){
     }
 }
 
-Object* SchemeReader::read(){
+SchemeObject* SchemeReader::read(){
 	char c;
 	short sign = 1;
 	long num = 0;
@@ -119,7 +119,7 @@ Object* SchemeReader::read(){
         return read_symbol();
     }
     else if (c == '\'' || c == '`'){
-        return objcreator_->make_special_form("quote", read());
+        return objcreator_->make_tagged_list("quote", read());
     }
     else {
 		std::cerr << "bad input. unexpected character '" << c << "'." << std::endl;
@@ -129,9 +129,9 @@ Object* SchemeReader::read(){
 	exit(1);
 }
 
-Object* SchemeReader::read_pair(){
-    Object* car_obj = nullptr;
-    Object* cdr_obj = nullptr;
+SchemeObject* SchemeReader::read_pair(){
+    SchemeObject* car_obj = nullptr;
+    SchemeObject* cdr_obj = nullptr;
 
     eat_whitespace();
     char c = instream_.peek();
@@ -147,7 +147,8 @@ Object* SchemeReader::read_pair(){
     if (c == '.'){
         // Dot notation, cons cell
         if (!is_delimiter( instream_.peek() )){
-            std::cerr << "Unexpected character \"" << c << ". Was expecting delimiter." << std::endl;
+            std::cerr << "Unexpected character \"" << c 
+                << ". Was expecting delimiter." << std::endl;
             exit(1);
         }
 
@@ -157,7 +158,8 @@ Object* SchemeReader::read_pair(){
         c = instream_.get();
 
         if (c != ')'){
-            std::cerr << "Unexpected character \"" << c << ". Was expecting closing ')'" << std::endl;
+            std::cerr << "Unexpected character \"" << c 
+                << ". Was expecting closing ')'" << std::endl;
             exit(1);
         }
     } else {
@@ -168,7 +170,7 @@ Object* SchemeReader::read_pair(){
     return objcreator_->make_pair(car_obj, cdr_obj);
 }
 
-Object* SchemeReader::read_string(){
+SchemeObject* SchemeReader::read_string(){
     std::string buffer;
     char c = '\0';
 
@@ -197,7 +199,7 @@ Object* SchemeReader::read_string(){
     return objcreator_->make_string(buffer);
 }
 
-Object* SchemeReader::read_character(){
+SchemeObject* SchemeReader::read_character(){
     int c;
     c = instream_.get();
 
@@ -230,7 +232,7 @@ Object* SchemeReader::read_character(){
     return objcreator_->make_character(c);
 }
 
-Object* SchemeReader::read_symbol(){
+SchemeObject* SchemeReader::read_symbol(){
     // Allowable Symbol characters:
     // a-z A-Z + - . * / < = > ! ? : $ % _ & ~ ^ .
     std::string buffer;
