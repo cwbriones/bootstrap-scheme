@@ -3,8 +3,9 @@
 
 #include <string>
 
+#include "Environment.h"
+
 class SchemeObject;
-class Environment;
 
 class SchemeObjectCreator {
 public:
@@ -20,6 +21,9 @@ public:
 
     SchemeObject* make_special_form(std::string tag, SchemeObject* cdr);
     SchemeObject* make_tagged_list(std::string tag, SchemeObject* obj);
+
+    SchemeObject* make_comp_procedure(
+            Environment::Ptr& env, SchemeObject* params, SchemeObject* body);
 
     void setup_environment(Environment* env);
 private:

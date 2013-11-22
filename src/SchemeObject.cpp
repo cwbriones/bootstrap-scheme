@@ -1,5 +1,6 @@
 #include "SchemeObject.h"
 #include "Procedures/SchemePrimProcedure.h"
+#include "Procedures/SchemeCompoundProcedure.h"
 
 SchemeBoolean SchemeObject::the_false_object_ = 
     SchemeBoolean(SchemeObject::BOOLEAN, false);
@@ -41,6 +42,10 @@ SchemeSymbol* SchemeObject::to_symbol() {
 
 SchemePrimProcedure* SchemeObject::to_prim_procedure() {
     return static_cast<SchemePrimProcedure*>(this);
+}
+
+SchemeCompoundProcedure* SchemeObject::to_comp_procedure() {
+    return static_cast<SchemeCompoundProcedure*>(this);
 }
 
 int SchemeObject::length_as_list() {
@@ -88,6 +93,10 @@ bool SchemeObject::is_symbol() {
 
 bool SchemeObject::is_prim_procedure() {
     return type_ == Type::PRIMPROCEDURE;
+}
+
+bool SchemeObject::is_comp_procedure() {
+    return type_ == Type::COMPPROCEDURE;
 }
 
 bool SchemeObject::is_proper_list() {

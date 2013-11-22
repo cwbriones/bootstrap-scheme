@@ -17,6 +17,7 @@ typedef SchemePrimitive<std::string> SchemeString;
 class SchemePair;
 class SchemeSymbol;
 class SchemePrimProcedure;
+class SchemeCompoundProcedure;
 
 //============================================================================
 // SchemeObject
@@ -48,6 +49,7 @@ public:
     SchemePair* to_pair();
     SchemeSymbol* to_symbol();
     SchemePrimProcedure* to_prim_procedure();
+    SchemeCompoundProcedure* to_comp_procedure();
 
     // Boolean operations
     bool is_tagged_list(std::string tag);
@@ -65,6 +67,7 @@ public:
     bool is_pair();
     bool is_symbol();
     bool is_prim_procedure();
+    bool is_comp_procedure();
     bool is_proper_list();
 
     bool is_application();

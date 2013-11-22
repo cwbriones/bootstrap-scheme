@@ -1,6 +1,7 @@
 #include "Environment.h"
 
 #include "Procedures/SchemePrimProcedure.h"
+#include "Procedures/SchemeCompoundProcedure.h"
 #include "SchemeObjectCreator.h"
 #include "SchemeObject.h"
 
@@ -52,6 +53,14 @@ SchemeObject* SchemeObjectCreator::make_tagged_list(std::string tag, SchemeObjec
             make_symbol(tag), 
             make_pair(obj, make_empty_list())
         );
+}
+
+SchemeObject* SchemeObjectCreator::make_comp_procedure(
+        Environment::Ptr& env,
+        SchemeObject* params, 
+        SchemeObject* body) 
+{
+    return new SchemeCompoundProcedure(env, params, body);
 }
 
 //============================================================================

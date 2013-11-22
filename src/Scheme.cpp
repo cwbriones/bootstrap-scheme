@@ -16,10 +16,6 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-// TODO: Use more C++-style code to read in single character input,
-//       like cin >> c; instead of checking against EOF
-//       then I'd only need iostream and string
-
 #include "Scheme.h"
 #include "Reader.h"
 #include "SchemeObject.h"
@@ -27,6 +23,7 @@
 #include "Environment.h"
 
 #include "Procedures/SchemePrimProcedure.h"
+#include "Procedures/SchemeCompoundProcedure.h"
 
 #include <iostream>
 #include <string>
@@ -34,6 +31,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <vector>
+#include <cassert>
 
 Scheme::Scheme(std::istream& instream) : 
     cursor_(">>>"),
@@ -41,14 +39,17 @@ Scheme::Scheme(std::istream& instream) :
     reader_(&obj_creator_, instream)
 { 
     // Populate environment with bindings to built-ins
-    obj_creator_.setup_environment(&the_global_environment_);
-    // Save current environment as global
-    env_ = &the_global_environment_;
+    the_global_environment_ = std::make_shared<Environment>();
+    obj_creator_.setup_environment(the_global_environment_.get());
 }
 
-void Scheme::print_welcome_message(){
+void Scheme::print_welcome_message() {
 	std::cout << "Welcome to Bootstrap Scheme. " << std::endl;
 	std::cout << "Use ctrl-c to exit." << std::endl;
+}
+
+void Scheme::print_goodbye_message() {
+    std::cout << "Happy Happy Joy Joy." << std::endl;
 }
 
 //============================================================================
@@ -59,33 +60,45 @@ SchemeObject* Scheme::cons(SchemeObject* car, SchemeObject* cdr) {
     return obj_creator_.make_pair(car, cdr);
 }
 
-SchemeObject* Scheme::eval(SchemeObject* exp){
+SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
+    assert(the_global_environment_);
 
+    tailcall:
     if (exp->is_self_evaluating()){
 
         return exp;
+
     } else if (exp->is_symbol()){
 
-        SchemeObject* value = env_->lookup_variable_value(exp->to_symbol());
+        SchemeObject* value = env->lookup_variable_value(exp->to_symbol());
 
         if (!value){
-            std::cerr << "Error: unbound variable " << exp->to_symbol()->value()
-                      << "." << std::endl;
+            std::cerr << "Error: unbound variable \'" << exp->to_symbol()->value()
+                      << "\'." << std::endl;
             exit(1);
         }
 
         return value;
+
+    } else if (exp->is_tagged_list("lambda")) {
+   
+        return obj_creator_.make_comp_procedure(
+                env,
+                exp->cadr(),
+                exp->cddr());
 
     } else if (exp->is_tagged_list("if")) {
         if (exp->length_as_list() == 4) {
 
             exp = exp->cdr();
 
-            if (exp->car()->is_false_obj()) {
-                return eval(exp->cdr()->cadr());
+            if (exp->car()->is_true_obj()) {
+                exp = exp->cadr();
             } else {
-                return eval(exp->cadr());
+                exp = exp->caddr();
             }
+            goto tailcall;
+
         } else {
             std::cerr << "Error: cannot evaluate if form" << std::endl;
             exit(1);
@@ -94,9 +107,9 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
         return exp->cadr();
     } else if (exp->is_tagged_list("define")){
         if (exp->length_as_list() == 3){
-            env_->define_variable_value(
+            env->define_variable_value(
                     exp->cadr()->to_symbol(), 
-                    eval(exp->caddr()));
+                    eval(exp->caddr(), env));
             return obj_creator_.make_symbol("ok");
         } else {
             std::cerr << "Error: cannot evaluate def form" << std::endl;
@@ -104,9 +117,9 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
         }
     } else if (exp->is_tagged_list("set!")){
         if (exp->length_as_list() == 3){
-            if (env_->set_variable_value(
+            if (env->set_variable_value(
                         exp->cadr()->to_symbol(), 
-                        eval(exp->caddr()))){
+                        eval(exp->caddr(), env))){
                 return obj_creator_.make_symbol("ok");
             } else {
                 std::cerr << "Error: unbound variable " 
@@ -119,10 +132,27 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
             exit(1);
         }
     } else if (exp->is_application()) {
-        SchemeObject* proc = eval(exp->car());
-        SchemeObject* args = get_value_of_args(exp->cdr());
+
+        SchemeObject* proc = eval(exp->car(), env);
+        SchemeObject* args = get_value_of_args(exp->cdr(), env);
+
         if (proc->is_prim_procedure()) {
+
             return proc->to_prim_procedure()->func(args);
+
+        } else if (proc->is_comp_procedure()) {
+
+            SchemeCompoundProcedure* comp = proc->to_comp_procedure();
+            env = env->extend(comp->params(), args);
+
+            exp = comp->body();
+            while (exp->length_as_list() > 1) {
+                eval(exp->car(), env);
+                exp = exp->cdr();
+            }
+            exp = exp->car();
+            goto tailcall;
+
         } else {
             std::cerr << "Error: Cannot apply object." << std::endl;
             exit(1);
@@ -136,7 +166,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
     exit(1);
 }
 
-SchemeObject* Scheme::get_value_of_args(SchemeObject* args) {
+SchemeObject* Scheme::get_value_of_args(SchemeObject* args, Environment::Ptr& env) {
     if (!args->is_proper_list()) {
         std::cout << "Error: ill-formed argument list" << std::endl;
         exit(1);
@@ -147,7 +177,7 @@ SchemeObject* Scheme::get_value_of_args(SchemeObject* args) {
 
     while (!args->is_empty_list()) {
         // Evaluate each item and add it to the list
-        stack.push_back(eval(args->car()));
+        stack.push_back(eval(args->car(), env));
         args = args->cdr();
     }
     SchemeObject* list = obj_creator_.make_empty_list();
@@ -203,6 +233,9 @@ void Scheme::write(SchemeObject* obj){
             break;
         case SchemeObject::PRIMPROCEDURE:
             std::cout << "#<primitive-procedure>";
+            break;
+        case SchemeObject::COMPPROCEDURE:
+            std::cout << "#<compound-procedure>";
             break;
 		default:
 			std::cerr << "unknown type, cannot write." << std::endl;
@@ -261,7 +294,8 @@ void Scheme::main_loop(){
 	print_welcome_message();
 	while (true) {
 		std::cout << cursor_ << ' ';
-		write(eval(reader_.read()));
+		write(eval(reader_.read(), the_global_environment_));
 		std::cout << std::endl;
 	}
+    print_goodbye_message();
 }

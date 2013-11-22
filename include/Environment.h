@@ -11,18 +11,20 @@ class SchemeObjectCreator;
 
 class Environment {
 public:
-    typedef std::unique_ptr<Environment> Ptr;
+    typedef std::shared_ptr<Environment> Ptr;
 
     Environment() :
         enclosing_(nullptr) {}
 
     Environment(Environment* enclosing) : 
         enclosing_(enclosing) {}
+    ~Environment();
 
-    Environment::Ptr extend();
+    Environment::Ptr extend(SchemeObject* vars, SchemeObject* vals);
 
     void define_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool set_variable_value(SchemeSymbol* symbol, SchemeObject* value);
+    bool variable_is_defined(std::string var);
 
     SchemeObject* lookup_variable_value(SchemeSymbol* symbol);
     Environment* get_enclosing_env();

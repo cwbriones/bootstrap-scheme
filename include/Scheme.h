@@ -21,16 +21,15 @@ private:
     // Model
     SchemeObjectCreator obj_creator_;
 
-    Environment the_global_environment_;
-    Environment* env_;
+    Environment::Ptr the_global_environment_;
     
     // Read
     SchemeReader reader_;
 
     // Evaluate
     SchemeObject* cons(SchemeObject* car, SchemeObject* cdr);
-    SchemeObject* eval(SchemeObject* exp);
-    SchemeObject* get_value_of_args(SchemeObject* args);
+    SchemeObject* eval(SchemeObject* exp, Environment::Ptr env);
+    SchemeObject* get_value_of_args(SchemeObject* args, Environment::Ptr& env);
 
     // Print
 	void write(SchemeObject* obj);
@@ -38,6 +37,7 @@ private:
     void write_string(std::string);
 
     void print_welcome_message();
+    void print_goodbye_message();
 };
 
 
