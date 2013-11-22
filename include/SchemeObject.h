@@ -81,7 +81,6 @@ public:
     SchemeObject* caddr();
 
     SchemeObject* cdddr();
-    SchemeObject* cons(SchemeObject* cdr);
 
     int length_as_list();
 

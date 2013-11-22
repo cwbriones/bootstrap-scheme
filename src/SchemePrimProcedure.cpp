@@ -129,3 +129,11 @@ SchemeObject* SchemeModuloProcedure::func(SchemeObject* args) {
 SchemeObject* SchemePredicateProcedure::func(SchemeObject* args) {
     return obj_creator_->make_boolean(args->car()->type() == target_type_);
 }
+
+//============================================================================
+// List Operations
+//============================================================================
+
+SchemeObject* SchemeConsProcedure::func(SchemeObject* args) {
+    return obj_creator_->make_pair(args->car(), args->cadr());
+}

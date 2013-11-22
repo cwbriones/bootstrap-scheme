@@ -161,10 +161,6 @@ SchemeObject* SchemeObject::cdddr() {
     return cdr()->cdr()->cdr();
 }
 
-SchemeObject* SchemeObject::cons(SchemeObject* cdr) {
-    return new SchemePair(this, cdr);
-}
-
 //============================================================================
 // SchemeSymbol
 //============================================================================

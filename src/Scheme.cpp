@@ -56,7 +56,7 @@ void Scheme::print_welcome_message(){
 //============================================================================
 
 SchemeObject* Scheme::cons(SchemeObject* car, SchemeObject* cdr) {
-    return car->cons(cdr);
+    return obj_creator_.make_pair(car, cdr);
 }
 
 SchemeObject* Scheme::eval(SchemeObject* exp){
@@ -92,14 +92,6 @@ SchemeObject* Scheme::eval(SchemeObject* exp){
         }
     } else if (exp->is_tagged_list("quote")){
         return exp->cadr();
-    } else if (exp->is_tagged_list("cons")){
-        // Should probably reimplement this as a proper procedure
-        if (exp->length_as_list() == 3){
-            return cons(eval(exp->cadr()), eval(exp->caddr()));
-        } else {
-            std::cerr << "Error: cannot evaluate cons form" << std::endl;
-            exit(1);
-        }
     } else if (exp->is_tagged_list("define")){
         if (exp->length_as_list() == 3){
             env_->define_variable_value(

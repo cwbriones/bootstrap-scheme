@@ -48,7 +48,10 @@ SchemeObject* SchemeObjectCreator::make_special_form(std::string tag, SchemeObje
 }
 
 SchemeObject* SchemeObjectCreator::make_tagged_list(std::string tag, SchemeObject* obj) {
-    return new SchemePair(make_symbol(tag), obj->cons(make_empty_list()));
+    return new SchemePair(
+            make_symbol(tag), 
+            make_pair(obj, make_empty_list())
+        );
 }
 
 //============================================================================
@@ -136,6 +139,12 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
     env->define_variable_value(
             make_symbol("procedure?")->to_symbol(),
             new SchemePredicateProcedure(this, SchemeObject::PRIMPROCEDURE)
+        );
+
+    // List operations
+    env->define_variable_value(
+            make_symbol("cons")->to_symbol(),
+            new SchemeConsProcedure(this)
         );
 }
 

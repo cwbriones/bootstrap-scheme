@@ -128,4 +128,17 @@ private:
 //     friend class SchemeObjectCreator;
 // };
 
+//============================================================================
+// List Operations
+//============================================================================
+
+class SchemeConsProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeConsProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 2) {}
+    friend class SchemeObjectCreator;
+};
+
 #endif /* SCHEMEPRIMPROCEDURE_H_ */
