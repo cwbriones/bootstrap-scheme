@@ -35,7 +35,8 @@ public:
         EMPTY_LIST,
         PAIR,
         SYMBOL,
-        PRIMPROCEDURE
+        PRIMPROCEDURE,
+        COMPPROCEDURE
     };
     Type type() const;
 
@@ -124,7 +125,6 @@ private:
 //============================================================================
 // SchemeSymbol
 //============================================================================
-
 
 class SchemeSymbol : public SchemeObject {
 public:

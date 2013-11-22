@@ -2,8 +2,6 @@
 #include "SchemeObject.h"
 #include "SchemeObjectCreator.h"
 
-Environment::Environment() {}
-
 void Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
     Environment* env = this;
 
@@ -79,4 +77,8 @@ SchemeObject* Environment::lookup_variable_value(SchemeSymbol* symbol) {
     }
 
     return nullptr;
+}
+
+Environment::Ptr Environment::extend() {
+    return Environment::Ptr(new Environment(this));
 }

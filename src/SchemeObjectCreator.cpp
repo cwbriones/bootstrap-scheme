@@ -5,7 +5,7 @@
 #include "SchemeObject.h"
 
 SchemeObjectCreator::SchemeObjectCreator() {
-    init_symbols();
+    init_keywords();
 }
 
 //============================================================================
@@ -58,13 +58,14 @@ SchemeObject* SchemeObjectCreator::make_tagged_list(std::string tag, SchemeObjec
 // Initialization
 //============================================================================
 
-void SchemeObjectCreator::init_symbols() {
+void SchemeObjectCreator::init_keywords() {
     make_symbol("quote");
     make_symbol("define");
     make_symbol("set!");
 
     make_symbol("ok");
     make_symbol("if");
+    make_symbol("lambda");
 }
 
 void SchemeObjectCreator::setup_environment(Environment* env) {

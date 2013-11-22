@@ -11,8 +11,15 @@ class SchemeObjectCreator;
 
 class Environment {
 public:
-    Environment();
-    Environment extend();
+    typedef std::unique_ptr<Environment> Ptr;
+
+    Environment() :
+        enclosing_(nullptr) {}
+
+    Environment(Environment* enclosing) : 
+        enclosing_(enclosing) {}
+
+    Environment::Ptr extend();
 
     void define_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool set_variable_value(SchemeSymbol* symbol, SchemeObject* value);
@@ -20,7 +27,7 @@ public:
     SchemeObject* lookup_variable_value(SchemeSymbol* symbol);
     Environment* get_enclosing_env();
 private:
-    Environment* enclosing_ = nullptr;
+    Environment* enclosing_;
     std::unordered_map<std::string, SchemeObject*> frame_bindings_;
 };
 

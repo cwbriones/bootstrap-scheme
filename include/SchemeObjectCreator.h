@@ -23,7 +23,7 @@ public:
 
     void setup_environment(Environment* env);
 private:
-    void init_symbols();
+    void init_keywords();
     void init_type_predicates();
     void init_type_conversions();
 
@@ -63,8 +63,6 @@ private:
     SchemeObject* str_to_number = nullptr;
     SchemeObject* symbol_to_str = nullptr;
     SchemeObject* str_to_symbol = nullptr;
-
-    SchemeObject* alloc_obj();
 };
 
 #endif /* SCHEMEOBJECTCREATOR_H_ */
