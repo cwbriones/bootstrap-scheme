@@ -14,7 +14,7 @@ public:
     SchemeObject* make_fixnum(int value);
     SchemeObject* make_boolean(bool value);
     SchemeObject* make_character(char value);
-    SchemeObject* make_string(std::string& value);
+    SchemeObject* make_string(std::string value);
     SchemeObject* make_pair(SchemeObject* car, SchemeObject* cdr);
     SchemeObject* make_symbol(std::string value);
     SchemeObject* make_empty_list();
@@ -30,8 +30,8 @@ public:
     void setup_environment(Environment* env);
 private:
     void init_keywords();
-    void init_type_predicates();
-    void init_type_conversions();
+    void init_type_predicates(Environment* env);
+    void init_type_conversions(Environment* env);
 
     // -----------------------------
     // Symbols

@@ -2,6 +2,8 @@
 
 #include "Procedures/SchemePrimProcedure.h"
 #include "Procedures/SchemeCompoundProcedure.h"
+#include "Procedures/TypeConversions.h"
+
 #include "SchemeObjectCreator.h"
 #include "SchemeObject.h"
 
@@ -28,7 +30,7 @@ SchemeObject* SchemeObjectCreator::make_character(char value) {
     return new SchemeCharacter(SchemeObject::CHARACTER, value);
 }
 
-SchemeObject* SchemeObjectCreator::make_string(std::string& value) {
+SchemeObject* SchemeObjectCreator::make_string(std::string value) {
     return new SchemeString(SchemeObject::STRING, value);
 }
 
@@ -61,18 +63,18 @@ SchemeObject* SchemeObjectCreator::make_tagged_list(
         SchemeObject* obj2) {
 
     return make_pair(
-            make_symbol(tag), 
-            make_pair(
-                obj1,
-                make_pair(obj2, make_empty_list())
-            )
+        make_symbol(tag), 
+        make_pair(
+            obj1,
+            make_pair(obj2, make_empty_list())
+        )
     );
 }
 
 SchemeObject* SchemeObjectCreator::make_comp_procedure(
-        Environment::Ptr& env,
-        SchemeObject* params, 
-        SchemeObject* body) 
+    Environment::Ptr& env,
+    SchemeObject* params, 
+    SchemeObject* body)
 {
     return new SchemeCompoundProcedure(env, params, body);
 }
@@ -92,7 +94,6 @@ void SchemeObjectCreator::init_keywords() {
 }
 
 void SchemeObjectCreator::setup_environment(Environment* env) {
-    
     // Arithmetic Operators
     env->define_variable_value(
             make_symbol("+")->to_symbol(), 
@@ -130,8 +131,37 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             make_symbol("modulo")->to_symbol(), 
             new SchemeModuloProcedure(this)
         );
+    // List operations
+    env->define_variable_value(
+            make_symbol("list")->to_symbol(),
+            new SchemeListProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("cons")->to_symbol(),
+            new SchemeConsProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("car")->to_symbol(),
+            new SchemeCarProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("set-car!")->to_symbol(),
+            new SchemeSetCarProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("cdr")->to_symbol(),
+            new SchemeCdrProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("set-cdr!")->to_symbol(),
+            new SchemeSetCdrProcedure(this)
+        );
 
-    // Type Predicates
+    init_type_predicates(env);
+    init_type_conversions(env);
+}
+
+void SchemeObjectCreator::init_type_predicates(Environment* env) {
     env->define_variable_value(
             make_symbol("null?")->to_symbol(),
             new SchemePredicateProcedure(this, SchemeObject::EMPTY_LIST)
@@ -165,38 +195,31 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             new SchemePredicateProcedure(this, 
                 SchemeObject::PRIMPROCEDURE | SchemeObject::COMPPROCEDURE)
         );
-
-    // List operations
-    env->define_variable_value(
-            make_symbol("list")->to_symbol(),
-            new SchemeListProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("cons")->to_symbol(),
-            new SchemeConsProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("car")->to_symbol(),
-            new SchemeCarProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("set-car!")->to_symbol(),
-            new SchemeSetCarProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("cdr")->to_symbol(),
-            new SchemeCdrProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("set-cdr!")->to_symbol(),
-            new SchemeSetCdrProcedure(this)
-        );
 }
 
-void SchemeObjectCreator::init_type_predicates() {
-
-}
-
-void SchemeObjectCreator::init_type_conversions() {
-
+void SchemeObjectCreator::init_type_conversions(Environment* env) {
+    env->define_variable_value(
+            make_symbol("char->integer")->to_symbol(),
+            new SchemeCharToIntProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("integer->char")->to_symbol(),
+            new SchemeIntToCharProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("string->int")->to_symbol(),
+            new SchemeStringToIntProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("int->string")->to_symbol(),
+            new SchemeIntToStringProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("string->symbol")->to_symbol(),
+            new SchemeStringToSymbolProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("symbol->string")->to_symbol(),
+            new SchemeSymbolToStringProcedure(this)
+        );
 }
