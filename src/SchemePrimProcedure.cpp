@@ -137,3 +137,11 @@ SchemeObject* SchemePredicateProcedure::func(SchemeObject* args) {
 SchemeObject* SchemeConsProcedure::func(SchemeObject* args) {
     return obj_creator_->make_pair(args->car(), args->cadr());
 }
+
+SchemeObject* SchemeCarProcedure::func(SchemeObject* args) {
+    return args->caar();
+}
+
+SchemeObject* SchemeCdrProcedure::func(SchemeObject* args) {
+    return args->cdar();
+}

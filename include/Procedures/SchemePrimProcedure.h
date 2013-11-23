@@ -141,4 +141,22 @@ private:
     friend class SchemeObjectCreator;
 };
 
+class SchemeCarProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeCarProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
+
+class SchemeCdrProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeCdrProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
+
 #endif /* SCHEMEPRIMPROCEDURE_H_ */

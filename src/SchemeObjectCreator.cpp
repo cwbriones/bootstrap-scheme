@@ -170,6 +170,14 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             make_symbol("cons")->to_symbol(),
             new SchemeConsProcedure(this)
         );
+    env->define_variable_value(
+            make_symbol("car")->to_symbol(),
+            new SchemeCarProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("cdr")->to_symbol(),
+            new SchemeCdrProcedure(this)
+        );
 }
 
 void SchemeObjectCreator::init_type_predicates() {
