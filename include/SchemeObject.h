@@ -26,7 +26,7 @@ class SchemeCompoundProcedure;
 class SchemeObject {
 public:
     typedef std::unique_ptr<SchemeObject> Ptr;
-    virtual ~SchemeObject(){}
+    virtual ~SchemeObject();
 
     enum Type {
               UNKNOWN = 1,
@@ -72,6 +72,7 @@ public:
     bool is_proper_list();
 
     bool is_application();
+    bool is_true();
 
     // Specific checks for object equality
 
@@ -95,6 +96,8 @@ public:
     int mark() {
         return mark_;
     }
+
+    static void object_summary();
 protected:
     SchemeObject(SchemeObject::Type t);
     Type type_ = UNKNOWN;
@@ -107,6 +110,9 @@ protected:
     static SchemePair the_empty_list_;
 
     friend class SchemeObjectCreator;
+
+    static int objects_created_;
+    static int objects_destroyed_;
 };
 
 //============================================================================

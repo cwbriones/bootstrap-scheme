@@ -2,6 +2,8 @@
 #include "SchemeObjectCreator.h"
 #include "Procedures/TypeConversions.h"
 
+#include <sstream>
+
 SchemeObject* SchemeCharToIntProcedure::func(SchemeObject* args) {
     SchemeObject* obj = args->car();
     int value = static_cast<int>(obj->to_character()->value());
@@ -17,9 +19,20 @@ SchemeObject* SchemeIntToCharProcedure::func(SchemeObject* args) {
 }
 
 SchemeObject* SchemeStringToIntProcedure::func(SchemeObject* args) {
+    std::stringstream ss(args->car()->to_string()->value());
+    int value;
+
+    ss >> value;
+
+    return obj_creator_->make_fixnum(value);
 }
 
 SchemeObject* SchemeIntToStringProcedure::func(SchemeObject* args) {
+    std::stringstream ss;
+    int value = args->car()->to_fixnum()->value();
+    ss << value;
+
+    return obj_creator_->make_string(ss.str());
 }
 
 SchemeObject* SchemeStringToSymbolProcedure::func(SchemeObject* args) {

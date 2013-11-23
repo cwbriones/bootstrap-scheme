@@ -2,6 +2,19 @@
 #include "Procedures/SchemePrimProcedure.h"
 #include "Procedures/SchemeCompoundProcedure.h"
 
+#include <iostream>
+
+int SchemeObject::objects_created_ = 0;
+int SchemeObject::objects_destroyed_ = 0;
+
+void SchemeObject::object_summary() {
+    std::cout << "Objects Created: " << objects_created_ << std::endl;
+    std::cout << "Objects Destroyed: " << objects_destroyed_ << std::endl;
+
+    std::cout << "Unaccounted for: " << 
+        objects_created_ - objects_destroyed_ << std::endl;
+}
+
 SchemeBoolean SchemeObject::the_false_object_ = 
     SchemeBoolean(SchemeObject::BOOLEAN, false);
 
@@ -10,7 +23,13 @@ SchemeBoolean SchemeObject::the_true_object_ =
 
 SchemePair SchemeObject::the_empty_list_ = SchemePair();
 
-SchemeObject::SchemeObject(Type t) : type_(t) {}
+SchemeObject::SchemeObject(Type t) : type_(t) {
+    objects_created_++;
+}
+
+SchemeObject::~SchemeObject() {
+    objects_destroyed_++;
+}
 
 SchemeObject::Type SchemeObject::type() const {
     return type_;
@@ -130,6 +149,10 @@ bool SchemeObject::is_self_evaluating() {
 
 bool SchemeObject::is_application() {
     return is_pair();
+}
+
+bool SchemeObject::is_true() {
+    return !this->is_false_obj();
 }
 
 SchemeObject* SchemeObject::car() {
