@@ -157,7 +157,9 @@ SchemeObject* SchemeListProcedure::func(SchemeObject* args) {
 }
 
 SchemeObject* SchemeConsProcedure::func(SchemeObject* args) {
-    return obj_creator_->make_pair(args->car(), args->cadr());
+    args->to_pair()->set_cdr(args->cadr());
+
+    return args;
 }
 
 SchemeObject* SchemeCarProcedure::func(SchemeObject* args) {
@@ -180,4 +182,15 @@ SchemeObject* SchemeSetCdrProcedure::func(SchemeObject* args) {
     the_pair->set_cdr(args->cadr());
 
     return obj_creator_->make_symbol("ok");
+}
+
+//============================================================================
+// Polymorphic Equality Testing
+//============================================================================
+
+SchemeObject* SchemePolyEqProcedure::func(SchemeObject* args) {
+    if (args->car() != args->cadr()) {
+        return &the_false_object_;
+    }
+    return &the_true_object_;
 }

@@ -186,4 +186,17 @@ private:
         SchemePrimProcedure(creator, 1) {}
     friend class SchemeObjectCreator;
 };
+
+//============================================================================
+// Polymorphic Equality Testing
+//============================================================================
+
+class SchemePolyEqProcedure : public SchemePrimProcedure { 
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemePolyEqProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 2) {}
+    friend class SchemeObjectCreator;
+};
 #endif /* SCHEMEPRIMPROCEDURE_H_ */

@@ -195,6 +195,9 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
             new SchemePredicateProcedure(this, 
                 SchemeObject::PRIMPROCEDURE | SchemeObject::COMPPROCEDURE)
         );
+    env->define_variable_value(
+            make_symbol("eq?")->to_symbol(),
+            new SchemePolyEqProcedure(this));
 }
 
 void SchemeObjectCreator::init_type_conversions(Environment* env) {
