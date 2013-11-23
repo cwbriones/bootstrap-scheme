@@ -162,6 +162,14 @@ SchemeObject* SchemeObject::cddr() {
     return cdr()->cdr();
 }
 
+SchemeObject* SchemeObject::cdadr() {
+    return cdr()->car()->cdr();
+}
+
+SchemeObject* SchemeObject::caadr() {
+    return cdr()->car()->car();
+}
+
 SchemeObject* SchemeObject::caddr() {
     return cdr()->cdr()->car();
 }

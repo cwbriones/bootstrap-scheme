@@ -82,8 +82,9 @@ public:
     SchemeObject* cdar();
     SchemeObject* cadr();
     SchemeObject* cddr();
+    SchemeObject* caadr();
     SchemeObject* caddr();
-
+    SchemeObject* cdadr();
     SchemeObject* cdddr();
 
     int length_as_list();

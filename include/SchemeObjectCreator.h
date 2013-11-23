@@ -21,6 +21,8 @@ public:
 
     SchemeObject* make_special_form(std::string tag, SchemeObject* cdr);
     SchemeObject* make_tagged_list(std::string tag, SchemeObject* obj);
+    SchemeObject* make_tagged_list(
+            std::string tag, SchemeObject* obj1, SchemeObject* obj2);
 
     SchemeObject* make_comp_procedure(
             Environment::Ptr& env, SchemeObject* params, SchemeObject* body);

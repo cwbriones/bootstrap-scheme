@@ -61,9 +61,9 @@ SchemeObject* Scheme::cons(SchemeObject* car, SchemeObject* cdr) {
 }
 
 SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
-    assert(the_global_environment_);
-
     tailcall:
+
+    assert(the_global_environment_);
     if (exp->is_self_evaluating()){
 
         return exp;
@@ -89,13 +89,12 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
 
     } else if (exp->is_tagged_list("if")) {
         if (exp->length_as_list() == 4) {
-
             exp = exp->cdr();
 
-            if (exp->car()->is_true_obj()) {
-                exp = exp->cadr();
-            } else {
+            if (eval(exp->car(), env)->is_false_obj()) {
                 exp = exp->caddr();
+            } else {
+                exp = exp->cadr();
             }
             goto tailcall;
 
@@ -104,23 +103,39 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
             exit(1);
         }
     } else if (exp->is_tagged_list("quote")){
+
         return exp->cadr();
+
     } else if (exp->is_tagged_list("define")){
         if (exp->length_as_list() == 3){
-            env->define_variable_value(
-                    exp->cadr()->to_symbol(), 
-                    eval(exp->caddr(), env));
-            return obj_creator_.make_symbol("ok");
+            if (exp->cadr()->is_proper_list()) {
+                // TODO: Really clean up this part of the code
+                // Convert to definition of variable as lambda form
+                SchemeObject* the_lambda = obj_creator_.make_tagged_list("lambda", exp->cdadr(), exp->caddr());
+                SchemeObject* var = exp->caadr();
+
+                return eval(obj_creator_.make_tagged_list("define", var, the_lambda), env);
+
+            } else {
+                env->define_variable_value(
+                        exp->cadr()->to_symbol(), 
+                        eval(exp->caddr(), env)
+                    );
+                return obj_creator_.make_symbol("ok");
+            }
         } else {
-            std::cerr << "Error: cannot evaluate def form" << std::endl;
+            std::cerr << "Error: cannot evaluate define form" << std::endl;
             exit(1);
         }
     } else if (exp->is_tagged_list("set!")){
         if (exp->length_as_list() == 3){
+
             if (env->set_variable_value(
                         exp->cadr()->to_symbol(), 
                         eval(exp->caddr(), env))){
+
                 return obj_creator_.make_symbol("ok");
+
             } else {
                 std::cerr << "Error: unbound variable " 
                           << exp->cadr()->to_symbol()->value()
@@ -143,10 +158,10 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         } else if (proc->is_comp_procedure()) {
 
             SchemeCompoundProcedure* comp = proc->to_comp_procedure();
-            env = env->extend(comp->params(), args);
+            env = std::make_shared<Environment>(env, comp->params(), args);
 
             exp = comp->body();
-            while (exp->length_as_list() > 1) {
+            while (!exp->cdr()->is_empty_list()) {
                 eval(exp->car(), env);
                 exp = exp->cdr();
             }
@@ -166,7 +181,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
     exit(1);
 }
 
-SchemeObject* Scheme::get_value_of_args(SchemeObject* args, Environment::Ptr& env) {
+SchemeObject* Scheme::get_value_of_args(SchemeObject* args, Environment::Ptr env) {
     if (!args->is_proper_list()) {
         std::cout << "Error: ill-formed argument list" << std::endl;
         exit(1);

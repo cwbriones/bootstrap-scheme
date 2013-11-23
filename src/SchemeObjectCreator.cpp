@@ -50,9 +50,23 @@ SchemeObject* SchemeObjectCreator::make_special_form(std::string tag, SchemeObje
 
 SchemeObject* SchemeObjectCreator::make_tagged_list(std::string tag, SchemeObject* obj) {
     return new SchemePair(
+        make_symbol(tag), 
+        make_pair(obj, make_empty_list())
+    );
+}
+
+SchemeObject* SchemeObjectCreator::make_tagged_list(
+        std::string tag, 
+        SchemeObject* obj1,
+        SchemeObject* obj2) {
+
+    return make_pair(
             make_symbol(tag), 
-            make_pair(obj, make_empty_list())
-        );
+            make_pair(
+                obj1,
+                make_pair(obj2, make_empty_list())
+            )
+    );
 }
 
 SchemeObject* SchemeObjectCreator::make_comp_procedure(

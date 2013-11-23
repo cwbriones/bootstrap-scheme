@@ -16,20 +16,19 @@ public:
     Environment() :
         enclosing_(nullptr) {}
 
-    Environment(Environment* enclosing) : 
-        enclosing_(enclosing) {}
-    ~Environment();
+    Environment(Environment::Ptr enclosing, 
+            SchemeObject* vars, SchemeObject* vals);
 
-    Environment::Ptr extend(SchemeObject* vars, SchemeObject* vals);
+    ~Environment();
 
     void define_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool set_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool variable_is_defined(std::string var);
 
     SchemeObject* lookup_variable_value(SchemeSymbol* symbol);
-    Environment* get_enclosing_env();
+    Environment* enclosing();
 private:
-    Environment* enclosing_;
+    Environment::Ptr enclosing_;
     std::unordered_map<std::string, SchemeObject*> frame_bindings_;
 };
 

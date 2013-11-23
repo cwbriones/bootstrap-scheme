@@ -4,6 +4,23 @@
 
 #include <iostream>
 
+Environment::Environment(Environment::Ptr enclosing,
+            SchemeObject* vars, SchemeObject* vals) 
+{
+    enclosing_ = enclosing;
+
+    while (!vars->is_empty_list()) {
+        // Bind new variables
+        define_variable_value(
+                vars->car()->to_symbol(),
+                vals->car()
+            );
+
+        vals = vals->cdr();
+        vars = vars->cdr();
+    }
+}
+
 Environment::~Environment() {}
 
 void Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
@@ -23,7 +40,7 @@ void Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* valu
         if (found == env->frame_bindings_.end()) {
             // Try to go up
             if (env->enclosing_) {
-                env = env->enclosing_;
+                env = env->enclosing();
             } else {
                 // Relent and create the binding
                 this->frame_bindings_[symbol->value()] = value;
@@ -37,7 +54,15 @@ void Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* valu
 }
 
 bool Environment::variable_is_defined(std::string var) {
-    return frame_bindings_.find(var) != frame_bindings_.end();
+    Environment* env = this;
+    while (env) {
+        if (env->frame_bindings_.find(var) != env->frame_bindings_.end()) {
+            return true;
+        } else {
+            env = env->enclosing();
+        }
+    }
+    return false;
 }
 
 bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
@@ -53,8 +78,8 @@ bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) 
     while (env){
         auto found = env->frame_bindings_.find(symbol->value());
         if (found == env->frame_bindings_.end()){
-            if (env->enclosing_) {
-                env = env->enclosing_;
+            if (env->enclosing()) {
+                env = env->enclosing();
             }
             break;
         } else {
@@ -72,31 +97,14 @@ SchemeObject* Environment::lookup_variable_value(SchemeSymbol* symbol) {
     while (env){
         auto found = env->frame_bindings_.find(symbol->value());
         if (found == env->frame_bindings_.end()){
-            env = env->enclosing_;
+            env = env->enclosing();
         } else {
-            return env->frame_bindings_[symbol->value()];
+            return found->second;
         }
     }
     return nullptr;
 }
 
-Environment::Ptr Environment::extend(SchemeObject* vars, SchemeObject* vals) {
-    
-    Environment::Ptr extension(new Environment(this));
-
-    while (!vars->is_empty_list()) {
-        // Bind new variables
-        extension->define_variable_value(
-                vars->car()->to_symbol(),
-                vals->car()
-                );
-
-        vals = vals->cdr();
-        vars = vars->cdr();
-    }
-    return std::move(extension);
-}
-
-Environment* Environment::get_enclosing_env() {
-    return enclosing_;
+Environment* Environment::enclosing() {
+    return enclosing_.get();
 }
