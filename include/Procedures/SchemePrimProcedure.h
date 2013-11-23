@@ -133,6 +133,15 @@ private:
 // List Operations
 //============================================================================
 
+class SchemeListProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeListProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, -1) {}
+    friend class SchemeObjectCreator;
+};
+
 class SchemeConsProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
@@ -160,4 +169,21 @@ private:
     friend class SchemeObjectCreator;
 };
 
+class SchemeSetCarProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeSetCarProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
+
+class SchemeSetCdrProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeSetCdrProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
 #endif /* SCHEMEPRIMPROCEDURE_H_ */

@@ -2,6 +2,8 @@
 #include "SchemeObject.h"
 #include "SchemeObjectCreator.h"
 
+#include <vector>
+
 bool SchemePrimProcedure::check_arg_length(SchemeObject* args) {
     return false;
 }
@@ -134,6 +136,26 @@ SchemeObject* SchemePredicateProcedure::func(SchemeObject* args) {
 // List Operations
 //============================================================================
 
+#include <iostream>
+
+SchemeObject* SchemeListProcedure::func(SchemeObject* args) {
+    std::vector<SchemeObject*> the_args;
+    the_args.reserve(args->length_as_list());
+
+    while (!args->is_empty_list()) {
+        the_args.push_back(args->car());
+        args = args->cdr();
+    }
+
+    SchemeObject* the_list = obj_creator_->make_empty_list();
+    while (!the_args.empty()) {
+        the_list = obj_creator_->make_pair(the_args.back(), the_list);
+        the_args.pop_back();
+    }
+
+    return the_list;
+}
+
 SchemeObject* SchemeConsProcedure::func(SchemeObject* args) {
     return obj_creator_->make_pair(args->car(), args->cadr());
 }
@@ -144,4 +166,18 @@ SchemeObject* SchemeCarProcedure::func(SchemeObject* args) {
 
 SchemeObject* SchemeCdrProcedure::func(SchemeObject* args) {
     return args->cdar();
+}
+
+SchemeObject* SchemeSetCarProcedure::func(SchemeObject* args) {
+    SchemePair* the_pair = args->car()->to_pair();
+    the_pair->set_car(args->cadr());
+
+    return obj_creator_->make_symbol("ok");
+}
+
+SchemeObject* SchemeSetCdrProcedure::func(SchemeObject* args) {
+    SchemePair* the_pair = args->car()->to_pair();
+    the_pair->set_cdr(args->cadr());
+
+    return obj_creator_->make_symbol("ok");
 }

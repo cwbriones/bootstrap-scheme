@@ -156,8 +156,16 @@ public:
         return car_;
     }
 
-    SchemeObject* cdr() {
+    SchemeObject* cdr(){
         return cdr_;
+    }
+
+    SchemeObject* set_cdr(SchemeObject* cdr) {
+        cdr_ = cdr;
+    }
+    
+    SchemeObject* set_car(SchemeObject* car) {
+        car_ = car;
     }
     int length() {
         return length_;

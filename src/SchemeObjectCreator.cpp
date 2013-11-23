@@ -168,6 +168,10 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
 
     // List operations
     env->define_variable_value(
+            make_symbol("list")->to_symbol(),
+            new SchemeListProcedure(this)
+        );
+    env->define_variable_value(
             make_symbol("cons")->to_symbol(),
             new SchemeConsProcedure(this)
         );
@@ -176,8 +180,16 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             new SchemeCarProcedure(this)
         );
     env->define_variable_value(
+            make_symbol("set-car!")->to_symbol(),
+            new SchemeSetCarProcedure(this)
+        );
+    env->define_variable_value(
             make_symbol("cdr")->to_symbol(),
             new SchemeCdrProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("set-cdr!")->to_symbol(),
+            new SchemeSetCdrProcedure(this)
         );
 }
 
