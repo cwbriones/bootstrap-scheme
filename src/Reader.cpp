@@ -65,6 +65,10 @@ SchemeObject* SchemeReader::read(){
 	long num = 0;
 
 	eat_whitespace();
+
+    if (!instream_.good()) {
+        return nullptr;
+    }
 	c = instream_.get();
 
     if (c == '\"'){
@@ -120,8 +124,7 @@ SchemeObject* SchemeReader::read(){
     }
     else if (c == '\'' || c == '`'){
         return objcreator_->make_tagged_list("quote", read());
-    }
-    else {
+    } else {
 		std::cerr << "bad input. unexpected character '" << c << "'." << std::endl;
 		exit(1);
 	}

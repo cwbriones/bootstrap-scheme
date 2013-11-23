@@ -26,18 +26,19 @@ class SchemeCompoundProcedure;
 class SchemeObject {
 public:
     typedef std::unique_ptr<SchemeObject> Ptr;
+    virtual ~SchemeObject(){}
 
     enum Type {
-        UNKNOWN,
-        FIXNUM,
-        BOOLEAN,
-        CHARACTER,
-        STRING,
-        EMPTY_LIST,
-        PAIR,
-        SYMBOL,
-        PRIMPROCEDURE,
-        COMPPROCEDURE
+              UNKNOWN = 1,
+               FIXNUM = 1 << 1,
+              BOOLEAN = 1 << 2,
+            CHARACTER = 1 << 3,
+               STRING = 1 << 4,
+           EMPTY_LIST = 1 << 5,
+                 PAIR = 1 << 6,
+               SYMBOL = 1 << 7,
+        PRIMPROCEDURE = 1 << 8,
+        COMPPROCEDURE = 1 << 9
     };
     Type type() const;
 
@@ -88,16 +89,17 @@ public:
     SchemeObject* cdddr();
 
     int length_as_list();
-
-    // Environment related methods
-    // SchemeObject* first_frame();
-    // SchemeObject* make_frame(SchemeObject* obj);
-    // SchemeObject* frame_variables(SchemeObject* obj);
-    // SchemeObject* frame_values(SchemeObject* obj);
-    // SchemeObject* enclosing_enviroment();
+    void set_mark(int mark) {
+        mark_ = mark;
+    }
+    int mark() {
+        return mark_;
+    }
 protected:
     SchemeObject(SchemeObject::Type t);
     Type type_ = UNKNOWN;
+
+    int mark_ = 0;
 
     // Singletons
     static SchemeBoolean the_true_object_;

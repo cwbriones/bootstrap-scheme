@@ -127,7 +127,7 @@ SchemeObject* SchemeModuloProcedure::func(SchemeObject* args) {
 }
 
 SchemeObject* SchemePredicateProcedure::func(SchemeObject* args) {
-    return obj_creator_->make_boolean(args->car()->type() == target_type_);
+    return obj_creator_->make_boolean(args->car()->type() & target_type_);
 }
 
 //============================================================================

@@ -15,12 +15,12 @@ class Scheme {
 public:
 	Scheme(std::istream& instream);
 	void main_loop();
+    bool load_file(std::string fname);
 private:
 	const std::string cursor_;
     
     // Model
     SchemeObjectCreator obj_creator_;
-
     Environment::Ptr the_global_environment_;
     
     // Read

@@ -15,6 +15,14 @@
  * License version 3 along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+#include <iostream>
+#include <string>
+#include <fstream>
+
+#include <cstdlib>
+#include <cstring>
+#include <vector>
+#include <cassert>
 
 #include "Scheme.h"
 #include "Reader.h"
@@ -24,14 +32,6 @@
 
 #include "Procedures/SchemePrimProcedure.h"
 #include "Procedures/SchemeCompoundProcedure.h"
-
-#include <iostream>
-#include <string>
-
-#include <cstdlib>
-#include <cstring>
-#include <vector>
-#include <cassert>
 
 Scheme::Scheme(std::istream& instream) : 
     cursor_(">>>"),
@@ -304,6 +304,25 @@ void Scheme::write_string(std::string str){
 //============================================================================
 // REPL
 //============================================================================
+
+bool Scheme::load_file(std::string fname) {
+
+    std::ifstream file_stream(fname, std::ifstream::in);
+    SchemeReader file_reader(&obj_creator_, file_stream);
+
+    std::cout << "Loading file \'" << fname << "\'."  << std::endl;
+
+    SchemeObject* what_was_read = file_reader.read();
+
+    while (what_was_read) {
+        eval(what_was_read, the_global_environment_);
+        what_was_read = file_reader.read();
+    }
+    std::cout << "done." << std::endl;
+    file_stream.close();
+
+    return true;
+}
 
 void Scheme::main_loop(){
 	print_welcome_message();

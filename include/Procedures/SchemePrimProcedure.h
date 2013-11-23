@@ -12,6 +12,7 @@ public:
         argc_(argc),
         obj_creator_(creator) {}
 
+    virtual ~SchemePrimProcedure(){}
     virtual SchemeObject* func(SchemeObject* args) = 0;
 
 protected:
@@ -110,13 +111,13 @@ class SchemePredicateProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
 private:
-    SchemePredicateProcedure(SchemeObjectCreator* creator, SchemeObject::Type target) :
+    SchemePredicateProcedure(SchemeObjectCreator* creator, uint16_t target) :
         SchemePrimProcedure(creator, 1),
         target_type_(target) {}
 
     friend class SchemeObjectCreator;
 
-    SchemeObject::Type target_type_;
+    uint16_t target_type_;
 };
 
 // class SchemeNAMEProcedure : public SchemePrimProcedure {

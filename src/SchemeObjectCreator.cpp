@@ -162,7 +162,8 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
         );
     env->define_variable_value(
             make_symbol("procedure?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::PRIMPROCEDURE)
+            new SchemePredicateProcedure(this, 
+                SchemeObject::PRIMPROCEDURE | SchemeObject::COMPPROCEDURE)
         );
 
     // List operations
