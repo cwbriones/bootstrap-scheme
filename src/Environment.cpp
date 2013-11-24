@@ -77,15 +77,11 @@ bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) 
      */
     while (env){
         auto found = env->frame_bindings_.find(symbol->value());
-        if (found == env->frame_bindings_.end()){
-            if (env->enclosing()) {
-                env = env->enclosing();
-            }
-            break;
-        } else {
+        if (found != env->frame_bindings_.end()){
             found->second = value;
             return true;
         }
+        env = env->enclosing();
     }
     return false;
 }
@@ -96,11 +92,10 @@ SchemeObject* Environment::lookup_variable_value(SchemeSymbol* symbol) {
 
     while (env){
         auto found = env->frame_bindings_.find(symbol->value());
-        if (found == env->frame_bindings_.end()){
-            env = env->enclosing();
-        } else {
+        if (found != env->frame_bindings_.end()){
             return found->second;
         }
+        env = env->enclosing();
     }
     return nullptr;
 }

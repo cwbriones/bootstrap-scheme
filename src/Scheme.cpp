@@ -123,33 +123,28 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         goto tailcall;
 
     } else if (exp->is_tagged_list("define")){
-        if (exp->length_as_list() == 3){
-            if (exp->cadr()->is_proper_list()) {
-                // FIXME:
-                // Nested defines don't work correctly (body should be executed
-                // as in a begin form)
-                // TODO: Really clean up this part of the code
-                // Convert to definition of variable as lambda form
-                // should have lambda, exp->cdadr(), exp->cddr()
-                // reimplement the end as a begin form abstract syntax
-                // tree manipulation
-                SchemeObject* the_lambda = cons(
-                        obj_creator_.make_symbol("lambda"),
-                        cons(exp->cdadr(), exp->cddr()));
-                SchemeObject* var = exp->caadr();
+        if (exp->cadr()->is_proper_list()) {
+            // FIXME:
+            // Nested defines don't work correctly (body should be executed
+            // as in a begin form)
+            // TODO: Really clean up this part of the code
+            // Convert to definition of variable as lambda form
+            // should have lambda, exp->cdadr(), exp->cddr()
+            // reimplement the end as a begin form abstract syntax
+            // tree manipulation
+            SchemeObject* the_lambda = cons(
+                    obj_creator_.make_symbol("lambda"),
+                    cons(exp->cdadr(), exp->cddr()));
+            SchemeObject* var = exp->caadr();
 
-                return eval(obj_creator_.make_tagged_list("define", var, the_lambda), env);
+            return eval(obj_creator_.make_tagged_list("define", var, the_lambda), env);
 
-            } else {
-                env->define_variable_value(
-                        exp->cadr()->to_symbol(), 
-                        eval(exp->caddr(), env)
-                    );
-                return obj_creator_.make_symbol("ok");
-            }
         } else {
-            std::cerr << "Error: cannot evaluate define form" << std::endl;
-            exit(1);
+            env->define_variable_value(
+                    exp->cadr()->to_symbol(), 
+                    eval(exp->caddr(), env)
+                );
+            return obj_creator_.make_symbol("ok");
         }
     } else if (exp->is_tagged_list("set!")){
         if (exp->length_as_list() == 3){
@@ -184,9 +179,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
             SchemeCompoundProcedure* comp = proc->to_comp_procedure();
             env = std::make_shared<Environment>(env, comp->params(), args);
 
-            return eval(obj_creator_.make_pair(
-                            obj_creator_.make_symbol("begin"), 
-                            comp->body()), env);
+            return eval(cons(obj_creator_.make_symbol("begin"), comp->body()), env);
 
         } else {
             std::cerr << "Error: Cannot apply object." << std::endl;
@@ -238,14 +231,14 @@ SchemeObject* Scheme::eval_let_form(
 
     while (!args->is_empty_list()) {
         pair = args->car();
-        vars = obj_creator_.make_pair(pair->car(), vars);
-        vals = obj_creator_.make_pair(pair->cadr(), vals);
+        vars = cons(pair->car(), vars);
+        vals = cons(pair->cadr(), vals);
         args = args->cdr();
     }
 
     SchemeObject* lambda =
         obj_creator_.make_tagged_list("lambda", vars, body);
-    return eval(obj_creator_.make_pair(lambda, vals), env);
+    return eval(cons(lambda, vals), env);
 }
 
 //============================================================================
