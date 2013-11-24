@@ -87,6 +87,8 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
                 exp->cadr(),
                 exp->cddr());
 
+    } else if (exp->is_tagged_list("let")) {
+        return evaluate_let_form(exp->cdr(), env);
     } else if (exp->is_tagged_list("if")) {
         if (exp->length_as_list() == 4) {
             exp = exp->cdr();
@@ -201,6 +203,28 @@ SchemeObject* Scheme::get_value_of_args(SchemeObject* args, Environment::Ptr env
         stack.pop_back();
     }
     return list;
+}
+
+SchemeObject* Scheme::evaluate_let_form(SchemeObject* args, Environment::Ptr env) {
+    SchemeObject* body = args->cadr();
+    args = args->car();
+    // Args now points to the list of (variable, value) pairs
+
+    SchemeObject* vars = obj_creator_.make_empty_list();
+    SchemeObject* vals = obj_creator_.make_empty_list();
+
+    SchemeObject* pair;
+
+    while (!args->is_empty_list()) {
+        pair = args->car();
+        vars = obj_creator_.make_pair(pair->car(), vars);
+        vals = obj_creator_.make_pair(pair->cadr(), vals);
+        args = args->cdr();
+    }
+
+    SchemeObject* lambda =
+        obj_creator_.make_tagged_list("lambda", vars, body);
+    return eval(obj_creator_.make_pair(lambda, vals), env);
 }
 
 //============================================================================

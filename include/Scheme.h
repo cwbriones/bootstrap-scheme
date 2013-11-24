@@ -30,6 +30,7 @@ private:
     SchemeObject* cons(SchemeObject* car, SchemeObject* cdr);
     SchemeObject* eval(SchemeObject* exp, Environment::Ptr env);
     SchemeObject* get_value_of_args(SchemeObject* args, Environment::Ptr env);
+    SchemeObject* evaluate_let_form(SchemeObject* args, Environment::Ptr env);
 
     // Print
 	void write(SchemeObject* obj);
