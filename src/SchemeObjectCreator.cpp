@@ -198,6 +198,15 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
     env->define_variable_value(
             make_symbol("eq?")->to_symbol(),
             new SchemePolyEqProcedure(this));
+    env->define_variable_value(
+            make_symbol("or")->to_symbol(),
+            new SchemeOrProcedure(this));
+    env->define_variable_value(
+            make_symbol("and")->to_symbol(),
+            new SchemeAndProcedure(this));
+    env->define_variable_value(
+            make_symbol("not")->to_symbol(),
+            new SchemeNotProcedure(this));
 }
 
 void SchemeObjectCreator::init_type_conversions(Environment* env) {

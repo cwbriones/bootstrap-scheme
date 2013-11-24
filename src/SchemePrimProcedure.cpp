@@ -194,3 +194,34 @@ SchemeObject* SchemePolyEqProcedure::func(SchemeObject* args) {
     }
     return &the_true_object_;
 }
+
+//============================================================================
+// Boolean Operations
+//============================================================================
+
+SchemeObject* SchemeAndProcedure::func(SchemeObject* args) {
+    while (!args->is_empty_list()) {
+        if (!args->car()->is_true()) {
+            return &the_false_object_;
+        }
+        args = args->cdr();
+    }
+    return &the_true_object_;
+}
+
+SchemeObject* SchemeOrProcedure::func(SchemeObject* args) {
+    while (!args->is_empty_list()) {
+        if (args->car()->is_true()) {
+            return &the_true_object_;
+        }
+        args = args->cdr();
+    }
+    return &the_false_object_;
+}
+
+SchemeObject* SchemeNotProcedure::func(SchemeObject* args) {
+    if (args->car()->is_true()) {
+        return &the_false_object_;
+    }
+    return &the_true_object_;
+}

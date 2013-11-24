@@ -199,4 +199,35 @@ private:
         SchemePrimProcedure(creator, 2) {}
     friend class SchemeObjectCreator;
 };
+
+//============================================================================
+// Boolean Operations
+//============================================================================
+
+class SchemeAndProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeAndProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, -1) {}
+    friend class SchemeObjectCreator;
+};
+
+class SchemeOrProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeOrProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, -1) {}
+    friend class SchemeObjectCreator;
+};
+
+class SchemeNotProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    SchemeNotProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
 #endif /* SCHEMEPRIMPROCEDURE_H_ */
