@@ -92,6 +92,7 @@ void SchemeObjectCreator::init_keywords() {
     make_symbol("if");
     make_symbol("lambda");
     make_symbol("let");
+    make_symbol("begin");
 }
 
 void SchemeObjectCreator::setup_environment(Environment* env) {

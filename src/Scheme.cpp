@@ -88,7 +88,9 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
                 exp->cddr());
 
     } else if (exp->is_tagged_list("let")) {
-        return evaluate_let_form(exp->cdr(), env);
+
+        return eval_let_form(exp->cdr(), env);
+
     } else if (exp->is_tagged_list("if")) {
         if (exp->length_as_list() == 4) {
             exp = exp->cdr();
@@ -108,9 +110,24 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
 
         return exp->cadr();
 
+    } else if (exp->is_tagged_list("begin")) {
+
+        // Point expression to the body of the begin form
+        exp = exp->cdr();
+
+        while (!exp->cdr()->is_empty_list()) {
+            eval(exp->car(), env);
+            exp = exp->cdr();
+        }
+        exp = exp->car();
+        goto tailcall;
+
     } else if (exp->is_tagged_list("define")){
         if (exp->length_as_list() == 3){
             if (exp->cadr()->is_proper_list()) {
+                // FIXME:
+                // Nested defines don't work correctly (body should be executed
+                // as in a begin form)
                 // TODO: Really clean up this part of the code
                 // Convert to definition of variable as lambda form
                 SchemeObject* the_lambda = obj_creator_.make_tagged_list("lambda", exp->cdadr(), exp->caddr());
@@ -205,7 +222,10 @@ SchemeObject* Scheme::get_value_of_args(SchemeObject* args, Environment::Ptr env
     return list;
 }
 
-SchemeObject* Scheme::evaluate_let_form(SchemeObject* args, Environment::Ptr env) {
+SchemeObject* Scheme::eval_let_form(
+        SchemeObject* args, 
+        Environment::Ptr env) 
+{
     SchemeObject* body = args->cadr();
     args = args->car();
     // Args now points to the list of (variable, value) pairs
