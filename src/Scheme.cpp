@@ -130,7 +130,12 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
                 // as in a begin form)
                 // TODO: Really clean up this part of the code
                 // Convert to definition of variable as lambda form
-                SchemeObject* the_lambda = obj_creator_.make_tagged_list("lambda", exp->cdadr(), exp->caddr());
+                // should have lambda, exp->cdadr(), exp->cddr()
+                // reimplement the end as a begin form abstract syntax
+                // tree manipulation
+                SchemeObject* the_lambda = cons(
+                        obj_creator_.make_symbol("lambda"),
+                        cons(exp->cdadr(), exp->cddr()));
                 SchemeObject* var = exp->caadr();
 
                 return eval(obj_creator_.make_tagged_list("define", var, the_lambda), env);
@@ -179,13 +184,9 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
             SchemeCompoundProcedure* comp = proc->to_comp_procedure();
             env = std::make_shared<Environment>(env, comp->params(), args);
 
-            exp = comp->body();
-            while (!exp->cdr()->is_empty_list()) {
-                eval(exp->car(), env);
-                exp = exp->cdr();
-            }
-            exp = exp->car();
-            goto tailcall;
+            return eval(obj_creator_.make_pair(
+                            obj_creator_.make_symbol("begin"), 
+                            comp->body()), env);
 
         } else {
             std::cerr << "Error: Cannot apply object." << std::endl;
