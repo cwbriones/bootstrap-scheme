@@ -80,6 +80,18 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
 
         return value;
 
+    } else if (exp->is_tagged_list("begin")) {
+
+        // Point expression to the body of the begin form
+        exp = exp->cdr();
+
+        while (!exp->length_as_list() > 1) {
+            eval(exp->car(), env);
+            exp = exp->cdr();
+        }
+        exp = exp->car();
+        goto tailcall;
+
     } else if (exp->is_tagged_list("lambda")) {
    
         return obj_creator_.make_comp_procedure(
@@ -106,32 +118,41 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
             std::cerr << "Error: cannot evaluate if form" << std::endl;
             exit(1);
         }
+    } else if (exp->is_tagged_list("cond")) {
+
+        SchemeObject* the_begin_form;
+
+        while (!exp->is_empty_list()) {
+            exp = exp->cdr();
+
+            if (exp->car()->is_tagged_list("else")) {
+                // Make a begin form and assert that this is valid
+                // placement for an if clause
+                if (exp->length_as_list() > 1) {
+                    std::cerr << "Error: misplaced ELSE clause:";
+                    write(exp->car());
+                    std::cerr << std::endl;
+                    exit(1);
+                }
+                the_begin_form = cons(
+                        obj_creator_.make_symbol("begin"), 
+                        exp->cdar());
+                return eval(the_begin_form, env);
+            }
+            else if (eval(exp->caar(), env)->is_true()) {
+                // Make a begin form out of the body
+                the_begin_form = cons(
+                        obj_creator_.make_symbol("begin"), 
+                        exp->cdar());
+                return eval(the_begin_form, env);
+            }
+        }
     } else if (exp->is_tagged_list("quote")){
 
         return exp->cadr();
 
-    } else if (exp->is_tagged_list("begin")) {
-
-        // Point expression to the body of the begin form
-        exp = exp->cdr();
-
-        while (!exp->cdr()->is_empty_list()) {
-            eval(exp->car(), env);
-            exp = exp->cdr();
-        }
-        exp = exp->car();
-        goto tailcall;
-
     } else if (exp->is_tagged_list("define")){
         if (exp->cadr()->is_proper_list()) {
-            // FIXME:
-            // Nested defines don't work correctly (body should be executed
-            // as in a begin form)
-            // TODO: Really clean up this part of the code
-            // Convert to definition of variable as lambda form
-            // should have lambda, exp->cdadr(), exp->cddr()
-            // reimplement the end as a begin form abstract syntax
-            // tree manipulation
             SchemeObject* the_lambda = cons(
                     obj_creator_.make_symbol("lambda"),
                     cons(exp->cdadr(), exp->cddr()));
