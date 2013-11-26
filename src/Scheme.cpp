@@ -347,6 +347,9 @@ void Scheme::write(SchemeObject* obj){
 		case SchemeObject::FIXNUM:
 			std::cout << obj->to_fixnum()->value();
 			break;
+        case SchemeObject::FLOAT:
+            std::cout <<  obj->to_float()->value();
+            break;
         case SchemeObject::BOOLEAN:
             std::cout << '#' << ((obj->is_true_obj()) ? 't' : 'f');
             break;
@@ -382,7 +385,7 @@ void Scheme::write(SchemeObject* obj){
             std::cout << obj->to_symbol()->value();
             break;
         case SchemeObject::PRIMPROCEDURE:
-            std::cout << "#<primitive-procedure>";
+            std::cout << "#<compiled-procedure>";
             break;
         case SchemeObject::COMPPROCEDURE:
             std::cout << "#<compound-procedure>";

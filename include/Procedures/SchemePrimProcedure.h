@@ -235,7 +235,7 @@ public:
     virtual bool is_eval(){ return true;}
 private:
     SchemeEvalProcedure() :
-        SchemePrimProcedure(nullptr, -1) {}
+        SchemePrimProcedure(nullptr, 2) {}
     friend class SchemeObjectCreator;
 };
 #endif /* SCHEMEPRIMPROCEDURE_H_ */

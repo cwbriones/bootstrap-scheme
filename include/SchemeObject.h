@@ -10,6 +10,7 @@ template <class T>
 class SchemePrimitive;
 
 typedef SchemePrimitive<int> SchemeFixnum;
+typedef SchemePrimitive<double> SchemeFloat;
 typedef SchemePrimitive<bool> SchemeBoolean;
 typedef SchemePrimitive<char> SchemeCharacter;
 typedef SchemePrimitive<std::string> SchemeString;
@@ -31,19 +32,21 @@ public:
     enum Type {
           UNSPECIFIED = 1,
                FIXNUM = 1 << 1,
-              BOOLEAN = 1 << 2,
-            CHARACTER = 1 << 3,
-               STRING = 1 << 4,
-           EMPTY_LIST = 1 << 5,
-                 PAIR = 1 << 6,
-               SYMBOL = 1 << 7,
-        PRIMPROCEDURE = 1 << 8,
-        COMPPROCEDURE = 1 << 9
+                FLOAT = 1 << 2,
+              BOOLEAN = 1 << 3,
+            CHARACTER = 1 << 4,
+               STRING = 1 << 5,
+           EMPTY_LIST = 1 << 6,
+                 PAIR = 1 << 7,
+               SYMBOL = 1 << 8,
+        PRIMPROCEDURE = 1 << 9,
+        COMPPROCEDURE = 1 << 10
     };
     Type type() const;
 
     // Casts
     SchemeFixnum* to_fixnum();
+    SchemeFloat* to_float();
     SchemeBoolean* to_boolean();
     SchemeCharacter* to_character();
     SchemeString* to_string();
@@ -62,6 +65,7 @@ public:
     bool is_empty_list();
 
     bool is_fixnum();
+    bool is_float();
     bool is_boolean();
     bool is_character();
     bool is_string();

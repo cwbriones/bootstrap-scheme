@@ -1,0 +1,42 @@
+Primitive Procedures
+--------------------
+Equality Procedures for boolean and string
+
+procedures for strings:
+string=?
+string
+string-length
+string-ref
+string-append
+
+string->list
+list->string
+
+copy procedures
+
+Make Lambda accept a variable number of arguments:
+
+I. if only a single parameter is specified (not as a list)
+then that parameter is bound to the list of arguments
+
+e.g. ((lambda x x ) 3 4 5 6) ==> (3 4 5 6)
+e.g. ((lambda (x y . z) z) 3 4 5 6) ==> (3 4 5 6)
+
+II. if paramaters are specified followed by a period and one more,
+the remaining arguments are bound as a list to the last parameter,
+that is the list of args is improper and the end is the variadic
+argument rather than the empty list
+
+Decimal values
+
+Optional:
+Michaux did not implement type checking on the arguments
+since by his consideration bootstrap shouldn't require it
+since good input -> good output
+
+maybe consider adding type checking?
+
+Make car/cdr more efficient since most operations depend on these two primitives,
+and currently they perform by casting every time they are performed
+
+Garbage Collection
