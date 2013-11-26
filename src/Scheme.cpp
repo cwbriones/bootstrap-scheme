@@ -295,6 +295,9 @@ SchemeObject* Scheme::eval_let_form(
 
 void Scheme::write(SchemeObject* obj){
 	switch (obj->type()){
+        case SchemeObject::UNSPECIFIED:
+            std::cout << "#<unspecified>";
+            break;
 		case SchemeObject::FIXNUM:
 			std::cout << obj->to_fixnum()->value();
 			break;
