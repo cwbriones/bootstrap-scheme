@@ -83,6 +83,8 @@ public:
     // Pair Operations
     SchemeObject* car();
     SchemeObject* cdr();
+    void set_car(SchemeObject* car);
+    void set_cdr(SchemeObject* cdr);
 
     SchemeObject* caar();
     SchemeObject* cdar();
@@ -107,6 +109,25 @@ protected:
     Type type_ = UNSPECIFIED;
 
     int mark_ = 0;
+
+    union {
+        struct {
+            bool value;
+        } boolean;
+        struct {
+            char value;
+        } character;
+        struct {
+            long value;
+        } fixnum;
+        struct {
+            double value;
+        } flonum;
+        struct {
+            SchemeObject* car;
+            SchemeObject* cdr;
+        } pair;
+    } data;
 
     // Singletons
     static SchemeObject the_unspecified_object_;
@@ -166,22 +187,16 @@ public:
     SchemeObject* car(){
         return car_;
     }
-
     SchemeObject* cdr(){
         return cdr_;
     }
 
-    SchemeObject* set_cdr(SchemeObject* cdr) {
-        cdr_ = cdr;
-    }
-    
-    SchemeObject* set_car(SchemeObject* car) {
-        car_ = car;
-    }
+    void set_car(SchemeObject* car);
+    void set_cdr(SchemeObject* cdr);
+
     int length() {
         return length_;
     }
-
     bool is_proper_list() {
         return proper_list_;
     }

@@ -135,7 +135,7 @@ bool SchemeObject::is_proper_list() {
 bool SchemeObject::is_tagged_list(std::string tag) {
     if (type_ == Type::PAIR) {
 
-        SchemeObject* car = to_pair()->car();
+        SchemeObject* car = data.pair.car;
 
         return car->is_symbol()
 
@@ -168,16 +168,28 @@ bool SchemeObject::is_true() {
 
 SchemeObject* SchemeObject::car() {
     if (type_ == PAIR) {
-        return static_cast<SchemePair*>(this)->car();
+        return data.pair.car;
     }
     return nullptr;
 }
 
 SchemeObject* SchemeObject::cdr() {
     if (type_ == PAIR) {
-        return static_cast<SchemePair*>(this)->cdr();
+        return data.pair.cdr;
     }
     return nullptr;
+}
+
+void SchemeObject::set_car(SchemeObject* car) {
+    if (type_ == PAIR) {
+        data.pair.car = car;
+    }
+}
+
+void SchemeObject::set_cdr(SchemeObject* cdr) {
+    if (type_ == PAIR) {
+        data.pair.cdr = cdr;
+    }
 }
 
 SchemeObject* SchemeObject::caar() {
@@ -245,7 +257,10 @@ SchemePair::SchemePair() :
     cdr_(nullptr),
     proper_list_(true),
     length_(0)
-{}
+{
+    data.pair.car = car_;
+    data.pair.cdr = cdr_;
+}
 
 SchemePair::SchemePair(SchemeObject* car, SchemeObject* cdr) :
     SchemeObject(PAIR),
@@ -254,6 +269,9 @@ SchemePair::SchemePair(SchemeObject* car, SchemeObject* cdr) :
     proper_list_(false)
 {
     int cdr_type = cdr->type();
+
+    data.pair.car = car_;
+    data.pair.cdr = cdr_;
 
     if (cdr_type == Type::EMPTY_LIST) {
 
@@ -268,4 +286,14 @@ SchemePair::SchemePair(SchemeObject* car, SchemeObject* cdr) :
             length_ = cdr->to_pair()->length_ + 1;
         }
     }
+}
+
+void SchemePair::set_cdr(SchemeObject* cdr) {
+    cdr_ = cdr;
+    data.pair.cdr = cdr;
+}
+
+void SchemePair::set_car(SchemeObject* car) {
+    car_ = car;
+    data.pair.car = car;
 }
