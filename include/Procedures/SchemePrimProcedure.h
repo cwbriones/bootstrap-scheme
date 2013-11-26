@@ -148,8 +148,8 @@ class SchemeConsProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
 private:
-    SchemeConsProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 2) {}
+    SchemeConsProcedure() :
+        SchemePrimProcedure(nullptr, 2) {}
     friend class SchemeObjectCreator;
 };
 
@@ -157,8 +157,8 @@ class SchemeCarProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
 private:
-    SchemeCarProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
+    SchemeCarProcedure() :
+        SchemePrimProcedure(nullptr, 1) {}
     friend class SchemeObjectCreator;
 };
 
@@ -166,8 +166,8 @@ class SchemeCdrProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
 private:
-    SchemeCdrProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
+    SchemeCdrProcedure() :
+        SchemePrimProcedure(nullptr, 1) {}
     friend class SchemeObjectCreator;
 };
 
@@ -175,8 +175,8 @@ class SchemeSetCarProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
 private:
-    SchemeSetCarProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
+    SchemeSetCarProcedure() :
+        SchemePrimProcedure(nullptr, 1) {}
     friend class SchemeObjectCreator;
 };
 
@@ -184,8 +184,8 @@ class SchemeSetCdrProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
 private:
-    SchemeSetCdrProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
+    SchemeSetCdrProcedure() :
+        SchemePrimProcedure(nullptr, 1) {}
     friend class SchemeObjectCreator;
 };
 
@@ -234,7 +234,7 @@ public:
     virtual SchemeObject* func(SchemeObject* args);
     virtual bool is_eval(){ return true;}
 private:
-    SchemeApplyProcedure() :
+    SchemeEvalProcedure() :
         SchemePrimProcedure(nullptr, -1) {}
     friend class SchemeObjectCreator;
 };

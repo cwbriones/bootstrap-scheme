@@ -148,23 +148,23 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
         );
     env->define_variable_value(
             make_symbol("cons")->to_symbol(),
-            new SchemeConsProcedure(this)
+            new SchemeConsProcedure()
         );
     env->define_variable_value(
             make_symbol("car")->to_symbol(),
-            new SchemeCarProcedure(this)
+            new SchemeCarProcedure()
         );
     env->define_variable_value(
             make_symbol("set-car!")->to_symbol(),
-            new SchemeSetCarProcedure(this)
+            new SchemeSetCarProcedure()
         );
     env->define_variable_value(
             make_symbol("cdr")->to_symbol(),
-            new SchemeCdrProcedure(this)
+            new SchemeCdrProcedure()
         );
     env->define_variable_value(
             make_symbol("set-cdr!")->to_symbol(),
-            new SchemeSetCdrProcedure(this)
+            new SchemeSetCdrProcedure()
         );
 
     init_type_predicates(env);
