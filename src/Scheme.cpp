@@ -63,7 +63,6 @@ SchemeObject* Scheme::cons(SchemeObject* car, SchemeObject* cdr) {
 SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
     tailcall:
 
-    assert(the_global_environment_);
     if (exp->is_self_evaluating()){
 
         return exp;
@@ -85,7 +84,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         // Point expression to the body of the begin form
         exp = exp->cdr();
 
-        while (!exp->length_as_list() > 1) {
+        while (exp->length_as_list() > 1) {
             eval(exp->car(), env);
             exp = exp->cdr();
         }
