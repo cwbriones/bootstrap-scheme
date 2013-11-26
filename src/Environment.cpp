@@ -24,32 +24,12 @@ Environment::Environment(Environment::Ptr enclosing,
 Environment::~Environment() {}
 
 void Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
-    Environment* env = this;
+    auto found = frame_bindings_.find(symbol->value());
 
-    while (env) {
-        auto found = env->frame_bindings_.find(symbol->value());
-
-        /*
-         * Check if the symbol already exists.
-         *
-         * If the symbol is not found, we try to continue up
-         * and if there is no way up we create it
-         * in the initial frame
-         */
-
-        if (found == env->frame_bindings_.end()) {
-            // Try to go up
-            if (env->enclosing_) {
-                env = env->enclosing();
-            } else {
-                // Relent and create the binding
-                this->frame_bindings_[symbol->value()] = value;
-                return;
-            }
-        } else {
-            found->second = value;
-            return;
-        }
+    if (found == frame_bindings_.end()) {
+        frame_bindings_[symbol->value()] = value;
+    } else {
+        found->second = value;
     }
 }
 
