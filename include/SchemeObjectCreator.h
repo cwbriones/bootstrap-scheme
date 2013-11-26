@@ -13,6 +13,7 @@ public:
 
     SchemeObject* make_unspecified();
     SchemeObject* make_fixnum(int value);
+    SchemeObject* make_flonum(double value);
     SchemeObject* make_boolean(bool value);
     SchemeObject* make_character(char value);
     SchemeObject* make_string(std::string value);

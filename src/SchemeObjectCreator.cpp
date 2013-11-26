@@ -23,6 +23,10 @@ SchemeObject* SchemeObjectCreator::make_fixnum(int value) {
     return new SchemeFixnum(SchemeObject::FIXNUM, value);
 }
 
+SchemeObject* SchemeObjectCreator::make_flonum(double value) {
+    return new SchemeFlonum(SchemeObject::FLONUM, value);
+}
+
 SchemeObject* SchemeObjectCreator::make_boolean(bool value) {
     if (value) {
         return &SchemeObject::the_true_object_;

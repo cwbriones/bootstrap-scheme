@@ -41,8 +41,8 @@ SchemeFixnum* SchemeObject::to_fixnum() {
     return static_cast<SchemeFixnum*>(this);
 }
 
-SchemeFloat* SchemeObject::to_float() {
-    return static_cast<SchemeFloat*>(this);
+SchemeFlonum* SchemeObject::to_flonum() {
+    return static_cast<SchemeFlonum*>(this);
 }
 
 SchemeBoolean* SchemeObject::to_boolean() {
@@ -96,8 +96,8 @@ bool SchemeObject::is_fixnum() {
     return type_ == Type::FIXNUM;
 }
 
-bool SchemeObject::is_float() {
-    return type_ == Type::FLOAT;
+bool SchemeObject::is_flonum() {
+    return type_ == Type::FLONUM;
 }
 
 bool SchemeObject::is_boolean() {
@@ -147,8 +147,8 @@ bool SchemeObject::is_tagged_list(std::string tag) {
 bool SchemeObject::is_self_evaluating() {
     switch (type_) {
         case EMPTY_LIST:
-        case FLOAT:
         case FIXNUM:
+        case FLONUM:
         case BOOLEAN:
         case STRING:
         case CHARACTER:

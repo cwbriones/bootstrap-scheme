@@ -2,6 +2,8 @@
 #include "SchemeObjectCreator.h"
 
 #include <unordered_set>
+#include <cstdlib>
+#include <string>
 
 SchemeReader::SchemeReader(SchemeObjectCreator* objcreator){
     objcreator_ = objcreator;
@@ -61,9 +63,6 @@ void SchemeReader::peek_expecting_delimiter(){
 
 SchemeObject* SchemeReader::read(){
 	char c;
-	short sign = 1;
-	long num = 0;
-
 	eat_whitespace();
 
     if (!instream_.good()) {
@@ -95,23 +94,40 @@ SchemeObject* SchemeReader::read(){
             }
         } 
     } 
-    else if (isdigit(c) || (c == '-' && isdigit(instream_.peek())) ){
+    else if (isdigit(c) || 
+            (c == '.' && isdigit(instream_.peek())) ||
+            (c == '-' && (isdigit(instream_.peek()) || instream_.peek() == '.'))){
+        
+        std::string number("");
+        bool is_float = false;
 		// Read in a fixnum.
 		if (c == '-'){
-			sign = -1;
-		}
-		else {
+            number += c;
+        } else {
 			instream_.unget();
 		}
 
-		while (isdigit(c = instream_.get())){
-			num = (num * 10) + (c - '0');
+		while (true) {
+            c = instream_.get();
+
+            if (isdigit(c)) {
+                number += c;
+            } else if (c == '.') {
+                is_float = true;
+                number += '.';
+            } else {
+                break;
+            }
 		}
-		num *= sign;
+
 		if (is_delimiter(c)){
 			instream_.unget();
-			return objcreator_->make_fixnum(num);
-		}
+            if (!is_float) {
+                return objcreator_->make_fixnum(std::stol(number));
+            } else {
+                return objcreator_->make_flonum(std::stof(number));
+            }
+		} 
 		else {
 			std::cerr << "number not followed by delimiter" << std::endl;
 			exit(1);

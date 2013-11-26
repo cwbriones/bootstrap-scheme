@@ -347,8 +347,8 @@ void Scheme::write(SchemeObject* obj){
 		case SchemeObject::FIXNUM:
 			std::cout << obj->to_fixnum()->value();
 			break;
-        case SchemeObject::FLOAT:
-            std::cout <<  obj->to_float()->value();
+        case SchemeObject::FLONUM:
+            std::cout <<  obj->to_flonum()->value();
             break;
         case SchemeObject::BOOLEAN:
             std::cout << '#' << ((obj->is_true_obj()) ? 't' : 'f');
