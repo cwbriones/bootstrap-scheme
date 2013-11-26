@@ -94,6 +94,8 @@ void SchemeObjectCreator::init_keywords() {
     make_symbol("let");
     make_symbol("begin");
     make_symbol("cond");
+    make_symbol("and");
+    make_symbol("or");
     make_symbol("else");
 }
 
@@ -202,12 +204,6 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
     env->define_variable_value(
             make_symbol("eq?")->to_symbol(),
             new SchemePolyEqProcedure(this));
-    env->define_variable_value(
-            make_symbol("or")->to_symbol(),
-            new SchemeOrProcedure(this));
-    env->define_variable_value(
-            make_symbol("and")->to_symbol(),
-            new SchemeAndProcedure(this));
     env->define_variable_value(
             make_symbol("not")->to_symbol(),
             new SchemeNotProcedure(this));

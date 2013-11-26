@@ -79,6 +79,9 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
 
         return value;
 
+    } else if (exp->is_tagged_list("and")) {
+    } else if (exp->is_tagged_list("or")) {
+    
     } else if (exp->is_tagged_list("begin")) {
 
         // Point expression to the body of the begin form
