@@ -29,7 +29,7 @@ public:
     virtual ~SchemeObject();
 
     enum Type {
-              UNKNOWN = 1,
+          UNSPECIFIED = 1,
                FIXNUM = 1 << 1,
               BOOLEAN = 1 << 2,
             CHARACTER = 1 << 3,
@@ -100,11 +100,12 @@ public:
     static void object_summary();
 protected:
     SchemeObject(SchemeObject::Type t);
-    Type type_ = UNKNOWN;
+    Type type_ = UNSPECIFIED;
 
     int mark_ = 0;
 
     // Singletons
+    static SchemeObject the_unspecified_object_;
     static SchemeBoolean the_true_object_;
     static SchemeBoolean the_false_object_;
     static SchemePair the_empty_list_;

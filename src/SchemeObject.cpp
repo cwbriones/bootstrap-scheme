@@ -23,6 +23,8 @@ SchemeBoolean SchemeObject::the_true_object_ =
 
 SchemePair SchemeObject::the_empty_list_ = SchemePair();
 
+SchemeObject SchemeObject::the_unspecified_object_ = SchemeObject(UNSPECIFIED);
+
 SchemeObject::SchemeObject(Type t) : type_(t) {
     objects_created_++;
 }

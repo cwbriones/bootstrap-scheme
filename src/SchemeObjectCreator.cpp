@@ -15,6 +15,10 @@ SchemeObjectCreator::SchemeObjectCreator() {
 // Creational Methods
 //============================================================================
 
+SchemeObject* SchemeObjectCreator::make_unspecified() {
+    return &SchemeObject::the_unspecified_object_;
+}
+
 SchemeObject* SchemeObjectCreator::make_fixnum(int value) {
     return new SchemeFixnum(SchemeObject::FIXNUM, value);
 }
