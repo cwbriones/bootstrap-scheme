@@ -166,6 +166,10 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             make_symbol("set-cdr!")->to_symbol(),
             new SchemeSetCdrProcedure()
         );
+    env->define_variable_value(
+            make_symbol("apply")->to_symbol(),
+            new SchemeApplyProcedure()
+        );
 
     init_type_predicates(env);
     init_type_conversions(env);

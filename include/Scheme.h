@@ -32,6 +32,9 @@ private:
     SchemeObject* get_value_of_args(SchemeObject* args, Environment::Ptr env);
     SchemeObject* eval_let_form(SchemeObject* args, Environment::Ptr env);
 
+    SchemeObject* prepare_apply_args(SchemeObject* args_to_apply);
+    SchemeObject* convert_eval_form(SchemeObject* eval_args);
+
     // Print
 	void write(SchemeObject* obj);
     void write_pair(SchemePair* obj);

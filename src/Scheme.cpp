@@ -228,7 +228,15 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
 
         if (proc->is_prim_procedure()) {
 
-            return proc->to_prim_procedure()->func(args);
+            SchemePrimProcedure* prim = proc->to_prim_procedure();
+
+            if (prim->is_apply()) {
+                prim = args->car()->to_prim_procedure();
+                args = prepare_apply_args(args->cdr());
+            } else if (prim->is_eval()) {
+                return convert_eval_form(exp->cdr());
+            }
+            return prim->func(args);
 
         } else if (proc->is_comp_procedure()) {
 
@@ -238,7 +246,8 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
             return eval(cons(obj_creator_.make_symbol("begin"), comp->body()), env);
 
         } else {
-            std::cerr << "Error: Cannot apply object." << std::endl;
+            std::cerr << "Error: Cannot apply object ";
+            write(proc);
             exit(1);
         }
     } else { 
@@ -295,6 +304,35 @@ SchemeObject* Scheme::eval_let_form(
     SchemeObject* lambda =
         obj_creator_.make_tagged_list("lambda", vars, body);
     return eval(cons(lambda, vals), env);
+}
+
+SchemeObject* Scheme::prepare_apply_args(SchemeObject* args_to_apply) {
+    // TODO: Error checking to ensure the values end with a list
+    
+    SchemeObject* the_args = args_to_apply;
+
+    if (the_args->length_as_list() == 1 &&
+        the_args->car()->is_proper_list())
+    {
+        // only arg is a list, just return it
+        return the_args->car();
+    }
+
+    // Get to the last argument
+    while (!args_to_apply->cadr()->is_proper_list()) {
+        args_to_apply = args_to_apply->cdr();
+    }
+    // Make one big list
+    args_to_apply->to_pair()->set_cdr(args_to_apply->cadr());
+
+    return the_args;
+}
+
+SchemeObject* Scheme::convert_eval_form(SchemeObject* eval_args) {
+    // TODO: Error checking to ensure the values end with
+    // a list
+    // Get to the last argument and create a list
+    return eval_args;
 }
 
 //============================================================================
