@@ -205,3 +205,17 @@ SchemeObject* SchemeNotProcedure::func(SchemeObject* args) {
     }
     return &the_true_object_;
 }
+
+//============================================================================
+// Apply and Eval
+//============================================================================
+
+SchemeObject* SchemeApplyProcedure::func(SchemeObject* args) {
+    //TODO: This should be an error
+    return nullptr;
+}
+
+SchemeObject* SchemeEvalProcedure::func(SchemeObject* args) {
+    //TODO: This should be an error
+    return nullptr;
+}

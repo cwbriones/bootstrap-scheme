@@ -15,6 +15,8 @@ public:
     virtual ~SchemePrimProcedure(){}
     virtual SchemeObject* func(SchemeObject* args) = 0;
 
+    virtual bool is_apply(){ return false;}
+    virtual bool is_eval(){ return false;}
 protected:
     int argc_;
     SchemeObjectCreator* obj_creator_ = nullptr;
@@ -210,6 +212,30 @@ public:
 private:
     SchemeNotProcedure(SchemeObjectCreator* creator) :
         SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
+
+//============================================================================
+// Apply and Eval
+//============================================================================
+
+class SchemeApplyProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+    virtual bool is_apply(){ return true;}
+private:
+    SchemeApplyProcedure() :
+        SchemePrimProcedure(nullptr, -1) {}
+    friend class SchemeObjectCreator;
+};
+
+class SchemeEvalProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+    virtual bool is_eval(){ return true;}
+private:
+    SchemeApplyProcedure() :
+        SchemePrimProcedure(nullptr, -1) {}
     friend class SchemeObjectCreator;
 };
 #endif /* SCHEMEPRIMPROCEDURE_H_ */
