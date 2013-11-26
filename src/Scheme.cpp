@@ -80,8 +80,33 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         return value;
 
     } else if (exp->is_tagged_list("and")) {
+
+        exp = exp->cdr();
+        SchemeObject* result = obj_creator_.make_boolean(true);
+
+        while (!exp->is_empty_list()) {
+            result = eval(exp->car(), env);
+            if (result->is_false_obj()) {
+                return result;
+            }
+            exp = exp->cdr();
+        }
+        return result;
+
     } else if (exp->is_tagged_list("or")) {
-    
+
+        exp = exp->cdr();
+        SchemeObject* result = obj_creator_.make_boolean(false);
+
+        while (!exp->is_empty_list()) {
+            result = eval(exp->car(), env);
+            if (result->is_true()) {
+                return result;
+            }
+            exp = exp->cdr();
+        }
+        return result;
+
     } else if (exp->is_tagged_list("begin")) {
 
         // Point expression to the body of the begin form
