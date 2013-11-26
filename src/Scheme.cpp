@@ -131,11 +131,15 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         return eval_let_form(exp->cdr(), env);
 
     } else if (exp->is_tagged_list("if")) {
-        if (exp->length_as_list() == 4) {
+
+        if (exp->length_as_list() == 4 || exp->length_as_list() == 3) {
             exp = exp->cdr();
 
             if (eval(exp->car(), env)->is_false_obj()) {
                 exp = exp->caddr();
+                if (!exp) {
+                    return obj_creator_.make_unspecified();
+                }
             } else {
                 exp = exp->cadr();
             }
@@ -145,13 +149,13 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
             std::cerr << "Error: cannot evaluate if form" << std::endl;
             exit(1);
         }
+
     } else if (exp->is_tagged_list("cond")) {
 
         SchemeObject* the_begin_form;
+        exp = exp->cdr();
 
         while (!exp->is_empty_list()) {
-            exp = exp->cdr();
-
             if (exp->car()->is_tagged_list("else")) {
                 // Make a begin form and assert that this is valid
                 // placement for an if clause
@@ -173,7 +177,11 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
                         exp->cdar());
                 return eval(the_begin_form, env);
             }
+            exp = exp->cdr();
         }
+
+        return obj_creator_.make_unspecified();
+
     } else if (exp->is_tagged_list("quote")){
 
         return exp->cadr();
