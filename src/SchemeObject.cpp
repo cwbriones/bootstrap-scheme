@@ -19,12 +19,9 @@ void SchemeObject::object_summary() {
 
 SchemeBoolean SchemeObject::the_false_object_ = 
     SchemeBoolean(SchemeObject::BOOLEAN, false);
-
 SchemeBoolean SchemeObject::the_true_object_ =
     SchemeBoolean(SchemeObject::BOOLEAN, true);
-
 SchemeObject SchemeObject::the_empty_list_ = SchemeObject(EMPTY_LIST);
-
 SchemeObject SchemeObject::the_unspecified_object_ = SchemeObject(UNSPECIFIED);
 
 SchemeObject::SchemeObject(Type t) : type_(t) {
@@ -35,6 +32,10 @@ SchemeObject::SchemeObject(Type t) : type_(t) {
         length_as_list_ = 0;
     } else if (type_ == PAIR) {
         length_as_list_ = 0;
+    }
+
+    if (type_ & (SYMBOL | BOOLEAN | UNSPECIFIED | EMPTY_LIST)) {
+        protect_from_gc();
     }
 }
 
@@ -168,8 +169,12 @@ bool SchemeObject::is_application() {
     return is_pair();
 }
 
+void SchemeObject::protect_from_gc() {
+    collectible_ = false;
+}
+
 bool SchemeObject::collectible() {
-    return !(type_ & (UNSPECIFIED | SYMBOL | EMPTY_LIST | BOOLEAN | ENVIRONMENT));
+    return collectible_;
 }
 
 bool SchemeObject::is_true() {
@@ -240,7 +245,6 @@ SchemeObject* SchemeObject::cdddr() {
 // SchemeSymbol
 //============================================================================
 
-std::unordered_map<std::string, size_t> SchemeSymbol::ref_count_;
 std::unordered_map<std::string, SchemeSymbol*> SchemeSymbol::symbols_;
 
 SchemeSymbol::SchemeSymbol(std::string& val) :
@@ -248,28 +252,12 @@ SchemeSymbol::SchemeSymbol(std::string& val) :
     value_(val)
 {
     symbols_[val] = this;
-    ref_count_[val] = 1;
-}
-
-SchemeSymbol::~SchemeSymbol() {
-    // Decrement reference count
-    int count = (--ref_count_[value_]);
-
-    if (count == 0) {
-        // Remove from the table of symbols
-        auto ref_iter = ref_count_.find(value_);
-        auto symbol_iter = symbols_.find(value_);
-
-        ref_count_.erase(ref_iter);
-        symbols_.erase(symbol_iter);
-    }
 }
 
 SchemeSymbol* SchemeSymbol::make_symbol(std::string& val) {
     auto found = symbols_.find(val);
 
     if (found != symbols_.end()) {
-        ref_count_[val]++;
         return found->second;
     } else {
         return new SchemeSymbol(val);
