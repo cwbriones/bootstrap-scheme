@@ -9,7 +9,7 @@ class SchemeObject;
 
 class SchemeObjectCreator {
 public:
-    SchemeObjectCreator();
+    SchemeObjectCreator(Environment::Ptr global_env);
 
     SchemeObject* make_unspecified();
     SchemeObject* make_fixnum(int value);
@@ -19,8 +19,11 @@ public:
     SchemeObject* make_string(std::string value);
     SchemeObject* make_pair(SchemeObject* car, SchemeObject* cdr);
     SchemeObject* make_symbol(std::string value);
-    SchemeObject* make_environment(const Environment::Ptr& env);
     SchemeObject* make_empty_list();
+
+    SchemeObject* make_environment();
+    SchemeObject* make_interaction_environment();
+    SchemeObject* make_null_environment();
 
     SchemeObject* make_special_form(std::string tag, SchemeObject* cdr);
     SchemeObject* make_tagged_list(std::string tag, SchemeObject* obj);
@@ -30,8 +33,9 @@ public:
     SchemeObject* make_comp_procedure(
             Environment::Ptr& env, SchemeObject* params, SchemeObject* body);
 
-    void setup_environment(Environment* env);
 private:
+    void setup_environment(Environment* env);
+
     void init_keywords();
     void init_type_predicates(Environment* env);
     void init_type_conversions(Environment* env);
@@ -39,6 +43,8 @@ private:
     // -----------------------------
     // Symbols
     // -----------------------------
+    
+    SchemeObject* the_interaction_env = nullptr;
 
     SchemeObject* quote_symbol = nullptr;
     SchemeObject* define_symbol = nullptr;

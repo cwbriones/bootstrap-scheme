@@ -20,8 +20,8 @@ private:
 	const std::string cursor_;
     
     // Model
-    SchemeObjectCreator obj_creator_;
     Environment::Ptr the_global_environment_;
+    SchemeObjectCreator obj_creator_;
     
     // Read
     SchemeReader reader_;

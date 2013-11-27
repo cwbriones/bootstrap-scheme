@@ -9,8 +9,12 @@
 
 #include "SchemeEnvironment.h"
 
-SchemeObjectCreator::SchemeObjectCreator() {
+SchemeObjectCreator::SchemeObjectCreator(Environment::Ptr global_env) {
+    the_interaction_env = new SchemeEnvironment(global_env);
+    Environment* the_env = global_env.get();
+
     init_keywords();
+    setup_environment(the_env);
 }
 
 //============================================================================
@@ -52,8 +56,19 @@ SchemeObject* SchemeObjectCreator::make_symbol(std::string value) {
     return SchemeSymbol::make_symbol(value);
 }
 
-SchemeObject* SchemeObjectCreator::make_environment(const Environment::Ptr& env) {
+SchemeObject* SchemeObjectCreator::make_environment() {
+    Environment::Ptr env = std::make_shared<Environment>();
+    setup_environment(env.get());
+
     return new SchemeEnvironment(env);
+}
+
+SchemeObject* SchemeObjectCreator::make_interaction_environment() {
+    return the_interaction_env;
+}
+
+SchemeObject* SchemeObjectCreator::make_null_environment() {
+    return new SchemeEnvironment(std::make_shared<Environment>());
 }
 
 SchemeObject* SchemeObjectCreator::make_empty_list() {

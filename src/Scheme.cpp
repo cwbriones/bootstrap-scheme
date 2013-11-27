@@ -35,12 +35,10 @@
 
 Scheme::Scheme(std::istream& instream) : 
     cursor_(">>>"),
-    obj_creator_(), 
+    the_global_environment_(std::make_shared<Environment>()),
+    obj_creator_(the_global_environment_), 
     reader_(&obj_creator_, instream)
 { 
-    // Populate environment with bindings to built-ins
-    the_global_environment_ = std::make_shared<Environment>();
-    obj_creator_.setup_environment(the_global_environment_.get());
 }
 
 void Scheme::print_welcome_message() {

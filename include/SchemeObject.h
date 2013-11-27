@@ -5,8 +5,6 @@
 #include <string>
 #include <memory>
 
-#include "Environment.h"
-
 // Forward Declarations needed
 template <class T>
 class SchemePrimitive;
