@@ -169,7 +169,7 @@ bool SchemeObject::is_application() {
 }
 
 bool SchemeObject::collectible() {
-    return !(type_ & (UNSPECIFIED | SYMBOL | EMPTY_LIST | BOOLEAN));
+    return !(type_ & (UNSPECIFIED | SYMBOL | EMPTY_LIST | BOOLEAN | ENVIRONMENT));
 }
 
 bool SchemeObject::is_true() {

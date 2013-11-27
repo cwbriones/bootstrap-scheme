@@ -26,6 +26,8 @@ private:
     std::unordered_set<SchemeObject*> the_white_set_;
     std::unordered_set<SchemeObject*> the_grey_set_;
     std::unordered_set<SchemeObject*> the_black_set_;
+
+    std::unordered_set<Environment*> checked_env_;
 };
 
 #endif /* SCHEME_GARBAGE_COLLECTOR_H_ */

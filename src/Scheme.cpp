@@ -29,6 +29,7 @@
 #include "SchemeObject.h"
 #include "SchemeEnvironment.h"
 #include "SchemeObjectCreator.h"
+#include "SchemeGarbageCollector.h"
 
 #include "Environment.h"
 
@@ -470,6 +471,9 @@ void Scheme::main_loop(){
 		std::cout << cursor_ << ' ';
 		write(eval(reader_.read(), the_global_environment_));
 		std::cout << std::endl;
+
+        SchemeGarbageCollector::the_gc().add_from_environment(the_global_environment_.get());
+        SchemeGarbageCollector::the_gc().collect();
 	}
     print_goodbye_message();
 }

@@ -30,12 +30,14 @@ SchemeObject* SchemeObjectCreator::make_unspecified() {
 
 SchemeObject* SchemeObjectCreator::make_fixnum(int value) {
     SchemeObject* obj = new SchemeFixnum(SchemeObject::FIXNUM, value);
+    SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_flonum(double value) {
     SchemeObject* obj = new SchemeFlonum(SchemeObject::FLONUM, value);
+    SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
 }
@@ -49,18 +51,21 @@ SchemeObject* SchemeObjectCreator::make_boolean(bool value) {
 
 SchemeObject* SchemeObjectCreator::make_character(char value) {
     SchemeObject* obj = new SchemeCharacter(SchemeObject::CHARACTER, value);
+    SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_string(std::string value) {
     SchemeObject* obj = new SchemeString(SchemeObject::STRING, value);
+    SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cdr) {
     SchemeObject* obj = new SchemeObject(SchemeObject::PAIR);
+    SchemeGarbageCollector::the_gc().add(obj);
 
     obj->set_car(car);
     obj->set_cdr(cdr);
@@ -70,6 +75,7 @@ SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cd
 
 SchemeObject* SchemeObjectCreator::make_symbol(std::string value) {
     SchemeObject* obj = SchemeSymbol::make_symbol(value);
+    SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
 }
@@ -79,6 +85,7 @@ SchemeObject* SchemeObjectCreator::make_environment() {
     setup_environment(env.get());
 
     SchemeObject* obj = new SchemeEnvironment(env);
+    SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
 }
@@ -89,7 +96,8 @@ SchemeObject* SchemeObjectCreator::make_interaction_environment() {
 
 SchemeObject* SchemeObjectCreator::make_null_environment() {
     SchemeObject* obj = new SchemeEnvironment(std::make_shared<Environment>());
-    
+    SchemeGarbageCollector::the_gc().add(obj);
+
     return obj;
 }
 
@@ -124,7 +132,8 @@ SchemeObject* SchemeObjectCreator::make_comp_procedure(
     SchemeObject* body)
 {
     SchemeObject* obj = new SchemeCompoundProcedure(env, params, body);
-
+    SchemeGarbageCollector::the_gc().add(obj);
+    
     return obj;
 }
 

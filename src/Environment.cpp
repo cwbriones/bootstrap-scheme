@@ -35,16 +35,16 @@ Environment::Environment(Environment::Ptr enclosing,
 Environment::~Environment() {}
 
 void Environment::define_variable_value(SchemeSymbol* symbol, SchemeObject* value) {
-    auto found = frame_bindings_.find(symbol->value());
+    auto found = frame_bindings_.find(symbol);
 
     if (found == frame_bindings_.end()) {
-        frame_bindings_[symbol->value()] = value;
+        frame_bindings_[symbol] = value;
     } else {
         found->second = value;
     }
 }
 
-bool Environment::variable_is_defined(std::string var) {
+bool Environment::variable_is_defined(SchemeSymbol* var) {
     Environment* env = this;
     while (env) {
         if (env->frame_bindings_.find(var) != env->frame_bindings_.end()) {
@@ -67,7 +67,7 @@ bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) 
      * and if there is no way up we relent and return failure
      */
     while (env){
-        auto found = env->frame_bindings_.find(symbol->value());
+        auto found = env->frame_bindings_.find(symbol);
         if (found != env->frame_bindings_.end()){
             found->second = value;
             return true;
@@ -78,7 +78,7 @@ bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) 
 }
 
 
-const std::unordered_map<std::string, SchemeObject*>& Environment::get_bindings() const {
+const std::unordered_map<SchemeSymbol*, SchemeObject*>& Environment::get_bindings() const {
     return frame_bindings_;
 }
 
@@ -87,7 +87,7 @@ SchemeObject* Environment::lookup_variable_value(SchemeSymbol* symbol) {
     Environment* env = this;
 
     while (env){
-        auto found = env->frame_bindings_.find(symbol->value());
+        auto found = env->frame_bindings_.find(symbol);
         if (found != env->frame_bindings_.end()){
             return found->second;
         }

@@ -2,7 +2,6 @@
 #define ENVIRONMENT_H
 
 #include <unordered_map>
-#include <string>
 
 #include "SchemeObject.h"
 
@@ -24,15 +23,15 @@ public:
 
     void define_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool set_variable_value(SchemeSymbol* symbol, SchemeObject* value);
-    bool variable_is_defined(std::string var);
+    bool variable_is_defined(SchemeSymbol* var);
 
-    const std::unordered_map<std::string, SchemeObject*>& get_bindings() const;
+    const std::unordered_map<SchemeSymbol*, SchemeObject*>& get_bindings() const;
 
     SchemeObject* lookup_variable_value(SchemeSymbol* symbol);
     Environment* enclosing();
 private:
     Environment::Ptr enclosing_;
-    std::unordered_map<std::string, SchemeObject*> frame_bindings_;
+    std::unordered_map<SchemeSymbol*, SchemeObject*> frame_bindings_;
 };
 
 
