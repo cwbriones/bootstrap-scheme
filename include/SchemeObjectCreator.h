@@ -19,6 +19,7 @@ public:
     SchemeObject* make_string(std::string value);
     SchemeObject* make_pair(SchemeObject* car, SchemeObject* cdr);
     SchemeObject* make_symbol(std::string value);
+    SchemeObject* make_environment(const Environment::Ptr& env);
     SchemeObject* make_empty_list();
 
     SchemeObject* make_special_form(std::string tag, SchemeObject* cdr);

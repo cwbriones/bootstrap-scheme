@@ -4,8 +4,10 @@
 #include "Procedures/SchemeCompoundProcedure.h"
 #include "Procedures/TypeConversions.h"
 
-#include "SchemeObjectCreator.h"
 #include "SchemeObject.h"
+#include "SchemeObjectCreator.h"
+
+#include "SchemeEnvironment.h"
 
 SchemeObjectCreator::SchemeObjectCreator() {
     init_keywords();
@@ -48,6 +50,10 @@ SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cd
 
 SchemeObject* SchemeObjectCreator::make_symbol(std::string value) {
     return SchemeSymbol::make_symbol(value);
+}
+
+SchemeObject* SchemeObjectCreator::make_environment(const Environment::Ptr& env) {
+    return new SchemeEnvironment(env);
 }
 
 SchemeObject* SchemeObjectCreator::make_empty_list() {

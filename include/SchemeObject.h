@@ -5,6 +5,8 @@
 #include <string>
 #include <memory>
 
+#include "Environment.h"
+
 // Forward Declarations needed
 template <class T>
 class SchemePrimitive;
@@ -19,6 +21,7 @@ class SchemePair;
 class SchemeSymbol;
 class SchemePrimProcedure;
 class SchemeCompoundProcedure;
+class SchemeEnvironment;
 
 //============================================================================
 // SchemeObject
@@ -40,7 +43,8 @@ public:
                  PAIR = 1 << 7,
                SYMBOL = 1 << 8,
         PRIMPROCEDURE = 1 << 9,
-        COMPPROCEDURE = 1 << 10
+        COMPPROCEDURE = 1 << 10,
+          ENVIRONMENT = 1 << 11
     };
     Type type() const;
 
@@ -213,5 +217,4 @@ private:
     friend class SchemeObject;
     friend class SchemeObjectCreator;
 };
-
 #endif /* SCHEMEOBJECT_H_ */

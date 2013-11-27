@@ -7,6 +7,7 @@
 #include "SchemeObject.h"
 
 class SchemeObject;
+class SchemeSymbol;
 class SchemeObjectCreator;
 
 class Environment {
