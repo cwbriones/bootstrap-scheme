@@ -167,16 +167,17 @@ private:
 
 class SchemeSymbol : public SchemeObject {
 public:
+    typedef std::unique_ptr<SchemeSymbol> Ptr;
+
     static SchemeSymbol* make_symbol(std::string& val);
-    static const std::unordered_map<std::string, SchemeSymbol*>& all_symbols() {
-        return symbols_;
-    }
+    static void clear_symbols();
+
     std::string value(){ return value_; }
 private:
     SchemeSymbol(std::string& value);
 
     std::string value_;
-    static std::unordered_map<std::string, SchemeSymbol*> symbols_;
+    static std::unordered_map<std::string, SchemeSymbol::Ptr> symbols_;
 };
 
 #endif /* SCHEMEOBJECT_H_ */

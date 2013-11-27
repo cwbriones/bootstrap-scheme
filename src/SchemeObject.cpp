@@ -245,21 +245,23 @@ SchemeObject* SchemeObject::cdddr() {
 // SchemeSymbol
 //============================================================================
 
-std::unordered_map<std::string, SchemeSymbol*> SchemeSymbol::symbols_;
+std::unordered_map<std::string, SchemeSymbol::Ptr> SchemeSymbol::symbols_;
+
+void SchemeSymbol::clear_symbols() {
+    symbols_.clear();
+}
 
 SchemeSymbol::SchemeSymbol(std::string& val) :
     SchemeObject(SchemeObject::SYMBOL),
     value_(val)
-{
-    symbols_[val] = this;
-}
+{}
 
 SchemeSymbol* SchemeSymbol::make_symbol(std::string& val) {
     auto found = symbols_.find(val);
 
-    if (found != symbols_.end()) {
-        return found->second;
-    } else {
-        return new SchemeSymbol(val);
+    if (found == symbols_.end()) {
+        symbols_[val].reset(new SchemeSymbol(val));
     }
+
+    return symbols_[val].get();
 }
