@@ -26,6 +26,8 @@ public:
     bool set_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool variable_is_defined(std::string var);
 
+    const std::unordered_map<std::string, SchemeObject*>& get_bindings() const;
+
     SchemeObject* lookup_variable_value(SchemeSymbol* symbol);
     Environment* enclosing();
 private:

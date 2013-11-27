@@ -77,6 +77,11 @@ bool Environment::set_variable_value(SchemeSymbol* symbol, SchemeObject* value) 
     return false;
 }
 
+
+const std::unordered_map<std::string, SchemeObject*>& Environment::get_bindings() const {
+    return frame_bindings_;
+}
+
 SchemeObject* Environment::lookup_variable_value(SchemeSymbol* symbol) {
 
     Environment* env = this;

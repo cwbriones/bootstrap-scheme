@@ -168,6 +168,10 @@ bool SchemeObject::is_application() {
     return is_pair();
 }
 
+bool SchemeObject::collectible() {
+    return !(type_ & (UNSPECIFIED | SYMBOL | EMPTY_LIST | BOOLEAN));
+}
+
 bool SchemeObject::is_true() {
     return !this->is_false_obj();
 }

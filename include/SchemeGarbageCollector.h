@@ -1,33 +1,31 @@
 #ifndef SCHEME_GARBAGE_COLLECTOR_H_
 #define SCHEME_GARBAGE_COLLECTOR_H_
 
-#include <list>
-#include <unordered_map>
+#include <memory>
+#include <unordered_set>
 
 class SchemeObject;
 class Environment;
 
 class SchemeGarbageCollector {
 public:
-    SchemeGarbageCollector& the_gc();
-    void set_global_environment(Environment* env);
+    typedef std::unique_ptr<SchemeGarbageCollector> Ptr;
+    static SchemeGarbageCollector& the_gc();
 
-    SchemeObject* get_object();
+    void add(SchemeObject* obj);
+    void add_from_environment(Environment* env);
+    void collect();
 private:
-    void mark_all_objects();
-    void sweep();
-    void reset_mark();
+    static Ptr instance_;
 
     SchemeGarbageCollector();
+    void follow(SchemeObject* obj);
+    void grey_object(SchemeObject* obj);
+    void free();
 
-    SchemeGarbageCollector instance_;
-    int current_mark_ = 0;
-
-    std::vector<SchemeObject*> white_set_;
-    std::vector<SchemeObject*> grey_set_;
-    std::vector<SchemeObject*> black_set_;
-
-    Environment* the_global_env = nullptr;
+    std::unordered_set<SchemeObject*> the_white_set_;
+    std::unordered_set<SchemeObject*> the_grey_set_;
+    std::unordered_set<SchemeObject*> the_black_set_;
 };
 
 #endif /* SCHEME_GARBAGE_COLLECTOR_H_ */

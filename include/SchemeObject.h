@@ -78,6 +78,7 @@ public:
 
     bool is_application();
     bool is_true();
+    bool collectible();
 
     // Specific checks for object equality
 
@@ -97,12 +98,6 @@ public:
     SchemeObject* cdddr();
 
     int length_as_list();
-    void set_mark(int mark) {
-        mark_ = mark;
-    }
-    int mark() {
-        return mark_;
-    }
 
     static void object_summary();
 protected:
