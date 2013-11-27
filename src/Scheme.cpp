@@ -187,7 +187,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         return exp->cadr();
 
     } else if (exp->is_tagged_list("define")){
-        if (exp->cadr()->is_proper_list()) {
+        if (exp->cadr()->is_pair()) {
             SchemeObject* the_lambda = cons(
                     obj_creator_.make_symbol("lambda"),
                     cons(exp->cdadr(), exp->cddr()));
@@ -330,9 +330,6 @@ SchemeObject* Scheme::prepare_apply_args(SchemeObject* args_to_apply) {
 }
 
 SchemeObject* Scheme::convert_eval_form(SchemeObject* eval_args) {
-    // TODO: Error checking to ensure the values end with
-    // a list
-    // Get to the last argument and create a list
     return eval_args;
 }
 

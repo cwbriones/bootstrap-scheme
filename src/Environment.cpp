@@ -9,6 +9,13 @@ Environment::Environment(Environment::Ptr enclosing,
 {
     enclosing_ = enclosing;
 
+    if (vars->is_symbol()) {
+        define_variable_value(
+                vars->to_symbol(),
+                vals);
+        return;
+    }
+
     while (!vars->is_empty_list()) {
         // Bind new variables
         define_variable_value(
