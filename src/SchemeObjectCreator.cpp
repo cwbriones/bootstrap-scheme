@@ -9,9 +9,11 @@
 #include "SchemeObjectCreator.h"
 
 #include "SchemeEnvironment.h"
+#include "SchemeGarbageCollector.h"
 
-SchemeObjectCreator::SchemeObjectCreator(Environment::Ptr global_env) {
-    the_interaction_env = new SchemeEnvironment(global_env);
+SchemeObjectCreator::SchemeObjectCreator(Environment::Ptr global_env) :
+    the_interaction_env(global_env) 
+{
     Environment* the_env = global_env.get();
 
     init_keywords();
@@ -27,11 +29,15 @@ SchemeObject* SchemeObjectCreator::make_unspecified() {
 }
 
 SchemeObject* SchemeObjectCreator::make_fixnum(int value) {
-    return new SchemeFixnum(SchemeObject::FIXNUM, value);
+    SchemeObject* obj = new SchemeFixnum(SchemeObject::FIXNUM, value);
+
+    return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_flonum(double value) {
-    return new SchemeFlonum(SchemeObject::FLONUM, value);
+    SchemeObject* obj = new SchemeFlonum(SchemeObject::FLONUM, value);
+
+    return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_boolean(bool value) {
@@ -42,11 +48,15 @@ SchemeObject* SchemeObjectCreator::make_boolean(bool value) {
 }
 
 SchemeObject* SchemeObjectCreator::make_character(char value) {
-    return new SchemeCharacter(SchemeObject::CHARACTER, value);
+    SchemeObject* obj = new SchemeCharacter(SchemeObject::CHARACTER, value);
+
+    return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_string(std::string value) {
-    return new SchemeString(SchemeObject::STRING, value);
+    SchemeObject* obj = new SchemeString(SchemeObject::STRING, value);
+
+    return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cdr) {
@@ -59,22 +69,28 @@ SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cd
 }
 
 SchemeObject* SchemeObjectCreator::make_symbol(std::string value) {
-    return SchemeSymbol::make_symbol(value);
+    SchemeObject* obj = SchemeSymbol::make_symbol(value);
+
+    return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_environment() {
     Environment::Ptr env = std::make_shared<Environment>();
     setup_environment(env.get());
 
-    return new SchemeEnvironment(env);
+    SchemeObject* obj = new SchemeEnvironment(env);
+
+    return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_interaction_environment() {
-    return the_interaction_env;
+    return &the_interaction_env;
 }
 
 SchemeObject* SchemeObjectCreator::make_null_environment() {
-    return new SchemeEnvironment(std::make_shared<Environment>());
+    SchemeObject* obj = new SchemeEnvironment(std::make_shared<Environment>());
+    
+    return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_empty_list() {
@@ -107,7 +123,9 @@ SchemeObject* SchemeObjectCreator::make_comp_procedure(
     SchemeObject* params, 
     SchemeObject* body)
 {
-    return new SchemeCompoundProcedure(env, params, body);
+    SchemeObject* obj = new SchemeCompoundProcedure(env, params, body);
+
+    return obj;
 }
 
 //============================================================================

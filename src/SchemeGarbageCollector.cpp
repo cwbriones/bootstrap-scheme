@@ -76,7 +76,9 @@ void SchemeGarbageCollector::grey_object(SchemeObject* obj) {
 
 void SchemeGarbageCollector::free() {
     for (auto& obj : the_white_set_) {
-        delete obj;
+        if (obj->collectible()) {
+            delete obj;
+        }
     }
     the_white_set_.clear();
 

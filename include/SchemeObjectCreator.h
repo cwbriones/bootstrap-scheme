@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "SchemeEnvironment.h"
 #include "Environment.h"
 
 class SchemeObject;
@@ -43,7 +44,7 @@ private:
     // Symbols
     // -----------------------------
     
-    SchemeObject* the_interaction_env = nullptr;
+    SchemeEnvironment the_interaction_env;
 
     SchemeObject* quote_symbol = nullptr;
     SchemeObject* define_symbol = nullptr;
