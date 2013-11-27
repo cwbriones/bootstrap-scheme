@@ -157,7 +157,7 @@ SchemeObject* SchemeListProcedure::func(SchemeObject* args) {
 }
 
 SchemeObject* SchemeConsProcedure::func(SchemeObject* args) {
-    args->to_pair()->set_cdr(args->cadr());
+    args->set_cdr(args->cadr());
 
     return args;
 }
@@ -171,14 +171,14 @@ SchemeObject* SchemeCdrProcedure::func(SchemeObject* args) {
 }
 
 SchemeObject* SchemeSetCarProcedure::func(SchemeObject* args) {
-    SchemePair* the_pair = args->car()->to_pair();
+    SchemeObject* the_pair = args->car();;
     the_pair->set_car(args->cadr());
 
     return obj_creator_->make_symbol("ok");
 }
 
 SchemeObject* SchemeSetCdrProcedure::func(SchemeObject* args) {
-    SchemePair* the_pair = args->car()->to_pair();
+    SchemeObject* the_pair = args->car();
     the_pair->set_cdr(args->cadr());
 
     return obj_creator_->make_symbol("ok");

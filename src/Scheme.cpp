@@ -249,6 +249,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         } else {
             std::cerr << "Error: Cannot apply object ";
             write(proc);
+            std::endl;
             exit(1);
         }
     } else { 
@@ -324,7 +325,7 @@ SchemeObject* Scheme::prepare_apply_args(SchemeObject* args_to_apply) {
         args_to_apply = args_to_apply->cdr();
     }
     // Make one big list
-    args_to_apply->to_pair()->set_cdr(args_to_apply->cadr());
+    args_to_apply->set_cdr(args_to_apply->cadr());
 
     return the_args;
 }
@@ -373,7 +374,7 @@ void Scheme::write(SchemeObject* obj){
             break;
         case SchemeObject::PAIR:
             std::cout << "(";
-            write_pair(obj->to_pair());
+            write_pair(obj);
             std::cout << ")";
             break;
         case SchemeObject::EMPTY_LIST:
@@ -397,7 +398,7 @@ void Scheme::write(SchemeObject* obj){
 	}
 }
 
-void Scheme::write_pair(SchemePair* pair){
+void Scheme::write_pair(SchemeObject* pair){
     SchemeObject* car_obj = pair->car();
     SchemeObject* cdr_obj = pair->cdr();
 
@@ -405,7 +406,7 @@ void Scheme::write_pair(SchemePair* pair){
 
     if (cdr_obj->is_pair()){
         std::cout << " ";
-        write_pair(cdr_obj->to_pair());
+        write_pair(cdr_obj);
         return;
     } 
     else if (cdr_obj->is_empty_list()){

@@ -37,7 +37,7 @@ private:
 
     // Print
 	void write(SchemeObject* obj);
-    void write_pair(SchemePair* obj);
+    void write_pair(SchemeObject* obj);
     void write_string(std::string);
 
     void print_welcome_message();

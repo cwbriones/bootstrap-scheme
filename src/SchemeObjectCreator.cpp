@@ -50,7 +50,12 @@ SchemeObject* SchemeObjectCreator::make_string(std::string value) {
 }
 
 SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cdr) {
-    return new SchemePair(car, cdr);
+    SchemeObject* obj = new SchemeObject(SchemeObject::PAIR);
+
+    obj->set_car(car);
+    obj->set_cdr(cdr);
+
+    return obj;
 }
 
 SchemeObject* SchemeObjectCreator::make_symbol(std::string value) {
@@ -77,14 +82,11 @@ SchemeObject* SchemeObjectCreator::make_empty_list() {
 }
 
 SchemeObject* SchemeObjectCreator::make_special_form(std::string tag, SchemeObject* cdr) {
-    return new SchemePair(make_symbol(tag), cdr);
+    return make_pair(make_symbol(tag), cdr);
 }
 
 SchemeObject* SchemeObjectCreator::make_tagged_list(std::string tag, SchemeObject* obj) {
-    return new SchemePair(
-        make_symbol(tag), 
-        make_pair(obj, make_empty_list())
-    );
+    return make_pair(make_symbol(tag), obj);
 }
 
 SchemeObject* SchemeObjectCreator::make_tagged_list(

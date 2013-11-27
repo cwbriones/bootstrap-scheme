@@ -23,12 +23,19 @@ SchemeBoolean SchemeObject::the_false_object_ =
 SchemeBoolean SchemeObject::the_true_object_ =
     SchemeBoolean(SchemeObject::BOOLEAN, true);
 
-SchemePair SchemeObject::the_empty_list_ = SchemePair();
+SchemeObject SchemeObject::the_empty_list_ = SchemeObject(EMPTY_LIST);
 
 SchemeObject SchemeObject::the_unspecified_object_ = SchemeObject(UNSPECIFIED);
 
 SchemeObject::SchemeObject(Type t) : type_(t) {
     objects_created_++;
+
+    if (type_ == EMPTY_LIST) {
+        is_proper_list_ = true;
+        length_as_list_ = 0;
+    } else if (type_ == PAIR) {
+        length_as_list_ = 0;
+    }
 }
 
 SchemeObject::~SchemeObject() {
@@ -59,10 +66,6 @@ SchemeString* SchemeObject::to_string() {
     return static_cast<SchemeString*>(this);
 }
 
-SchemePair* SchemeObject::to_pair() {
-    return static_cast<SchemePair*>(this);
-}
-
 SchemeSymbol* SchemeObject::to_symbol() {
     return static_cast<SchemeSymbol*>(this);
 }
@@ -80,10 +83,7 @@ SchemeEnvironment* SchemeObject::to_environment() {
 }
 
 int SchemeObject::length_as_list() {
-    if (type_ == Type::EMPTY_LIST || type_ == Type::PAIR) {
-        return to_pair()->length();
-    }
-    return -1;
+    return length_as_list_;
 }
 
 bool SchemeObject::is_true_obj() {
@@ -135,7 +135,7 @@ bool SchemeObject::is_comp_procedure() {
 }
 
 bool SchemeObject::is_proper_list() {
-    return is_empty_list() || (is_pair() && to_pair()->is_proper_list());
+    return is_empty_list() || (is_pair() && is_proper_list_);
 }
 
 bool SchemeObject::is_tagged_list(std::string tag) {
@@ -195,6 +195,8 @@ void SchemeObject::set_car(SchemeObject* car) {
 void SchemeObject::set_cdr(SchemeObject* cdr) {
     if (type_ == PAIR) {
         data.pair.cdr = cdr;
+        is_proper_list_ = cdr->is_proper_list();
+        length_as_list_ = cdr->length_as_list() + 1;
     }
 }
 
@@ -251,55 +253,4 @@ SchemeSymbol* SchemeSymbol::make_symbol(std::string& val) {
     } else {
         return new SchemeSymbol(val);
     }
-}
-
-//==============================================================================
-// SchemePair
-//==============================================================================
-
-SchemePair::SchemePair() :
-    SchemeObject(EMPTY_LIST),
-    car_(nullptr),
-    cdr_(nullptr),
-    proper_list_(true),
-    length_(0)
-{
-    data.pair.car = car_;
-    data.pair.cdr = cdr_;
-}
-
-SchemePair::SchemePair(SchemeObject* car, SchemeObject* cdr) :
-    SchemeObject(PAIR),
-    car_(car),
-    cdr_(cdr),
-    proper_list_(false)
-{
-    int cdr_type = cdr->type();
-
-    data.pair.car = car_;
-    data.pair.cdr = cdr_;
-
-    if (cdr_type == Type::EMPTY_LIST) {
-
-        proper_list_ = true;
-        length_ = 1;
-
-    } else if (cdr_type == Type::PAIR) {
-
-        proper_list_ = cdr->to_pair()->is_proper_list();
-
-        if (proper_list_) {
-            length_ = cdr->to_pair()->length_ + 1;
-        }
-    }
-}
-
-void SchemePair::set_cdr(SchemeObject* cdr) {
-    cdr_ = cdr;
-    data.pair.cdr = cdr;
-}
-
-void SchemePair::set_car(SchemeObject* car) {
-    car_ = car;
-    data.pair.car = car;
 }

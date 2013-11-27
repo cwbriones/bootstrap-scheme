@@ -15,7 +15,6 @@ typedef SchemePrimitive<bool> SchemeBoolean;
 typedef SchemePrimitive<char> SchemeCharacter;
 typedef SchemePrimitive<std::string> SchemeString;
 
-class SchemePair;
 class SchemeSymbol;
 class SchemePrimProcedure;
 class SchemeCompoundProcedure;
@@ -52,7 +51,6 @@ public:
     SchemeBoolean* to_boolean();
     SchemeCharacter* to_character();
     SchemeString* to_string();
-    SchemePair* to_pair();
     SchemeSymbol* to_symbol();
     SchemePrimProcedure* to_prim_procedure();
     SchemeCompoundProcedure* to_comp_procedure();
@@ -112,6 +110,8 @@ protected:
     Type type_ = UNSPECIFIED;
 
     int mark_ = 0;
+    int length_as_list_ = -1;
+    bool is_proper_list_ = false;
 
     union {
         struct {
@@ -136,7 +136,7 @@ protected:
     static SchemeObject the_unspecified_object_;
     static SchemeBoolean the_true_object_;
     static SchemeBoolean the_false_object_;
-    static SchemePair the_empty_list_;
+    static SchemeObject the_empty_list_;
 
     friend class SchemeObjectCreator;
 
@@ -181,39 +181,4 @@ private:
     static std::unordered_map<std::string, SchemeSymbol*> symbols_;
 };
 
-//============================================================================
-// SchemePair
-//============================================================================
-
-class SchemePair : public SchemeObject {
-public:
-    SchemeObject* car(){
-        return car_;
-    }
-    SchemeObject* cdr(){
-        return cdr_;
-    }
-
-    void set_car(SchemeObject* car);
-    void set_cdr(SchemeObject* cdr);
-
-    int length() {
-        return length_;
-    }
-    bool is_proper_list() {
-        return proper_list_;
-    }
-private:
-    SchemePair();
-    SchemePair(SchemeObject* car, SchemeObject* cdr);
-
-    SchemeObject* car_;
-    SchemeObject* cdr_;
-
-    bool proper_list_;
-    int length_;
-
-    friend class SchemeObject;
-    friend class SchemeObjectCreator;
-};
 #endif /* SCHEMEOBJECT_H_ */
