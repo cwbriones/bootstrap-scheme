@@ -9,19 +9,23 @@ Environment::Environment(Environment::Ptr enclosing,
 {
     enclosing_ = enclosing;
 
-    if (vars->is_symbol()) {
-        define_variable_value(
-                vars->to_symbol(),
-                vals);
-        return;
-    }
+    // List of arguments stored into the only variable
+    // Otherwise pair off each var/val into a binding
+    // TODO: Check that the correct number of arguments was passed
 
     while (!vars->is_empty_list()) {
         // Bind new variables
-        define_variable_value(
-                vars->car()->to_symbol(),
-                vals->car()
-            );
+        if (vars->is_symbol()) {
+            define_variable_value(
+                    vars->to_symbol(),
+                    vals);
+            break;
+        } else {
+            define_variable_value(
+                    vars->car()->to_symbol(),
+                    vals->car()
+                );
+        }
 
         vals = vals->cdr();
         vars = vars->cdr();
