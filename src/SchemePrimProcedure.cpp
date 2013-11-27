@@ -138,22 +138,11 @@ SchemeObject* SchemePredicateProcedure::func(SchemeObject* args) {
 
 #include <iostream>
 
-SchemeObject* SchemeListProcedure::func(SchemeObject* args) {
-    std::vector<SchemeObject*> the_args;
-    the_args.reserve(args->length_as_list());
-
-    while (!args->is_empty_list()) {
-        the_args.push_back(args->car());
-        args = args->cdr();
+SchemeObject* SchemeLengthProcedure::func(SchemeObject* args) {
+    if (args->is_proper_list()) {
+        return obj_creator_->make_fixnum(args->car()->length_as_list());
     }
-
-    SchemeObject* the_list = obj_creator_->make_empty_list();
-    while (!the_args.empty()) {
-        the_list = obj_creator_->make_pair(the_args.back(), the_list);
-        the_args.pop_back();
-    }
-
-    return the_list;
+    return nullptr;
 }
 
 SchemeObject* SchemeConsProcedure::func(SchemeObject* args) {

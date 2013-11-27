@@ -170,8 +170,8 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
         );
     // List operations
     env->define_variable_value(
-            make_symbol("list")->to_symbol(),
-            new SchemeListProcedure(this)
+            make_symbol("length")->to_symbol(),
+            new SchemeLengthProcedure(this)
         );
     env->define_variable_value(
             make_symbol("cons")->to_symbol(),

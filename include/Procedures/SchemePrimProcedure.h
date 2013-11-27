@@ -135,11 +135,11 @@ private:
 // List Operations
 //============================================================================
 
-class SchemeListProcedure : public SchemePrimProcedure {
+class SchemeLengthProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
 private:
-    SchemeListProcedure(SchemeObjectCreator* creator) :
+    SchemeLengthProcedure(SchemeObjectCreator* creator) :
         SchemePrimProcedure(creator, -1) {}
     friend class SchemeObjectCreator;
 };
