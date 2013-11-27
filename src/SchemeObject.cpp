@@ -240,6 +240,7 @@ SchemeObject* SchemeObject::cdddr() {
 // SchemeSymbol
 //============================================================================
 
+std::unordered_map<std::string, size_t> SchemeSymbol::ref_count_;
 std::unordered_map<std::string, SchemeSymbol*> SchemeSymbol::symbols_;
 
 SchemeSymbol::SchemeSymbol(std::string& val) :
@@ -247,12 +248,28 @@ SchemeSymbol::SchemeSymbol(std::string& val) :
     value_(val)
 {
     symbols_[val] = this;
+    ref_count_[val] = 1;
+}
+
+SchemeSymbol::~SchemeSymbol() {
+    // Decrement reference count
+    int count = (--ref_count_[value_]);
+
+    if (count == 0) {
+        // Remove from the table of symbols
+        auto ref_iter = ref_count_.find(value_);
+        auto symbol_iter = symbols_.find(value_);
+
+        ref_count_.erase(ref_iter);
+        symbols_.erase(symbol_iter);
+    }
 }
 
 SchemeSymbol* SchemeSymbol::make_symbol(std::string& val) {
     auto found = symbols_.find(val);
 
     if (found != symbols_.end()) {
+        ref_count_[val]++;
         return found->second;
     } else {
         return new SchemeSymbol(val);

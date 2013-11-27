@@ -164,6 +164,8 @@ private:
 
 class SchemeSymbol : public SchemeObject {
 public:
+    virtual ~SchemeSymbol();
+
     static SchemeSymbol* make_symbol(std::string& val);
     static const std::unordered_map<std::string, SchemeSymbol*>& all_symbols() {
         return symbols_;
@@ -173,6 +175,7 @@ private:
     SchemeSymbol(std::string& value);
 
     std::string value_;
+    static std::unordered_map<std::string, size_t> ref_count_;
     static std::unordered_map<std::string, SchemeSymbol*> symbols_;
 };
 
