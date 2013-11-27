@@ -10,8 +10,8 @@ public:
         SchemeObject(Type::ENVIRONMENT),
         env_(env) {}
 
-    Environment* get() {
-        return env_.get();
+    Environment::Ptr get() {
+        return env_;
     }
 private:
     Environment::Ptr env_;

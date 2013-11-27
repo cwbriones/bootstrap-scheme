@@ -27,7 +27,9 @@
 #include "Scheme.h"
 #include "Reader.h"
 #include "SchemeObject.h"
+#include "SchemeEnvironment.h"
 #include "SchemeObjectCreator.h"
+
 #include "Environment.h"
 
 #include "Procedures/SchemePrimProcedure.h"
@@ -232,7 +234,8 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
                 prim = args->car()->to_prim_procedure();
                 args = prepare_apply_args(args->cdr());
             } else if (prim->is_eval()) {
-                return convert_eval_form(exp->cdr());
+                SchemeObject* the_eval_env = args->cadr();
+                return eval(args->car(), the_eval_env->to_environment()->get());
             }
             return prim->func(args);
 

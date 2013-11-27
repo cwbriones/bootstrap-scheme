@@ -56,6 +56,7 @@ public:
     SchemeSymbol* to_symbol();
     SchemePrimProcedure* to_prim_procedure();
     SchemeCompoundProcedure* to_comp_procedure();
+    SchemeEnvironment* to_environment();
 
     // Boolean operations
     bool is_tagged_list(std::string tag);
