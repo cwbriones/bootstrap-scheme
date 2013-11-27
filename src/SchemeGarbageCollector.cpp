@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "SchemeGarbageCollector.h"
 
 #include "SchemeObject.h"
@@ -28,8 +30,18 @@ void SchemeGarbageCollector::add_from_environment(Environment* env) {
 
 void SchemeGarbageCollector::collect() {
     while (!the_grey_set_.empty()) {
+        // Grey all objects each object in the grey set
+        // references
+        for (auto iter = the_grey_set_.begin(); iter != the_grey_set_.end(); ++iter) {
+            // Grey all white objects this refers to
+            follow(*iter);
 
+            // Blacken this checked object
+            the_black_set_.insert(*iter);
+            iter = the_grey_set_.erase(iter);
+        }
     }
+    // White set now contains objects suitable for collection
     free();
 }
 
@@ -68,6 +80,7 @@ void SchemeGarbageCollector::free() {
     }
     the_white_set_.clear();
 
+    // Move objects back to the white set to prepare for the next round
     for (auto& obj : the_black_set_) {
         the_white_set_.insert(obj);
     }
