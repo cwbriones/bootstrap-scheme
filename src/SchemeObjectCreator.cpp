@@ -3,6 +3,7 @@
 #include "Procedures/SchemePrimProcedure.h"
 #include "Procedures/SchemeCompoundProcedure.h"
 #include "Procedures/TypeConversions.h"
+#include "Procedures/EnvironmentProcedures.h"
 
 #include "SchemeObject.h"
 #include "SchemeObjectCreator.h"
@@ -194,6 +195,19 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
     env->define_variable_value(
             make_symbol("apply")->to_symbol(),
             new SchemeApplyProcedure()
+        );
+    // Environment operations
+    env->define_variable_value(
+            make_symbol("null-environment")->to_symbol(),
+            new NullEnvironmentProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("interaction-environment")->to_symbol(),
+            new InteractionEnvironmentProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("environment")->to_symbol(),
+            new StandardEnvironmentProcedure(this)
         );
 
     init_type_predicates(env);

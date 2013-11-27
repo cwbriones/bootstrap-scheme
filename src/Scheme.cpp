@@ -388,6 +388,9 @@ void Scheme::write(SchemeObject* obj){
         case SchemeObject::COMPPROCEDURE:
             std::cout << "#<compound-procedure>";
             break;
+        case SchemeObject::ENVIRONMENT:
+            std::cout << "#<environment>";
+            break;
 		default:
 			std::cerr << "unknown type, cannot write." << std::endl;
 			exit(1);
