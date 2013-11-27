@@ -25,7 +25,6 @@ public:
     SchemeObject* make_interaction_environment();
     SchemeObject* make_null_environment();
 
-    SchemeObject* make_special_form(std::string tag, SchemeObject* cdr);
     SchemeObject* make_tagged_list(std::string tag, SchemeObject* obj);
     SchemeObject* make_tagged_list(
             std::string tag, SchemeObject* obj1, SchemeObject* obj2);

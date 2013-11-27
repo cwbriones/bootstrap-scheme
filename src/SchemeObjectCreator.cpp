@@ -81,12 +81,11 @@ SchemeObject* SchemeObjectCreator::make_empty_list() {
     return &SchemeObject::the_empty_list_;
 }
 
-SchemeObject* SchemeObjectCreator::make_special_form(std::string tag, SchemeObject* cdr) {
-    return make_pair(make_symbol(tag), cdr);
-}
-
 SchemeObject* SchemeObjectCreator::make_tagged_list(std::string tag, SchemeObject* obj) {
-    return make_pair(make_symbol(tag), obj);
+    return make_pair(
+        make_symbol(tag), 
+        make_pair(obj, make_empty_list())
+    );
 }
 
 SchemeObject* SchemeObjectCreator::make_tagged_list(

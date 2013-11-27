@@ -249,7 +249,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         } else {
             std::cerr << "Error: Cannot apply object ";
             write(proc);
-            std::endl;
+            std::cerr << std::endl;
             exit(1);
         }
     } else { 
