@@ -8,15 +8,12 @@
 #include "Procedures/SchemeCompoundProcedure.h"
 #include "Environment.h"
 
-SchemeGarbageCollector::Ptr SchemeGarbageCollector::instance_ = nullptr;
+SchemeGarbageCollector SchemeGarbageCollector::instance_;
 
 SchemeGarbageCollector::SchemeGarbageCollector() {}
 
 SchemeGarbageCollector& SchemeGarbageCollector::the_gc() {
-    if (!instance_) {
-        instance_.reset(new SchemeGarbageCollector());
-    }
-    return *instance_;
+    return instance_;
 }
 
 void SchemeGarbageCollector::add(SchemeObject* obj) {
@@ -24,10 +21,9 @@ void SchemeGarbageCollector::add(SchemeObject* obj) {
 }
 
 void SchemeGarbageCollector::add_from_environment(Environment* env) {
-    auto found = checked_env_.find(env);
-
-    if (found != checked_env_.end()) {
+    if (checked_env_.find(env) == checked_env_.end()) {
         for (auto& binding : env->get_bindings()) {
+            grey_object(binding.first);
             grey_object(binding.second);
         }
         checked_env_.insert(env);
@@ -38,7 +34,7 @@ void SchemeGarbageCollector::collect() {
     while (!the_grey_set_.empty()) {
         // Grey all objects each object in the grey set
         // references
-        for (auto iter = the_grey_set_.begin(); iter != the_grey_set_.end(); ++iter) {
+        for (auto iter = the_grey_set_.begin(); iter != the_grey_set_.end();) {
             // Grey all white objects this refers to
             follow(*iter);
 
@@ -49,6 +45,7 @@ void SchemeGarbageCollector::collect() {
     }
     // White set now contains objects suitable for collection
     free();
+    checked_env_.clear();
 }
 
 void SchemeGarbageCollector::follow(SchemeObject* obj) {
@@ -81,6 +78,7 @@ void SchemeGarbageCollector::grey_object(SchemeObject* obj) {
 }
 
 void SchemeGarbageCollector::free() {
+    // Clear objects now without references in the white set
     for (auto& obj : the_white_set_) {
         if (obj->collectible()) {
             delete obj;
@@ -92,6 +90,11 @@ void SchemeGarbageCollector::free() {
     for (auto& obj : the_black_set_) {
         the_white_set_.insert(obj);
     }
+
     the_black_set_.clear();
-    checked_env_.clear();
+}
+
+void SchemeGarbageCollector::free_remaining() {
+    free();
+    SchemeSymbol::clear_symbols();
 }

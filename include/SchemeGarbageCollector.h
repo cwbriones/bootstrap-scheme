@@ -1,7 +1,6 @@
 #ifndef SCHEME_GARBAGE_COLLECTOR_H_
 #define SCHEME_GARBAGE_COLLECTOR_H_
 
-#include <memory>
 #include <unordered_set>
 
 class SchemeObject;
@@ -9,14 +8,15 @@ class Environment;
 
 class SchemeGarbageCollector {
 public:
-    typedef std::unique_ptr<SchemeGarbageCollector> Ptr;
     static SchemeGarbageCollector& the_gc();
 
     void add(SchemeObject* obj);
     void add_from_environment(Environment* env);
     void collect();
+
+    void free_remaining();
 private:
-    static Ptr instance_;
+    static SchemeGarbageCollector instance_;
 
     SchemeGarbageCollector();
     void follow(SchemeObject* obj);

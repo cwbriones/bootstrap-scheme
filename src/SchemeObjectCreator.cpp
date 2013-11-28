@@ -160,6 +160,9 @@ void SchemeObjectCreator::init_keywords() {
 
 void SchemeObjectCreator::setup_environment(Environment* env) {
     // Arithmetic Operators
+    // Note that by defining these in the environment
+    // they are accessible to the garbage collector since it adds them
+    // with the other bindings
     env->define_variable_value(
             make_symbol("+")->to_symbol(), 
             new SchemeAddProcedure(this)

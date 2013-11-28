@@ -452,7 +452,6 @@ bool Scheme::load_file(std::string fname) {
     SchemeReader file_reader(&obj_creator_, file_stream);
 
     std::cout << "Loading file \'" << fname << "\'."  << std::endl;
-
     SchemeObject* what_was_read = file_reader.read();
 
     while (what_was_read) {
@@ -462,11 +461,15 @@ bool Scheme::load_file(std::string fname) {
     std::cout << "done." << std::endl;
     file_stream.close();
 
+    SchemeGarbageCollector::the_gc().add_from_environment(the_global_environment_.get());
+    SchemeGarbageCollector::the_gc().collect();
+
     return true;
 }
 
 void Scheme::main_loop(){
 	print_welcome_message();
+    
 	while (true) {
 		std::cout << cursor_ << ' ';
 		write(eval(reader_.read(), the_global_environment_));
@@ -475,5 +478,6 @@ void Scheme::main_loop(){
         SchemeGarbageCollector::the_gc().add_from_environment(the_global_environment_.get());
         SchemeGarbageCollector::the_gc().collect();
 	}
+    SchemeGarbageCollector::the_gc().free_remaining();
     print_goodbye_message();
 }
