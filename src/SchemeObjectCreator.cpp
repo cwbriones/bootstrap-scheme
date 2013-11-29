@@ -301,10 +301,12 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
         );
     env->define_variable_value(
             make_symbol("eq?")->to_symbol(),
-            new SchemePolyEqProcedure(this));
+            new SchemePolyEqProcedure(this)
+        );
     env->define_variable_value(
             make_symbol("not")->to_symbol(),
-            new SchemeNotProcedure(this));
+            new SchemeNotProcedure(this)
+        );
 }
 
 void SchemeObjectCreator::init_type_conversions(Environment* env) {
@@ -331,5 +333,9 @@ void SchemeObjectCreator::init_type_conversions(Environment* env) {
     env->define_variable_value(
             make_symbol("symbol->string")->to_symbol(),
             new SchemeSymbolToStringProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("list->string")->to_symbol(),
+            new ListStringProcedure(this)
         );
 }

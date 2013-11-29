@@ -1,6 +1,20 @@
 #include "SchemeObjectCreator.h"
 #include "Procedures/StringProcedures.h"
 
+SchemeObject* ListStringProcedure::func(SchemeObject* args) {
+    std::string str("");
+
+    args = args->car();
+
+    while (!args->is_empty_list()) {
+        str += args->car()->to_character()->value();
+
+        args = args->cdr();
+    }
+
+    return obj_creator_->make_string(str);
+}
+
 SchemeObject* StringRefProcedure::func(SchemeObject* args) {
     int index = args->cadr()->to_fixnum()->value();
     args = args->car();

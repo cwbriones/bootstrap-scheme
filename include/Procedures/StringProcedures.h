@@ -3,6 +3,15 @@
 
 #include "Procedures/SchemePrimProcedure.h"
 
+class ListStringProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    ListStringProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 2) {}
+    friend class SchemeObjectCreator;
+};
+
 class StringRefProcedure : public SchemePrimProcedure {
 public:
     virtual SchemeObject* func(SchemeObject* args);
