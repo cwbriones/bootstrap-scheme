@@ -4,6 +4,7 @@
 #include "Procedures/SchemeCompoundProcedure.h"
 #include "Procedures/TypeConversions.h"
 #include "Procedures/EnvironmentProcedures.h"
+#include "Procedures/StringProcedures.h"
 
 #include "SchemeObject.h"
 #include "SchemeObjectCreator.h"
@@ -246,6 +247,15 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             make_symbol("environment")->to_symbol(),
             new StandardEnvironmentProcedure(this)
         );
+    // String operations
+    env->define_variable_value(
+            make_symbol("string-ref")->to_symbol(),
+            new StringRefProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("string-length")->to_symbol(),
+            new StringLengthProcedure(this)
+        );
 
     init_type_predicates(env);
     init_type_conversions(env);
@@ -279,6 +289,10 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
     env->define_variable_value(
             make_symbol("pair?")->to_symbol(),
             new SchemePredicateProcedure(this, SchemeObject::PAIR)
+        );
+    env->define_variable_value(
+            make_symbol("flonum?")->to_symbol(),
+            new SchemePredicateProcedure(this, SchemeObject::FLONUM)
         );
     env->define_variable_value(
             make_symbol("procedure?")->to_symbol(),

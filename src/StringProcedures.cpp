@@ -1,0 +1,18 @@
+#include "SchemeObjectCreator.h"
+#include "Procedures/StringProcedures.h"
+
+SchemeObject* StringRefProcedure::func(SchemeObject* args) {
+    int index = args->cadr()->to_fixnum()->value();
+    args = args->car();
+
+    char c = args->to_string()->value().at(index);
+
+    return obj_creator_->make_character(c);
+}
+
+SchemeObject* StringLengthProcedure::func(SchemeObject* args) {
+    args = args->car();
+    int length = args->to_string()->value().size();
+
+    return obj_creator_->make_fixnum(length);
+}
