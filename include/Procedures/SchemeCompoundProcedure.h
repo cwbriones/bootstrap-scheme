@@ -5,8 +5,8 @@
 
 class SchemeCompoundProcedure : public SchemeObject {
 public:
-    Environment* env() {
-        return env_.get();
+    Environment::Ptr env() {
+        return env_;
     }
 
     SchemeObject* params() {

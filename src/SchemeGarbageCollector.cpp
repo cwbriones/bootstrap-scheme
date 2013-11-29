@@ -57,10 +57,11 @@ void SchemeGarbageCollector::follow(SchemeObject* obj) {
         case SchemeObject::COMPPROCEDURE:
             grey_object(obj->to_comp_procedure()->body());
             grey_object(obj->to_comp_procedure()->params());
-            add_from_environment(obj->to_comp_procedure()->env());
+            // gross
+            add_from_environment(obj->to_comp_procedure()->env().get());
             break;
         case SchemeObject::ENVIRONMENT:
-            // This is gross
+            // This is also gross
             add_from_environment(obj->to_environment()->get().get());
             break;
         default:

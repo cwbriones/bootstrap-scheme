@@ -243,7 +243,7 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         } else if (proc->is_comp_procedure()) {
 
             SchemeCompoundProcedure* comp = proc->to_comp_procedure();
-            env = std::make_shared<Environment>(env, comp->params(), args);
+            env = std::make_shared<Environment>(comp->env(), comp->params(), args);
 
             return eval(cons(obj_creator_.make_symbol("begin"), comp->body()), env);
 
@@ -304,8 +304,19 @@ SchemeObject* Scheme::eval_let_form(
         args = args->cdr();
     }
 
+    std::cout << "Let form: " << std::endl;
+    std::cout << "Vars: ";
+    write(vars);
+    std::cout << std::endl;
+    std::cout << "Vals: ";
+    write(vals);
+    std::cout << std::endl;
+
     SchemeObject* lambda =
         obj_creator_.make_tagged_list("lambda", vars, body);
+    std::cout << "Converted to lambda: ";
+    write(cons(lambda, vals));
+    std::cout << std::endl;
     return eval(cons(lambda, vals), env);
 }
 
