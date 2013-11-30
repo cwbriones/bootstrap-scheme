@@ -227,14 +227,18 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
         SchemeObject* proc = eval(exp->car(), env);
         SchemeObject* args = get_value_of_args(exp->cdr(), env);
 
+        if (proc->is_prim_procedure() &&
+            proc->to_prim_procedure()->is_apply()) {
+
+            proc = args->car();
+            args = prepare_apply_args(args->cdr());
+        }
+
         if (proc->is_prim_procedure()) {
 
             SchemePrimProcedure* prim = proc->to_prim_procedure();
-
-            if (prim->is_apply()) {
-                prim = args->car()->to_prim_procedure();
-                args = prepare_apply_args(args->cdr());
-            } else if (prim->is_eval()) {
+            
+            if (prim->is_eval()) {
                 SchemeObject* the_eval_env = args->cadr();
                 return eval(args->car(), the_eval_env->to_environment()->get());
             }
