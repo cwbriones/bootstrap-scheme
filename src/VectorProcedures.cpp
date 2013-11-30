@@ -42,3 +42,9 @@ SchemeObject* VectorToListProcedure::func(SchemeObject* args) {
     }
     return the_list;
 }
+
+SchemeObject* VectorLengthProcedure::func(SchemeObject* args) {
+    std::vector<SchemeObject*> the_vector = args->car()->to_vector()->data();
+
+    return obj_creator_->make_fixnum(the_vector.size());
+}

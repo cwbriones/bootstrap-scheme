@@ -369,4 +369,8 @@ void SchemeObjectCreator::init_type_conversions(Environment* env) {
             make_symbol("vector->list")->to_symbol(),
             new VectorToListProcedure(this)
         );
+    env->define_variable_value(
+            make_symbol("vector-length")->to_symbol(),
+            new VectorLengthProcedure(this)
+        );
 }

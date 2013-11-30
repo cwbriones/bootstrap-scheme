@@ -41,4 +41,12 @@ private:
     friend class SchemeObjectCreator;
 };
 
+class VectorLengthProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    VectorLengthProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
 #endif /* VECTOR_PROCEDURES_H_ */

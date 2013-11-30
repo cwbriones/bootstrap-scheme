@@ -1,13 +1,18 @@
 (define true #t)
 (define false #f)
 
+(define (even? n) (= (modulo n 2) 0))
+(define (odd? n) (not (even? n)))
+
 (define (boolean->integer a)
   (if a 1 0)
 )
 
 (define (range first last)
-  (if (= first last) () (cons first (range (+ first 1) last)))
-)
+  (if (= first last) () (cons first (range (+ first 1) last))))
+
+(define (vector-range first last) 
+  (make-initialized-vector (- last first) (lambda (i) (+ first i))))
 
 ; List operations
 (define number? integer?)
@@ -49,6 +54,13 @@
 (define (<= a b) (or (< a b) (= a b)))
 
 (define (list . x) x)
+
+(define (list? x)
+  (if (null? x)
+    #t
+    (if (pair? x) (list? (cdr x)) #f)
+  )
+)
 
 (define (build-list n proc)
   (define (iter m max-value)
@@ -126,20 +138,27 @@
 (define (min . lst) (list-min lst))
 (define (max . lst) (list-max lst))
 
-(define (append list1 list2)
+(define (append2 list1 list2)
   (if (null? list1)
     list2
-    (cons (car list1) (append (cdr list1) list2))
+    (cons (car list1) (append2 (cdr list1) list2))
   )
 )
 
-(define (pow x n)
-  (define (iter product n)
-    (if (= n 0)
-      product
-      (iter (* product x) (- n 1))
-    )
-  ) (iter 1 n)
+(define (append . lsts)
+  (if (null? (cdr lsts))
+    (car lsts)
+    (append2 (car lsts) (apply append (cdr lsts)))
+  )
+)
+
+(define (square n) (* n n))
+
+(define (expt n m)
+  (cond 
+    ((= m 0) 1)
+    ((even? m) (square (expt n (/ m 2))))
+    (else (* n (expt n (- m 1)))))
 )
 
 ;map
@@ -153,14 +172,17 @@
 (define (map fn primary-list . other-lists)
   (if (null? primary-list) '()
     (cons (apply fn (cons (car primary-list) (unary-map car other-lists)))
-          (apply map (cons fn (cons (cdr primary-list)
-                           (unary-map cdr other-lists)))))))
-
-(define (zip lst1 lst2)
-  (if (or (null? lst1) (null? lst2))
-    '()
-    (cons (cons (car lst1) (car lst2)) (zip (cdr lst1) (cdr lst2)))
+          (apply map (cons fn (cons (cdr primary-list) (unary-map cdr other-lists))))
+    )
   )
+)
+
+(define (append-map func . items)
+  (apply append (apply map (cons func items)))
+)
+
+(define (zip . lsts)
+  (apply map list lsts)
 )
 
 (define (map* initial proc ns)
@@ -197,3 +219,61 @@
   )
   (iter 0 (string-length str))
 )
+
+(define (char<? . chars) (< (unary-map char->integer chars)))
+(define (char>? . chars) (> (unary-map char->integer chars)))
+(define (char=? . chars) (= (unary-map char->integer chars)))
+
+(define (string-append . strs)
+  (list->string (apply append (map string->list strs)))
+)
+
+;; Vector operations
+(define (list->vector lst)
+  (define (iter vec count max-count lst)
+    (if (= count max-count)
+      vec
+      (begin (vector-set! vec count (car lst)) 
+             (iter vec (+ count 1) max-count (cdr lst)))
+    )
+  )
+  (iter (make-vector (length lst)) 0 (length lst) lst)
+)
+
+(define (make-initialized-vector k proc)
+  (define (iter vec count max-count)
+    (if (= count max-count)
+      vec
+      (begin (vector-set! vec count (proc count))
+             (iter vec (+ count 1) max-count))))
+  (iter (make-vector k) 0 k)
+)
+
+(define (vector-grow vec k)
+  (define (iter vec new-vec count max-count)
+    (if (= count max-count)
+      new-vec
+      (begin (vector-set! new-vec count (vector-ref vec count))
+             (iter vec new-vec (+ count 1) max-count))))
+  (iter vec (make-vector k) 0 (vector-length vec)))
+
+(define (vector-copy vec) (vector-grow vec (vector-length vec)))
+
+(define (vector-map proc vec)
+  (define (iter new-vec count max-count)
+    (if (= count max-count)
+      new-vec
+      (begin (vector-set! new-vec count (proc (vector-ref vec count)))
+             (iter new-vec (+ count 1) max-count))))
+  (iter (vector-copy vec) 0 (vector-length vec)))
+
+(define (subvector vec start end)
+  (define (iter vec new-vec count max-count)
+    (if (= count max-count)
+      new-vec
+      (begin (vector-set! new-vec count (vector-ref vec count))
+             (iter vec new-vec (+ count 1) max-count))))
+  (iter vec (make-vector (- end start)) start end))
+
+(define (vector-head vec end) (subvector vec 0 end))
+(define (vector-tail vec start) (subvector vec start (vector-length vec)))
