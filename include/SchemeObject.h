@@ -16,6 +16,7 @@ typedef SchemePrimitive<char> SchemeCharacter;
 typedef SchemePrimitive<std::string> SchemeString;
 
 class SchemeSymbol;
+class SchemeVector;
 class SchemePrimProcedure;
 class SchemeCompoundProcedure;
 class SchemeEnvironment;
@@ -41,7 +42,8 @@ public:
                SYMBOL = 1 << 8,
         PRIMPROCEDURE = 1 << 9,
         COMPPROCEDURE = 1 << 10,
-          ENVIRONMENT = 1 << 11
+          ENVIRONMENT = 1 << 11,
+               VECTOR = 1 << 12
     };
     Type type() const;
 
@@ -54,6 +56,7 @@ public:
     SchemeSymbol* to_symbol();
     SchemePrimProcedure* to_prim_procedure();
     SchemeCompoundProcedure* to_comp_procedure();
+    SchemeVector* to_vector();
     SchemeEnvironment* to_environment();
 
     // Boolean operations

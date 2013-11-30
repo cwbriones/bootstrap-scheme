@@ -12,6 +12,8 @@
 #include "SchemeEnvironment.h"
 #include "SchemeGarbageCollector.h"
 
+#include "SchemeVector.h"
+
 SchemeObjectCreator::SchemeObjectCreator(Environment::Ptr global_env) :
     the_interaction_env(global_env) 
 {
@@ -77,6 +79,13 @@ SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cd
 
 SchemeObject* SchemeObjectCreator::make_symbol(std::string value) {
     SchemeObject* obj = SchemeSymbol::make_symbol(value);
+    SchemeGarbageCollector::the_gc().add(obj);
+
+    return obj;
+}
+
+SchemeObject* SchemeObjectCreator::make_vector(size_t size, SchemeObject* init) {
+    SchemeObject* obj = new SchemeVector(size, init);
     SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;

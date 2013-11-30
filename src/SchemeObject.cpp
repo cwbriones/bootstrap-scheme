@@ -1,4 +1,5 @@
 #include "SchemeObject.h"
+#include "SchemeVector.h"
 #include "SchemeEnvironment.h"
 
 #include "Procedures/SchemePrimProcedure.h"
@@ -77,6 +78,10 @@ SchemePrimProcedure* SchemeObject::to_prim_procedure() {
 
 SchemeCompoundProcedure* SchemeObject::to_comp_procedure() {
     return static_cast<SchemeCompoundProcedure*>(this);
+}
+
+SchemeVector* SchemeObject::to_vector() {
+    return static_cast<SchemeVector*>(this);
 }
 
 SchemeEnvironment* SchemeObject::to_environment() {

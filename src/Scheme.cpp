@@ -27,6 +27,7 @@
 #include "Scheme.h"
 #include "Reader.h"
 #include "SchemeObject.h"
+#include "SchemeVector.h"
 #include "SchemeEnvironment.h"
 #include "SchemeObjectCreator.h"
 #include "SchemeGarbageCollector.h"
@@ -308,14 +309,6 @@ SchemeObject* Scheme::eval_let_form(
         args = args->cdr();
     }
 
-    std::cout << "Let form: " << std::endl;
-    std::cout << "Vars: ";
-    write(vars);
-    std::cout << std::endl;
-    std::cout << "Vals: ";
-    write(vals);
-    std::cout << std::endl;
-
     SchemeObject* lambda =
         obj_creator_.make_tagged_list("lambda", vars, body);
     std::cout << "Converted to lambda: ";
@@ -408,6 +401,11 @@ void Scheme::write(SchemeObject* obj){
         case SchemeObject::ENVIRONMENT:
             std::cout << "#<environment>";
             break;
+        case SchemeObject::VECTOR:
+            std::cout << "#(";
+            write_vector(obj);
+            std::cout << ")";
+            break;
 		default:
 			std::cerr << "unknown type, cannot write." << std::endl;
 			exit(1);
@@ -431,6 +429,14 @@ void Scheme::write_pair(SchemeObject* pair){
     else {
         std::cout << " . ";
         write(cdr_obj);
+    }
+}
+
+void Scheme::write_vector(SchemeObject* obj) {
+    std::vector<SchemeObject*> the_vector = obj->to_vector()->data();
+
+    for (auto& obj : the_vector) {
+        write(obj);
     }
 }
 
