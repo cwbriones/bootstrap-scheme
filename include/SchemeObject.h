@@ -20,6 +20,8 @@ class SchemeVector;
 class SchemePrimProcedure;
 class SchemeCompoundProcedure;
 class SchemeEnvironment;
+class SchemeInputPort;
+class SchemeOutputPort;
 
 //============================================================================
 // SchemeObject
@@ -43,7 +45,9 @@ public:
         PRIMPROCEDURE = 1 << 9,
         COMPPROCEDURE = 1 << 10,
           ENVIRONMENT = 1 << 11,
-               VECTOR = 1 << 12
+               VECTOR = 1 << 12,
+           INPUT_PORT = 1 << 13,
+          OUTPUT_PORT = 1 << 14,
     };
     Type type() const;
 
@@ -58,6 +62,7 @@ public:
     SchemeCompoundProcedure* to_comp_procedure();
     SchemeVector* to_vector();
     SchemeEnvironment* to_environment();
+    SchemeInputPort* to_input_port();
 
     // Boolean operations
     bool is_tagged_list(std::string tag);

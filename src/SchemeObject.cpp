@@ -1,6 +1,7 @@
 #include "SchemeObject.h"
 #include "SchemeVector.h"
 #include "SchemeEnvironment.h"
+#include "InputOutput.h"
 
 #include "Procedures/SchemePrimProcedure.h"
 #include "Procedures/SchemeCompoundProcedure.h"
@@ -86,6 +87,10 @@ SchemeVector* SchemeObject::to_vector() {
 
 SchemeEnvironment* SchemeObject::to_environment() {
     return static_cast<SchemeEnvironment*>(this);
+}
+
+SchemeInputPort* SchemeObject::to_input_port() {
+    return static_cast<SchemeInputPort*>(this);
 }
 
 int SchemeObject::length_as_list() {

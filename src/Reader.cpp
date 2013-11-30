@@ -271,6 +271,18 @@ SchemeObject* SchemeReader::read_character() {
     return objcreator_->make_character(c);
 }
 
+SchemeObject* SchemeReader::read_char() 
+{
+    char c = instream_.get();
+    return objcreator_->make_character(c);
+}
+
+SchemeObject* SchemeReader::peek_char() 
+{
+    char c = instream_.peek();
+    return objcreator_->make_character(c);
+}
+
 SchemeObject* SchemeReader::read_symbol() {
     // Allowable Symbol characters:
     // a-z A-Z + - . * / < = > ! ? : $ % _ & ~ ^ .

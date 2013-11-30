@@ -11,7 +11,10 @@ class SchemeReader {
     public:
         SchemeReader(SchemeObjectCreator* objcreator);
         SchemeReader(SchemeObjectCreator* objcreator, std::istream& instream);
+
         SchemeObject* read();
+        SchemeObject* read_char();
+        SchemeObject* peek_char();
     private:
         std::istream& instream_ = std::cin;
         SchemeObjectCreator* objcreator_ = nullptr;
