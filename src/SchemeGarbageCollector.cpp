@@ -4,6 +4,7 @@
 #include "SchemeGarbageCollector.h"
 
 #include "SchemeObject.h"
+#include "SchemeVector.h"
 #include "SchemeEnvironment.h"
 #include "Procedures/SchemeCompoundProcedure.h"
 #include "Environment.h"
@@ -64,8 +65,17 @@ void SchemeGarbageCollector::follow(SchemeObject* obj) {
             // This is also gross
             add_from_environment(obj->to_environment()->get().get());
             break;
+        case SchemeObject::VECTOR:
+            follow_vector(obj->to_vector());
+            break;
         default:
             break;
+    }
+}
+
+void SchemeGarbageCollector::follow_vector(SchemeVector* the_vector) {
+    for (auto& obj : the_vector->data()) {
+        grey_object(obj);
     }
 }
 

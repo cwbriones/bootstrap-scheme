@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 class SchemeObject;
+class SchemeVector;
 class Environment;
 
 class SchemeGarbageCollector {
@@ -20,6 +21,7 @@ private:
 
     SchemeGarbageCollector();
     void follow(SchemeObject* obj);
+    void follow_vector(SchemeVector* the_vector);
     void grey_object(SchemeObject* obj);
     void free();
 
