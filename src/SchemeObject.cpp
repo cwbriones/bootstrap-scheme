@@ -165,6 +165,7 @@ bool SchemeObject::is_self_evaluating() {
         case STRING:
         case CHARACTER:
         case VECTOR:
+        case UNSPECIFIED:
             return true;
         default:
             return false;

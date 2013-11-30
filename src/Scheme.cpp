@@ -18,6 +18,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 
 #include <cstdlib>
 #include <cstring>
@@ -36,6 +38,17 @@
 
 #include "Procedures/SchemePrimProcedure.h"
 #include "Procedures/SchemeCompoundProcedure.h"
+
+std::string make_string(const std::string& prefix, size_t suffix, size_t maxlen) {
+    std::ostringstream result;
+
+    result << prefix 
+           << std::setfill('0') 
+           << std::setw(maxlen - prefix.length())
+           << suffix;
+
+    return result.str();
+}
 
 Scheme::Scheme(std::istream& instream) : 
     cursor_(">>>"),
@@ -131,6 +144,11 @@ SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
     } else if (exp->is_tagged_list("let")) {
 
         return eval_let_form(exp->cdr(), env);
+
+    } else if (exp->is_tagged_list("letrec")) {
+
+        exp = convert_letrec_form(exp->cdr());
+        return eval(exp, env);
 
     } else if (exp->is_tagged_list("if")) {
 
@@ -293,7 +311,7 @@ SchemeObject* Scheme::eval_let_form(
         SchemeObject* args, 
         Environment::Ptr env) 
 {
-    SchemeObject* body = args->cadr();
+    SchemeObject* body = args->cdr();
     args = args->car();
     // Args now points to the list of (variable, value) pairs
 
@@ -309,12 +327,57 @@ SchemeObject* Scheme::eval_let_form(
         args = args->cdr();
     }
 
-    SchemeObject* lambda =
-        obj_creator_.make_tagged_list("lambda", vars, body);
-    std::cout << "Converted to lambda: ";
-    write(cons(lambda, vals));
-    std::cout << std::endl;
-    return eval(cons(lambda, vals), env);
+    SchemeObject* lambda = cons(vars, body);
+    lambda = cons(obj_creator_.make_symbol("lambda"), lambda);
+    lambda = cons(lambda, vals);
+
+    return eval(lambda, env);
+}
+
+SchemeObject* Scheme::convert_letrec_form(SchemeObject* args) {
+    /*
+     * (letrec ([x1 e1] ... [xn en]) body)
+     *      ---->
+     * (let ([x1 undef] .. [xn undef])
+     *     (let ([t1 e1] ...[t2 e2])
+     *          (set! x1 t1) ... (set! xn tn))
+     *     body)
+     */
+    SchemeObject* vars = args->car();
+    SchemeObject *var, *val, *inner_let, *tmp_var, *tmp_binding, *set_form;
+
+    SchemeObject* new_args = obj_creator_.make_empty_list();
+    inner_let = new_args;
+    
+    int var_id = 0;
+
+    while (!vars->is_empty_list()) {
+        var = vars->caar();
+        val = vars->cdar()->car();
+
+        tmp_var = obj_creator_.make_symbol(
+                make_string("t", var_id, 3));
+        // Replace the value with unspecified
+        vars->cdar()->set_car(obj_creator_.make_unspecified());
+        // Make a set form with the temp
+        set_form = obj_creator_.make_tagged_list("set!", var, tmp_var);
+        // make a new binding for inner let
+        tmp_binding = cons(tmp_var, cons(val, obj_creator_.make_empty_list()));
+
+        // Add the set form to the list
+        inner_let = cons(set_form, inner_let);
+        // Add the tmp binding to the list
+        new_args = cons(tmp_binding, new_args);
+
+        ++var_id;
+        vars = vars->cdr();
+    }
+    // Complete the inner let
+    inner_let = cons(obj_creator_.make_symbol("let"), cons(new_args, inner_let));
+    args->set_cdr(cons(inner_let, args->cdr()));
+    args = cons(obj_creator_.make_symbol("let"), args);
+
+    return args;
 }
 
 SchemeObject* Scheme::prepare_apply_args(SchemeObject* args_to_apply) {
@@ -337,10 +400,6 @@ SchemeObject* Scheme::prepare_apply_args(SchemeObject* args_to_apply) {
     args_to_apply->set_cdr(args_to_apply->cadr());
 
     return the_args;
-}
-
-SchemeObject* Scheme::convert_eval_form(SchemeObject* eval_args) {
-    return eval_args;
 }
 
 //============================================================================
