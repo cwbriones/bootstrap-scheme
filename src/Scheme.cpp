@@ -435,9 +435,11 @@ void Scheme::write_pair(SchemeObject* pair){
 void Scheme::write_vector(SchemeObject* obj) {
     std::vector<SchemeObject*> the_vector = obj->to_vector()->data();
 
-    for (auto& obj : the_vector) {
-        write(obj);
+    for (int i = 0; i < the_vector.size() - 1; i++) {
+        write(the_vector[i]);
+        std::cout << " ";
     }
+    write(the_vector.back());
 }
 
 void Scheme::write_string(std::string str){

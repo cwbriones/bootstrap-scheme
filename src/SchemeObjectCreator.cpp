@@ -5,6 +5,7 @@
 #include "Procedures/TypeConversions.h"
 #include "Procedures/EnvironmentProcedures.h"
 #include "Procedures/StringProcedures.h"
+#include "Procedures/VectorProcedures.h"
 
 #include "SchemeObject.h"
 #include "SchemeObjectCreator.h"
@@ -264,6 +265,11 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
     env->define_variable_value(
             make_symbol("string-length")->to_symbol(),
             new StringLengthProcedure(this)
+        );
+    // Vector Operations
+    env->define_variable_value(
+            make_symbol("make-vector")->to_symbol(),
+            new MakeVectorProcedure(this)
         );
 
     init_type_predicates(env);
