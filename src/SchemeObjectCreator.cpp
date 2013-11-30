@@ -271,6 +271,14 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             make_symbol("make-vector")->to_symbol(),
             new MakeVectorProcedure(this)
         );
+    env->define_variable_value(
+            make_symbol("vector-ref")->to_symbol(),
+            new VectorRefProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("vector-set!")->to_symbol(),
+            new VectorSetProcedure(this)
+        );
 
     init_type_predicates(env);
     init_type_conversions(env);
@@ -315,6 +323,10 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
                 SchemeObject::PRIMPROCEDURE | SchemeObject::COMPPROCEDURE)
         );
     env->define_variable_value(
+            make_symbol("vector?")->to_symbol(),
+            new SchemePredicateProcedure(this, SchemeObject::VECTOR)
+        );
+    env->define_variable_value(
             make_symbol("eq?")->to_symbol(),
             new SchemePolyEqProcedure(this)
         );
@@ -352,5 +364,9 @@ void SchemeObjectCreator::init_type_conversions(Environment* env) {
     env->define_variable_value(
             make_symbol("list->string")->to_symbol(),
             new ListStringProcedure(this)
+        );
+    env->define_variable_value(
+            make_symbol("vector->list")->to_symbol(),
+            new VectorToListProcedure(this)
         );
 }

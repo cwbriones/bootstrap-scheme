@@ -433,7 +433,7 @@ void Scheme::write_pair(SchemeObject* pair){
 }
 
 void Scheme::write_vector(SchemeObject* obj) {
-    std::vector<SchemeObject*> the_vector = obj->to_vector()->data();
+    std::vector<SchemeObject*>& the_vector = obj->to_vector()->data();
 
     for (int i = 0; i < the_vector.size() - 1; i++) {
         write(the_vector[i]);
