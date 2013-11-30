@@ -164,6 +164,7 @@ bool SchemeObject::is_self_evaluating() {
         case BOOLEAN:
         case STRING:
         case CHARACTER:
+        case VECTOR:
             return true;
         default:
             return false;

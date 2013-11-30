@@ -2,6 +2,7 @@
 #define SCHEMEOBJECTCREATOR_H_
 
 #include <string>
+#include <vector>
 
 #include "SchemeEnvironment.h"
 #include "Environment.h"
@@ -21,6 +22,7 @@ public:
     SchemeObject* make_pair(SchemeObject* car, SchemeObject* cdr);
     SchemeObject* make_symbol(std::string value);
     SchemeObject* make_vector(size_t size, SchemeObject* init);
+    SchemeObject* make_vector(std::vector<SchemeObject*>& objects);
     SchemeObject* make_empty_list();
 
     SchemeObject* make_environment();

@@ -17,24 +17,23 @@ SchemeObject* MakeVectorProcedure::func(SchemeObject* args) {
 }
 
 SchemeObject* VectorRefProcedure::func(SchemeObject* args) {
-    std::vector<SchemeObject*>& the_vector = args->car()->to_vector()->data();
+    SchemeVector* the_vector = args->car()->to_vector();
     int index = args->cadr()->to_fixnum()->value();
 
-    return the_vector[index];
+    return the_vector->at(index);
 }
 
 SchemeObject* VectorSetProcedure::func(SchemeObject* args) {
-    std::vector<SchemeObject*>& the_vector = args->car()->to_vector()->data();
+    SchemeVector* the_vector = args->car()->to_vector();
     int index = args->cadr()->to_fixnum()->value();
     
-    the_vector[index] = args->caddr();
+    the_vector->set(index, args->caddr());
 
     return obj_creator_->make_symbol("ok");
 }
 
 SchemeObject* VectorToListProcedure::func(SchemeObject* args) {
     std::vector<SchemeObject*> the_vector = args->car()->to_vector()->data();
-    
     SchemeObject* the_list = obj_creator_->make_empty_list();
 
     for (auto iter = the_vector.rbegin(); iter != the_vector.rend(); ++iter) {
@@ -44,7 +43,7 @@ SchemeObject* VectorToListProcedure::func(SchemeObject* args) {
 }
 
 SchemeObject* VectorLengthProcedure::func(SchemeObject* args) {
-    std::vector<SchemeObject*> the_vector = args->car()->to_vector()->data();
+    int length = args->car()->to_vector()->length();
 
-    return obj_creator_->make_fixnum(the_vector.size());
+    return obj_creator_->make_fixnum(length);
 }

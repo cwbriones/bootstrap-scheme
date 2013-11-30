@@ -1,9 +1,10 @@
 #include "Reader.h"
 #include "SchemeObjectCreator.h"
 
-#include <unordered_set>
 #include <cstdlib>
+#include <unordered_set>
 #include <string>
+#include <vector>
 
 SchemeReader::SchemeReader(SchemeObjectCreator* objcreator){
     objcreator_ = objcreator;
@@ -70,20 +71,22 @@ SchemeObject* SchemeReader::read(){
     }
 	c = instream_.get();
 
-    if (c == '\"'){
+    if (c == '\"') {
         return read_string();
     }
-    else if (c == '('){
+    else if (c == '(') {
         return read_pair();
     }
-    else if (c == '#'){
+    else if (c == '#') {
         c = instream_.get();
 
         if (c == '\\'){
             return read_character();
+        } else if (c == '(') {
+            return read_vector();
         } else {
             // Read in a boolean.
-            switch(c){
+            switch(c) {
                 case 't':
                     return objcreator_->make_boolean(true);
                 case 'f':
@@ -96,7 +99,7 @@ SchemeObject* SchemeReader::read(){
     } 
     else if (isdigit(c) || 
             (c == '.' && isdigit(instream_.peek())) ||
-            (c == '-' && (isdigit(instream_.peek()) || instream_.peek() == '.'))){
+            (c == '-' && (isdigit(instream_.peek()) || instream_.peek() == '.'))) {
         
         std::string number("");
         bool is_float = false;
@@ -120,7 +123,7 @@ SchemeObject* SchemeReader::read(){
             }
 		}
 
-		if (is_delimiter(c)){
+		if (is_delimiter(c)) {
 			instream_.unget();
             if (!is_float) {
                 return objcreator_->make_fixnum(std::stol(number));
@@ -133,12 +136,12 @@ SchemeObject* SchemeReader::read(){
 			exit(1);
 		}
 	} 
-    else if (is_start_of_symbol(c)){
+    else if (is_start_of_symbol(c)) {
         // Read in a symbol
         instream_.unget();
         return read_symbol();
     }
-    else if (c == '\'' || c == '`'){
+    else if (c == '\'' || c == '`') {
         return objcreator_->make_tagged_list("quote", read());
     } else {
 		std::cerr << "bad input. unexpected character '" << c << "'." << std::endl;
@@ -165,7 +168,7 @@ SchemeObject* SchemeReader::read_pair(){
     c = instream_.get();
     if (c == '.'){
         // Dot notation, cons cell
-        if (!is_delimiter( instream_.peek() )){
+        if (!is_delimiter(instream_.peek())) {
             std::cerr << "Unexpected character \"" << c 
                 << ". Was expecting delimiter." << std::endl;
             exit(1);
@@ -189,13 +192,30 @@ SchemeObject* SchemeReader::read_pair(){
     return objcreator_->make_pair(car_obj, cdr_obj);
 }
 
+SchemeObject* SchemeReader::read_vector() {
+
+    char c;
+    std::vector<SchemeObject*> objects;
+
+    while (true) {
+        eat_whitespace();
+        c = instream_.peek();
+        if (c == ')') {
+            instream_.get();
+            return objcreator_->make_vector(objects);
+        }
+        SchemeObject* obj = read();
+        objects.push_back(obj);
+    }
+}
+
 SchemeObject* SchemeReader::read_string(){
     std::string buffer;
     char c = '\0';
 
     while( (c = instream_.get()) != '\"') {
 
-        if (c == '\\'){
+        if (c == '\\') {
             // Escaped characters
             c = instream_.get();
             switch(c){
@@ -218,11 +238,11 @@ SchemeObject* SchemeReader::read_string(){
     return objcreator_->make_string(buffer);
 }
 
-SchemeObject* SchemeReader::read_character(){
+SchemeObject* SchemeReader::read_character() {
     int c;
     c = instream_.get();
 
-    switch(c){
+    switch(c) {
         case EOF:
             std::cerr << "incomplete character literal." << std::endl;
             exit(1);
@@ -234,14 +254,14 @@ SchemeObject* SchemeReader::read_character(){
             }
             break;
         case 'n':
-            if (instream_.peek() == 'e'){
+            if (instream_.peek() == 'e') {
                 eat_expected_word("ewline");
                 peek_expecting_delimiter();
                 return objcreator_->make_character('\n');
             }
             break;
         case 't':
-            if (instream_.peek() == 'a'){
+            if (instream_.peek() == 'a') {
                 eat_expected_word("ab");
                 peek_expecting_delimiter();
                 return objcreator_->make_character('\t');
@@ -251,7 +271,7 @@ SchemeObject* SchemeReader::read_character(){
     return objcreator_->make_character(c);
 }
 
-SchemeObject* SchemeReader::read_symbol(){
+SchemeObject* SchemeReader::read_symbol() {
     // Allowable Symbol characters:
     // a-z A-Z + - . * / < = > ! ? : $ % _ & ~ ^ .
     std::string buffer;
@@ -269,13 +289,13 @@ SchemeObject* SchemeReader::read_symbol(){
     // Ensure validity
     // Also note that # is allowed anywhere so long as it is not preceded by %
     int i = 0;
-    for (auto c : buffer){
-        if (!isalpha(c) && !isdigit(c) && (allowed_chars.find(c) == allowed_chars.end())){
+    for (auto c : buffer) {
+        if (!isalpha(c) && !isdigit(c) && (allowed_chars.find(c) == allowed_chars.end())) {
             std::cerr << "Unexpected character \'" << c 
                       << "\' not allowed in symbol." << std::endl;
             exit(1);
         }
-        else if (c == '#' && buffer[i - 1] == '%'){
+        else if (c == '#' && buffer[i - 1] == '%') {
         // This check is okay because read_symbol can't be called if the first char is #
             std::cerr << "# cannot follow a % in a symbol." << std::endl;
             exit(1);

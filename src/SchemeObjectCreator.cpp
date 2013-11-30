@@ -92,6 +92,13 @@ SchemeObject* SchemeObjectCreator::make_vector(size_t size, SchemeObject* init) 
     return obj;
 }
 
+SchemeObject* SchemeObjectCreator::make_vector(std::vector<SchemeObject*>& objects) {
+    SchemeObject* obj = new SchemeVector(objects);
+    SchemeGarbageCollector::the_gc().add(obj);
+
+    return obj;
+}
+
 SchemeObject* SchemeObjectCreator::make_environment() {
     Environment::Ptr env = std::make_shared<Environment>();
     setup_environment(env.get());

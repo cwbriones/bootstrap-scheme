@@ -20,6 +20,7 @@ class SchemeReader {
         SchemeObject* read_string();
         SchemeObject* read_character();
         SchemeObject* read_symbol();
+        SchemeObject* read_vector();
 
         void eat_whitespace();
         void eat_expected_word(std::string word);

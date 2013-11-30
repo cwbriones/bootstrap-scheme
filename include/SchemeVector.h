@@ -10,7 +10,21 @@ public:
     std::vector<SchemeObject*>& data() {
         return objects_;
     }
+    size_t length() {
+        return objects_.size();
+    }
+    SchemeObject* at(size_t i) {
+        return objects_[i];
+    }
+    void set(size_t i, SchemeObject* obj) {
+        if (i < objects_.size()) {
+            objects_[i] = obj;
+        }
+    }
 private:
+    SchemeVector(std::vector<SchemeObject*>& objects) :
+        SchemeObject(VECTOR),
+        objects_(objects) {}
     SchemeVector(size_t size, SchemeObject* fill) :
         SchemeObject(VECTOR),
         objects_(size, fill) {}
