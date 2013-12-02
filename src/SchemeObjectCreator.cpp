@@ -6,6 +6,7 @@
 #include "Procedures/EnvironmentProcedures.h"
 #include "Procedures/StringProcedures.h"
 #include "Procedures/VectorProcedures.h"
+#include "InputOutput.h"
 
 #include "SchemeObject.h"
 #include "SchemeObjectCreator.h"
@@ -16,10 +17,10 @@
 #include "SchemeVector.h"
 
 SchemeObjectCreator::SchemeObjectCreator(Environment::Ptr global_env) :
-    the_interaction_env(global_env) 
+    the_interaction_env_(global_env) 
 {
     Environment* the_env = global_env.get();
-    the_interaction_env.protect_from_gc();
+    the_interaction_env_.protect_from_gc();
 
     init_keywords();
     setup_environment(the_env);
@@ -110,7 +111,7 @@ SchemeObject* SchemeObjectCreator::make_environment() {
 }
 
 SchemeObject* SchemeObjectCreator::make_interaction_environment() {
-    return &the_interaction_env;
+    return &the_interaction_env_;
 }
 
 SchemeObject* SchemeObjectCreator::make_null_environment() {
@@ -289,6 +290,14 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
 
     init_type_predicates(env);
     init_type_conversions(env);
+    init_input_output(env);
+}
+
+void SchemeObjectCreator::init_input_output(Environment* env) {
+    env->define_variable_value(
+            make_symbol("load")->to_symbol(),
+            new LoadProcedure(this)
+        );
 }
 
 void SchemeObjectCreator::init_type_predicates(Environment* env) {

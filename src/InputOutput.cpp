@@ -2,7 +2,7 @@
 #include <fstream>
 
 #include "SchemeObject.h"
-
+#include "SchemeObjectCreator.h"
 #include "InputOutput.h"
 
 //============================================================================
@@ -41,4 +41,18 @@ bool SchemeInputPort::eof() {
 
 void SchemeInputPort::close_file() {
     input_file_.close();
+}
+
+SchemeObject* LoadProcedure::func(SchemeObject* args) {
+    std::string fname = args->car()->to_string()->value();
+
+    std::ifstream input_stream(fname);
+    SchemeReader reader(obj_creator_, input_stream);
+
+    return obj_creator_->make_symbol(fname.append(" loaded."));
+}
+
+SchemeObject* ReadProcedure::func(SchemeObject* args) {
+
+    return obj_creator_->make_symbol("okay");
 }

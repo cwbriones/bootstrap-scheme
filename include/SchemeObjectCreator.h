@@ -35,19 +35,23 @@ public:
 
     SchemeObject* make_comp_procedure(
             Environment::Ptr& env, SchemeObject* params, SchemeObject* body);
-
+    
+    Environment* the_interaction_env() {
+        return the_interaction_env_.get().get();
+    }
 private:
     void setup_environment(Environment* env);
 
     void init_keywords();
     void init_type_predicates(Environment* env);
     void init_type_conversions(Environment* env);
+    void init_input_output(Environment* env);
 
     // -----------------------------
     // Symbols
     // -----------------------------
     
-    SchemeEnvironment the_interaction_env;
+    SchemeEnvironment the_interaction_env_;
 
     SchemeObject* quote_symbol = nullptr;
     SchemeObject* define_symbol = nullptr;

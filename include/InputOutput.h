@@ -7,6 +7,8 @@
 #include "SchemeObject.h"
 #include "Reader.h"
 
+#include "Procedures/SchemePrimProcedure.h"
+
 //============================================================================
 // Input
 //============================================================================
@@ -28,6 +30,24 @@ private:
     std::ifstream input_file_;
     SchemeReader reader_;
 
+    friend class SchemeObjectCreator;
+};
+
+class LoadProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    LoadProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
+
+class ReadProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    ReadProcedure(SchemeObjectCreator* creator) :
+        SchemePrimProcedure(creator, 1) {}
     friend class SchemeObjectCreator;
 };
 
