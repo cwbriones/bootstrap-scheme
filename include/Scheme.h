@@ -14,13 +14,16 @@ class SchemeObject;
 class Scheme {
 public:
 	Scheme(std::istream& instream);
+
 	void main_loop();
     bool load_file(std::string fname);
+
+    SchemeObject* eval(SchemeObject* exp, Environment::Ptr env);
+    SchemeObject* eval_in_global_env(SchemeObject* exp);
 private:
 	const std::string cursor_;
     
     // Model
-    Environment::Ptr the_global_environment_;
     SchemeObjectCreator obj_creator_;
     
     // Read
@@ -28,7 +31,6 @@ private:
 
     // Evaluate
     SchemeObject* cons(SchemeObject* car, SchemeObject* cdr);
-    SchemeObject* eval(SchemeObject* exp, Environment::Ptr env);
     SchemeObject* get_value_of_args(SchemeObject* args, Environment::Ptr env);
     
     SchemeObject* eval_let_form(SchemeObject* args, Environment::Ptr env);

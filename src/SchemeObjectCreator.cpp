@@ -16,14 +16,11 @@
 
 #include "SchemeVector.h"
 
-SchemeObjectCreator::SchemeObjectCreator(Environment::Ptr global_env) :
-    the_interaction_env_(global_env) 
+SchemeObjectCreator::SchemeObjectCreator() :
+    the_interaction_env_(Environment::get_global_environment()) 
 {
-    Environment* the_env = global_env.get();
     the_interaction_env_.protect_from_gc();
-
     init_keywords();
-    setup_environment(the_env);
 }
 
 //============================================================================

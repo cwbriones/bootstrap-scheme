@@ -43,13 +43,21 @@ void SchemeInputPort::close_file() {
     input_file_.close();
 }
 
+#include <iostream>
+
 SchemeObject* LoadProcedure::func(SchemeObject* args) {
     std::string fname = args->car()->to_string()->value();
-
     std::ifstream input_stream(fname);
-    SchemeReader reader(obj_creator_, input_stream);
 
-    return obj_creator_->make_symbol(fname.append(" loaded."));
+    if (input_stream) {
+        SchemeReader reader(obj_creator_, input_stream);
+        bool success =
+            reader.load_into_environment(Environment::get_global_environment());
+        if (success) {
+            return obj_creator_->make_symbol(fname.append(" loaded."));
+        }
+    }
+    return obj_creator_->make_symbol("failed to load file " + fname);
 }
 
 SchemeObject* ReadProcedure::func(SchemeObject* args) {

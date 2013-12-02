@@ -52,9 +52,10 @@ std::string make_string(const std::string& prefix, size_t suffix, size_t maxlen)
 
 Scheme::Scheme(std::istream& instream) : 
     cursor_(">>>"),
-    obj_creator_(Environment::get_global_environment()), 
     reader_(&obj_creator_, instream)
-{ 
+{
+    reader_.set_evaluator(this);
+    obj_creator_.setup_environment(Environment::get_global_environment().get());
 }
 
 void Scheme::print_welcome_message() {
@@ -74,7 +75,11 @@ SchemeObject* Scheme::cons(SchemeObject* car, SchemeObject* cdr) {
     return obj_creator_.make_pair(car, cdr);
 }
 
-SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env){
+SchemeObject* Scheme::eval_in_global_env(SchemeObject* exp) {
+    return eval(exp, Environment::get_global_environment());
+}
+
+SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env) {
     tailcall:
 
     if (exp->is_self_evaluating()){
@@ -550,14 +555,14 @@ bool Scheme::load_file(std::string fname) {
 }
 
 void Scheme::main_loop(){
+    Environment* env = Environment::get_global_environment().get();
+
 	print_welcome_message();
-    
 	while (true) {
 		std::cout << cursor_ << ' ';
-		write(eval(reader_.read(), the_global_environment_));
+		write(eval_in_global_env(reader_.read()));
 		std::cout << std::endl;
 
-        Environment* env = Environment::get_global_environment().get();
         SchemeGarbageCollector::the_gc().add_from_environment(env);
         SchemeGarbageCollector::the_gc().collect();
 	}

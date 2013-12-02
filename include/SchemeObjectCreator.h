@@ -11,7 +11,7 @@ class SchemeObject;
 
 class SchemeObjectCreator {
 public:
-    SchemeObjectCreator(Environment::Ptr global_env);
+    SchemeObjectCreator();
 
     SchemeObject* make_unspecified();
     SchemeObject* make_fixnum(int value);
@@ -39,8 +39,8 @@ public:
     Environment* the_interaction_env() {
         return the_interaction_env_.get().get();
     }
-private:
     void setup_environment(Environment* env);
+private:
 
     void init_keywords();
     void init_type_predicates(Environment* env);

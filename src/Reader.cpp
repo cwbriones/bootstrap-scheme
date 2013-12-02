@@ -1,5 +1,9 @@
+#include "Scheme.h"
+
 #include "Reader.h"
 #include "SchemeObjectCreator.h"
+
+#include "Environment.h"
 
 #include <cstdlib>
 #include <unordered_set>
@@ -12,6 +16,20 @@ SchemeReader::SchemeReader(SchemeObjectCreator* objcreator){
 
 SchemeReader::SchemeReader(SchemeObjectCreator* objcreator, std::istream& instream) : 
     objcreator_(objcreator), instream_(instream) {
+}
+
+bool SchemeReader::load_into_environment(Environment::Ptr env) {
+    if (!evaluator_) {
+        return false;
+    }
+    SchemeObject* obj = read();
+
+    while (obj) {
+        evaluator_->eval(obj, env);
+        obj = read();
+    }
+
+    return true;
 }
 
 void SchemeReader::eat_whitespace(){
