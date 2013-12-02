@@ -4,9 +4,7 @@
 (define (even? n) (= (modulo n 2) 0))
 (define (odd? n) (not (even? n)))
 
-(define (boolean->integer a)
-  (if a 1 0)
-)
+(define (boolean->integer a) (if a 1 0))
 
 (define (range first last)
   (if (= first last) () (cons first (range (+ first 1) last))))
@@ -51,56 +49,39 @@
 
 (define (zero? x) (= 0 x))
 
-(define (<= a b) (or (< a b) (= a b)))
+(define (<= a b) (not (> a b)))
+(define (>= a b) (not (< a b)))
 
 (define (list . x) x)
 
 (define (list? x)
-  (if (null? x)
-    #t
-    (if (pair? x) (list? (cdr x)) #f)
-  )
-)
+  (if (null? x) #t
+    (if (pair? x) (list? (cdr x)) #f)))
 
 (define (build-list n proc)
   (define (iter m max-value)
-      (if (= m max-value)
-        '()
-        (cons (proc m) (iter (+ m 1) max-value))
-      )
-  ) (iter 0 n)
-)
+      (if (= m max-value) '()
+        (cons (proc m) (iter (+ m 1) max-value))))
+  (iter 0 n))
 
-(define (list-ref n ns)
-  (if (= n 0)
-    (car ns)
-    (list-ref (- n 1) (cdr ns))
-  )
-)
+(define (list-ref n ns) (if (= n 0) (car ns) (list-ref (- n 1) (cdr ns))))
 
 (define (reverse ns)
   (define (iter in out)
     (if (null? in)
       out
-      (iter (cdr in) (cons (car in) out))
-    )
-  )
-  (iter ns ())
-)
+      (iter (cdr in) (cons (car in) out))))
+  (iter ns ()))
 
 (define (take n ns)
   (if (or (null? ns) (= n 0))
     ()
-    (cons (car ns) (take (- n 1) (cdr ns)))
-  )
-)
+    (cons (car ns) (take (- n 1) (cdr ns)))))
 
 (define (take-while test ns)
   (if (or (not (test (car ns))) (null? ns))
     ()
-    (cons (car ns) (take-while test (cdr ns)))
-  )
-)
+    (cons (car ns) (take-while test (cdr ns)))))
 
 ;filter
 (define (filter test ns)
@@ -108,24 +89,17 @@
     ()
     (if (test (car ns)) 
       (cons (car ns) (filter test (cdr ns))) 
-      (filter test (cdr ns))
-    )
-  )
-)
+      (filter test (cdr ns)))))
 
 (define (fold-right accum op ns)
   (if (null? ns)
     accum
-    (fold-right (op accum (car ns)) op (cdr ns))
-  )
-)
+    (fold-right (op accum (car ns)) op (cdr ns))))
 
 (define (fold-left accum op ns)
   (if (null? ns)
       accum
-      (op (car ns) (fold-left accum op (cdr ns)))
-  )
-)
+      (op (car ns) (fold-left accum op (cdr ns)))))
 
 (define (list-min ns)
   (fold-right (car ns) (lambda (m val) (if (> m val) m val)) (cdr ns))
@@ -141,16 +115,12 @@
 (define (append2 list1 list2)
   (if (null? list1)
     list2
-    (cons (car list1) (append2 (cdr list1) list2))
-  )
-)
+    (cons (car list1) (append2 (cdr list1) list2))))
 
 (define (append . lsts)
   (if (null? (cdr lsts))
     (car lsts)
-    (append2 (car lsts) (apply append (cdr lsts)))
-  )
-)
+    (append2 (car lsts) (apply append (cdr lsts)))))
 
 (define (square n) (* n n))
 
@@ -158,16 +128,13 @@
   (cond 
     ((= m 0) 1)
     ((even? m) (square (expt n (/ m 2))))
-    (else (* n (expt n (- m 1)))))
-)
+    (else (* n (expt n (- m 1))))))
 
 ;map
 (define (unary-map proc ns)
   (if (null? ns) 
     ()
-    (cons (proc (car ns)) (unary-map proc (cdr ns)))
-  )
-)
+    (cons (proc (car ns)) (unary-map proc (cdr ns)))))
 
 (define (map fn primary-list . other-lists)
   (if (null? primary-list) '()
@@ -177,13 +144,9 @@
   )
 )
 
-(define (append-map func . items)
-  (apply append (apply map (cons func items)))
-)
+(define (append-map func . items) (apply append (apply map (cons func items))))
 
-(define (zip . lsts)
-  (apply map list lsts)
-)
+(define (zip . lsts) (apply map list lsts))
 
 (define (map* initial proc ns)
   (if (null? ns) 
@@ -277,3 +240,49 @@
 
 (define (vector-head vec end) (subvector vec 0 end))
 (define (vector-tail vec start) (subvector vec start (vector-length vec)))
+
+(define (make-random-list n k)
+  (if (= k 0)
+    '()
+    (cons (random n) (make-random-list n (- k 1)))))
+
+(define (partition-list test lst)
+  (define (iter first second item lst)
+    (if (null? lst)
+      (list first second)
+      (if (test (car lst) item)
+        (iter (cons (car lst) first) second item (cdr lst))
+        (iter first (cons (car lst) second) item (cdr lst)))))
+  (iter '() '() (car lst) (cdr lst)))
+
+(define (qsort test lst)
+  (if (null? lst)
+    '()
+    (let ((partitions (partition-list test lst)))
+      (append (qsort test (car partitions)) (cons (car lst) (qsort test (cadr partitions))))
+    )))
+
+(define (merge test lst1 lst2)
+  (cond ((null? lst1) lst2)
+        ((null? lst2) lst1)
+        (else
+            (if (test (car lst1) (car lst2))
+              (cons (car lst1) (merge test (cdr lst1) lst2))
+              (cons (car lst2) (merge test lst1 (cdr lst2)))))))
+
+(define (split lst at)
+  (define (iter n l i)
+    (if (or (null? l) (= i at))
+      (cons (reverse n) l)
+      (iter (cons (car l) n) (cdr l) (+ i 1))))
+  (iter () lst 0))
+
+(define (split-in-half lst) (split lst (quotient (length lst) 2)))
+
+(define (merge-sort test lst)
+  (if (< (length lst) 2)
+    lst
+    (let ((halves (split-in-half lst)))
+      (merge test (merge-sort test (car halves)) (merge-sort test (cdr halves))))))
+
+(define (sort test lst) (merge-sort test lst))

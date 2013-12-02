@@ -122,14 +122,17 @@ private:
     uint16_t target_type_;
 };
 
-// class SchemeNAMEProcedure : public SchemePrimProcedure {
-// public:
-//     virtual SchemeObject* func(SchemeObject* args);
-// private:
-//     SchemeNAMEProcedure(SchemeObjectCreator* creator) :
-//         SchemePrimProcedure(creator) {}
-//     friend class SchemeObjectCreator;
-// };
+#include <random>
+
+class RandomProcedure : public SchemePrimProcedure {
+public:
+    virtual SchemeObject* func(SchemeObject* args);
+private:
+    RandomProcedure();
+    std::default_random_engine generator_;
+
+    friend class SchemeObjectCreator;
+};
 
 //============================================================================
 // List Operations

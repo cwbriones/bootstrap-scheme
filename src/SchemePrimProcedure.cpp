@@ -3,6 +3,7 @@
 #include "SchemeObjectCreator.h"
 
 #include <vector>
+#include <ctime>
 
 bool SchemePrimProcedure::check_arg_length(SchemeObject* args) {
     return false;
@@ -130,6 +131,29 @@ SchemeObject* SchemeModuloProcedure::func(SchemeObject* args) {
 
 SchemeObject* SchemePredicateProcedure::func(SchemeObject* args) {
     return obj_creator_->make_boolean(args->car()->type() & target_type_);
+}
+
+RandomProcedure::RandomProcedure() : SchemePrimProcedure(nullptr, 1) {
+    generator_.seed(static_cast<unsigned int>(time(0)));
+}
+
+SchemeObject* RandomProcedure::func(SchemeObject* args) {
+    SchemeObject* top = args->car();
+
+    if (top->is_flonum()) {
+        double value = top->to_flonum()->value();
+        std::uniform_real_distribution<double> float_dist(0.0, value);
+        double result = float_dist(generator_);
+
+        return obj_creator_->make_flonum(result);
+
+    } else if (top->is_fixnum()) {
+        long value = top->to_fixnum()->value();
+        std::uniform_int_distribution<long> int_dist(0, value);
+        long result = int_dist(generator_);
+
+        return obj_creator_->make_fixnum(result);
+    }
 }
 
 //============================================================================
