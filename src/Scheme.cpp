@@ -52,8 +52,7 @@ std::string make_string(const std::string& prefix, size_t suffix, size_t maxlen)
 
 Scheme::Scheme(std::istream& instream) : 
     cursor_(">>>"),
-    the_global_environment_(std::make_shared<Environment>()),
-    obj_creator_(the_global_environment_), 
+    obj_creator_(Environment::get_global_environment()), 
     reader_(&obj_creator_, instream)
 { 
 }
@@ -537,13 +536,14 @@ bool Scheme::load_file(std::string fname) {
     SchemeObject* what_was_read = file_reader.read();
 
     while (what_was_read) {
-        eval(what_was_read, the_global_environment_);
+        eval(what_was_read, Environment::get_global_environment());
         what_was_read = file_reader.read();
     }
     std::cout << "done." << std::endl;
     file_stream.close();
 
-    SchemeGarbageCollector::the_gc().add_from_environment(the_global_environment_.get());
+    Environment* env = Environment::get_global_environment().get();
+    SchemeGarbageCollector::the_gc().add_from_environment(env);
     SchemeGarbageCollector::the_gc().collect();
 
     return true;
@@ -557,7 +557,8 @@ void Scheme::main_loop(){
 		write(eval(reader_.read(), the_global_environment_));
 		std::cout << std::endl;
 
-        SchemeGarbageCollector::the_gc().add_from_environment(the_global_environment_.get());
+        Environment* env = Environment::get_global_environment().get();
+        SchemeGarbageCollector::the_gc().add_from_environment(env);
         SchemeGarbageCollector::the_gc().collect();
 	}
     SchemeGarbageCollector::the_gc().free_remaining();

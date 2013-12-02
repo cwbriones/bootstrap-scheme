@@ -4,6 +4,9 @@
 
 #include <iostream>
 
+Environment::Ptr Environment::the_global_environment_ = 
+    std::make_shared<Environment>();
+
 Environment::Environment(Environment::Ptr enclosing,
             SchemeObject* vars, SchemeObject* vals) 
 {

@@ -21,6 +21,10 @@ public:
 
     ~Environment();
 
+    static Environment::Ptr get_global_environment() {
+        return the_global_environment_;
+    }
+
     void define_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool set_variable_value(SchemeSymbol* symbol, SchemeObject* value);
     bool variable_is_defined(SchemeSymbol* var);
@@ -32,6 +36,8 @@ public:
 private:
     Environment::Ptr enclosing_;
     std::unordered_map<SchemeSymbol*, SchemeObject*> frame_bindings_;
+
+    static Environment::Ptr the_global_environment_;
 };
 
 
