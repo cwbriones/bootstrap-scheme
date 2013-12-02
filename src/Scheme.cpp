@@ -18,8 +18,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <sstream>
-#include <iomanip>
 
 #include <cstdlib>
 #include <cstring>
@@ -28,6 +26,8 @@
 
 #include "Scheme.h"
 #include "Reader.h"
+#include "SchemeEvaluator.h"
+
 #include "SchemeObject.h"
 #include "SchemeVector.h"
 #include "SchemeEnvironment.h"
@@ -39,22 +39,11 @@
 #include "Procedures/SchemePrimProcedure.h"
 #include "Procedures/SchemeCompoundProcedure.h"
 
-std::string make_string(const std::string& prefix, size_t suffix, size_t maxlen) {
-    std::ostringstream result;
-
-    result << prefix 
-           << std::setfill('0') 
-           << std::setw(maxlen - prefix.length())
-           << suffix;
-
-    return result.str();
-}
-
 Scheme::Scheme(std::istream& instream) : 
     cursor_(">>>"),
+    evaluator_(&obj_creator_),
     reader_(&obj_creator_, instream)
 {
-    reader_.set_evaluator(this);
     obj_creator_.setup_environment(Environment::get_global_environment().get());
 }
 
@@ -65,345 +54,6 @@ void Scheme::print_welcome_message() {
 
 void Scheme::print_goodbye_message() {
     std::cout << "Happy Happy Joy Joy." << std::endl;
-}
-
-//============================================================================
-// Evaluate
-//============================================================================
-
-SchemeObject* Scheme::cons(SchemeObject* car, SchemeObject* cdr) {
-    return obj_creator_.make_pair(car, cdr);
-}
-
-SchemeObject* Scheme::eval_in_global_env(SchemeObject* exp) {
-    return eval(exp, Environment::get_global_environment());
-}
-
-SchemeObject* Scheme::eval(SchemeObject* exp, Environment::Ptr env) {
-    tailcall:
-
-    if (exp->is_self_evaluating()){
-
-        return exp;
-
-    } else if (exp->is_symbol()){
-
-        SchemeObject* value = env->lookup_variable_value(exp->to_symbol());
-
-        if (!value){
-            std::cerr << "Error: unbound variable \'" << exp->to_symbol()->value()
-                      << "\'." << std::endl;
-            exit(1);
-        }
-
-        return value;
-
-    } else if (exp->is_tagged_list("and")) {
-
-        exp = exp->cdr();
-        SchemeObject* result = obj_creator_.make_boolean(true);
-
-        while (!exp->is_empty_list()) {
-            result = eval(exp->car(), env);
-            if (result->is_false_obj()) {
-                return result;
-            }
-            exp = exp->cdr();
-        }
-        return result;
-
-    } else if (exp->is_tagged_list("or")) {
-
-        exp = exp->cdr();
-        SchemeObject* result = obj_creator_.make_boolean(false);
-
-        while (!exp->is_empty_list()) {
-            result = eval(exp->car(), env);
-            if (result->is_true()) {
-                return result;
-            }
-            exp = exp->cdr();
-        }
-        return result;
-
-    } else if (exp->is_tagged_list("begin")) {
-
-        // Point expression to the body of the begin form
-        exp = exp->cdr();
-
-        while (exp->length_as_list() > 1) {
-            eval(exp->car(), env);
-            exp = exp->cdr();
-        }
-        exp = exp->car();
-        goto tailcall;
-
-    } else if (exp->is_tagged_list("lambda")) {
-   
-        return obj_creator_.make_comp_procedure(
-                env,
-                exp->cadr(),
-                exp->cddr());
-
-    } else if (exp->is_tagged_list("let")) {
-
-        return eval_let_form(exp->cdr(), env);
-
-    } else if (exp->is_tagged_list("letrec")) {
-
-        exp = convert_letrec_form(exp->cdr());
-        return eval(exp, env);
-
-    } else if (exp->is_tagged_list("if")) {
-
-        if (exp->length_as_list() == 4 || exp->length_as_list() == 3) {
-            exp = exp->cdr();
-
-            if (eval(exp->car(), env)->is_false_obj()) {
-                exp = exp->caddr();
-                if (!exp) {
-                    return obj_creator_.make_unspecified();
-                }
-            } else {
-                exp = exp->cadr();
-            }
-            goto tailcall;
-
-        } else {
-            std::cerr << "Error: cannot evaluate if form" << std::endl;
-            exit(1);
-        }
-
-    } else if (exp->is_tagged_list("cond")) {
-
-        SchemeObject* the_begin_form;
-        exp = exp->cdr();
-
-        while (!exp->is_empty_list()) {
-            if (exp->car()->is_tagged_list("else")) {
-                // Make a begin form and assert that this is valid
-                // placement for an if clause
-                if (exp->length_as_list() > 1) {
-                    std::cerr << "Error: misplaced ELSE clause:";
-                    write(exp->car());
-                    std::cerr << std::endl;
-                    exit(1);
-                }
-                the_begin_form = cons(
-                        obj_creator_.make_symbol("begin"), 
-                        exp->cdar());
-                return eval(the_begin_form, env);
-            }
-            else if (eval(exp->caar(), env)->is_true()) {
-                // Make a begin form out of the body
-                the_begin_form = cons(
-                        obj_creator_.make_symbol("begin"), 
-                        exp->cdar());
-                return eval(the_begin_form, env);
-            }
-            exp = exp->cdr();
-        }
-
-        return obj_creator_.make_unspecified();
-
-    } else if (exp->is_tagged_list("quote")){
-
-        return exp->cadr();
-
-    } else if (exp->is_tagged_list("define")){
-        if (exp->cadr()->is_pair()) {
-            SchemeObject* the_lambda = cons(
-                    obj_creator_.make_symbol("lambda"),
-                    cons(exp->cdadr(), exp->cddr()));
-            SchemeObject* var = exp->caadr();
-
-            return eval(obj_creator_.make_tagged_list("define", var, the_lambda), env);
-
-        } else {
-            env->define_variable_value(
-                    exp->cadr()->to_symbol(), 
-                    eval(exp->caddr(), env)
-                );
-            return obj_creator_.make_symbol("ok");
-        }
-    } else if (exp->is_tagged_list("set!")){
-        if (exp->length_as_list() == 3){
-
-            if (env->set_variable_value(
-                        exp->cadr()->to_symbol(), 
-                        eval(exp->caddr(), env))){
-
-                return obj_creator_.make_symbol("ok");
-
-            } else {
-                std::cerr << "Error: unbound variable " 
-                          << exp->cadr()->to_symbol()->value()
-                          << "." << std::endl;
-                exit(1);
-            }
-        } else {
-            std::cerr << "Error: cannot evaluate set! form" << std::endl;
-            exit(1);
-        }
-    } else if (exp->is_application()) {
-
-        SchemeObject* proc = eval(exp->car(), env);
-        SchemeObject* args = get_value_of_args(exp->cdr(), env);
-
-        if (proc->is_prim_procedure() &&
-            proc->to_prim_procedure()->is_apply()) {
-
-            proc = args->car();
-            args = prepare_apply_args(args->cdr());
-        }
-
-        if (proc->is_prim_procedure()) {
-
-            SchemePrimProcedure* prim = proc->to_prim_procedure();
-            
-            if (prim->is_eval()) {
-                SchemeObject* the_eval_env = args->cadr();
-                return eval(args->car(), the_eval_env->to_environment()->get());
-            }
-            return prim->func(args);
-
-        } else if (proc->is_comp_procedure()) {
-
-            SchemeCompoundProcedure* comp = proc->to_comp_procedure();
-            env = std::make_shared<Environment>(comp->env(), comp->params(), args);
-
-            return eval(cons(obj_creator_.make_symbol("begin"), comp->body()), env);
-
-        } else {
-            std::cerr << "Error: Cannot apply object ";
-            write(proc);
-            std::cerr << std::endl;
-            exit(1);
-        }
-    } else { 
-        std::cerr << "Error: cannot evaluate unknown expression type." << std::endl;
-        exit(1);
-    }
-    
-    std::cerr << "Error: eval illegal state." << std::endl;
-    exit(1);
-}
-
-SchemeObject* Scheme::get_value_of_args(SchemeObject* args, Environment::Ptr env) {
-    if (!args->is_proper_list()) {
-        std::cout << "Error: ill-formed argument list" << std::endl;
-        exit(1);
-    }
-
-    std::vector<SchemeObject*> stack;
-    stack.reserve(args->length_as_list() + 1);
-
-    while (!args->is_empty_list()) {
-        // Evaluate each item and add it to the list
-        stack.push_back(eval(args->car(), env));
-        args = args->cdr();
-    }
-    SchemeObject* list = obj_creator_.make_empty_list();
-    while (!stack.empty()) {
-        list = cons(stack.back(), list);
-        stack.pop_back();
-    }
-    return list;
-}
-
-SchemeObject* Scheme::eval_let_form(
-        SchemeObject* args, 
-        Environment::Ptr env) 
-{
-    SchemeObject* body = args->cdr();
-    args = args->car();
-    // Args now points to the list of (variable, value) pairs
-
-    SchemeObject* vars = obj_creator_.make_empty_list();
-    SchemeObject* vals = obj_creator_.make_empty_list();
-
-    SchemeObject* pair;
-
-    while (!args->is_empty_list()) {
-        pair = args->car();
-        vars = cons(pair->car(), vars);
-        vals = cons(pair->cadr(), vals);
-        args = args->cdr();
-    }
-
-    SchemeObject* lambda = cons(vars, body);
-    lambda = cons(obj_creator_.make_symbol("lambda"), lambda);
-    lambda = cons(lambda, vals);
-
-    return eval(lambda, env);
-}
-
-SchemeObject* Scheme::convert_letrec_form(SchemeObject* args) {
-    /*
-     * (letrec ([x1 e1] ... [xn en]) body)
-     *      ---->
-     * (let ([x1 undef] .. [xn undef])
-     *     (let ([t1 e1] ...[t2 e2])
-     *          (set! x1 t1) ... (set! xn tn))
-     *     body)
-     */
-    SchemeObject* vars = args->car();
-    SchemeObject *var, *val, *inner_let, *tmp_var, *tmp_binding, *set_form;
-
-    SchemeObject* new_args = obj_creator_.make_empty_list();
-    inner_let = new_args;
-    
-    int var_id = 0;
-
-    while (!vars->is_empty_list()) {
-        var = vars->caar();
-        val = vars->cdar()->car();
-
-        tmp_var = obj_creator_.make_symbol(
-                make_string("t", var_id, 3));
-        // Replace the value with unspecified
-        vars->cdar()->set_car(obj_creator_.make_unspecified());
-        // Make a set form with the temp
-        set_form = obj_creator_.make_tagged_list("set!", var, tmp_var);
-        // make a new binding for inner let
-        tmp_binding = cons(tmp_var, cons(val, obj_creator_.make_empty_list()));
-
-        // Add the set form to the list
-        inner_let = cons(set_form, inner_let);
-        // Add the tmp binding to the list
-        new_args = cons(tmp_binding, new_args);
-
-        ++var_id;
-        vars = vars->cdr();
-    }
-    // Complete the inner let
-    inner_let = cons(obj_creator_.make_symbol("let"), cons(new_args, inner_let));
-    args->set_cdr(cons(inner_let, args->cdr()));
-    args = cons(obj_creator_.make_symbol("let"), args);
-
-    return args;
-}
-
-SchemeObject* Scheme::prepare_apply_args(SchemeObject* args_to_apply) {
-    // TODO: Error checking to ensure the values end with a list
-    
-    SchemeObject* the_args = args_to_apply;
-
-    if (the_args->length_as_list() == 1 &&
-        the_args->car()->is_proper_list())
-    {
-        // only arg is a list, just return it
-        return the_args->car();
-    }
-
-    // Get to the last argument
-    while (!args_to_apply->cadr()->is_proper_list()) {
-        args_to_apply = args_to_apply->cdr();
-    }
-    // Make one big list
-    args_to_apply->set_cdr(args_to_apply->cadr());
-
-    return the_args;
 }
 
 //============================================================================
@@ -538,11 +188,11 @@ bool Scheme::load_file(std::string fname) {
     SchemeReader file_reader(&obj_creator_, file_stream);
 
     std::cout << "Loading file \'" << fname << "\'."  << std::endl;
-    SchemeObject* what_was_read = file_reader.read();
+    SchemeObject* obj = file_reader.read();
 
-    while (what_was_read) {
-        eval(what_was_read, Environment::get_global_environment());
-        what_was_read = file_reader.read();
+    while (obj) {
+        evaluator_.eval(obj, Environment::get_global_environment());
+        obj = file_reader.read();
     }
     std::cout << "done." << std::endl;
     file_stream.close();
@@ -560,7 +210,7 @@ void Scheme::main_loop(){
 	print_welcome_message();
 	while (true) {
 		std::cout << cursor_ << ' ';
-		write(eval_in_global_env(reader_.read()));
+		write(evaluator_.eval_in_global_env(reader_.read()));
 		std::cout << std::endl;
 
         SchemeGarbageCollector::the_gc().add_from_environment(env);

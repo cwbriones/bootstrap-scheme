@@ -21,10 +21,6 @@ class SchemeReader {
         SchemeObject* peek_char();
 
         bool load_into_environment(Environment::Ptr env);
-
-        void set_evaluator(Scheme* evaluator) {
-            evaluator_ = evaluator;
-        }
     private:
         std::istream& instream_ = std::cin;
         SchemeObjectCreator* objcreator_ = nullptr;

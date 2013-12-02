@@ -1,4 +1,4 @@
-#include "Scheme.h"
+#include "SchemeEvaluator.h"
 
 #include "Reader.h"
 #include "SchemeObjectCreator.h"
@@ -19,13 +19,11 @@ SchemeReader::SchemeReader(SchemeObjectCreator* objcreator, std::istream& instre
 }
 
 bool SchemeReader::load_into_environment(Environment::Ptr env) {
-    if (!evaluator_) {
-        return false;
-    }
-    SchemeObject* obj = read();
+    SchemeEvaluator evaluator(objcreator_);
 
+    SchemeObject* obj = read();
     while (obj) {
-        evaluator_->eval(obj, env);
+        evaluator.eval(obj, env);
         obj = read();
     }
 

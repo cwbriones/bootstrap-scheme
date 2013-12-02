@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "Environment.h"
+#include "SchemeEvaluator.h"
 #include "Reader.h"
 #include "SchemeObjectCreator.h"
 
@@ -17,9 +18,6 @@ public:
 
 	void main_loop();
     bool load_file(std::string fname);
-
-    SchemeObject* eval(SchemeObject* exp, Environment::Ptr env);
-    SchemeObject* eval_in_global_env(SchemeObject* exp);
 private:
 	const std::string cursor_;
     
@@ -28,15 +26,9 @@ private:
     
     // Read
     SchemeReader reader_;
-
-    // Evaluate
-    SchemeObject* cons(SchemeObject* car, SchemeObject* cdr);
-    SchemeObject* get_value_of_args(SchemeObject* args, Environment::Ptr env);
     
-    SchemeObject* eval_let_form(SchemeObject* args, Environment::Ptr env);
-    SchemeObject* convert_letrec_form(SchemeObject* args);
-
-    SchemeObject* prepare_apply_args(SchemeObject* args_to_apply);
+    // Evaluate
+    SchemeEvaluator evaluator_;
 
     // Print
 	void write(SchemeObject* obj);
