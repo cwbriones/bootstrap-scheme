@@ -113,7 +113,8 @@ SchemeObject* SchemeEvaluator::eval(SchemeObject* exp, Environment::Ptr env) {
 
     } else if (exp->is_tagged_list("let")) {
 
-        return eval_let_form(exp->cdr(), env);
+        exp = eval_let_form(exp->cdr(), env);
+        return eval(exp, env);
 
     } else if (exp->is_tagged_list("letrec")) {
 
@@ -277,19 +278,19 @@ SchemeObject* SchemeEvaluator::eval_let_form(
         SchemeObject* args, 
         Environment::Ptr env) 
 {
+    if (args->car()->is_symbol()) {
+        return convert_named_let_form(args, env);
+    }
     SchemeObject* body = args->cdr();
+    // point args to the list of (variable, value) pairs
     args = args->car();
-    // Args now points to the list of (variable, value) pairs
 
     SchemeObject* vars = obj_creator_->make_empty_list();
     SchemeObject* vals = obj_creator_->make_empty_list();
 
-    SchemeObject* pair;
-
     while (!args->is_empty_list()) {
-        pair = args->car();
-        vars = cons(pair->car(), vars);
-        vals = cons(pair->cadr(), vals);
+        vars = cons(args->caar(), vars);
+        vals = cons(args->cdar()->car(), vals);
         args = args->cdr();
     }
 
@@ -297,7 +298,43 @@ SchemeObject* SchemeEvaluator::eval_let_form(
     lambda = cons(obj_creator_->make_symbol("lambda"), lambda);
     lambda = cons(lambda, vals);
 
-    return eval(lambda, env);
+    return lambda;
+}
+
+SchemeObject* SchemeEvaluator::convert_named_let_form(
+        SchemeObject* args, 
+        Environment::Ptr env) 
+{
+    //Initialize each list to empty
+    SchemeObject* lambda_params = obj_creator_->make_empty_list();
+    SchemeObject* lambda_args = lambda_params;
+    SchemeObject* letrec_vars = lambda_params;
+
+    // Grab each of the relevant pieces
+    SchemeObject* lambda_name = args->car();
+    SchemeObject* bindings = args->cadr();
+    SchemeObject* body = args->cddr();
+
+    // Parse the param/arg pairs
+    while (!bindings->is_empty_list()) {
+        lambda_params = cons(bindings->caar(), lambda_params);
+        lambda_args = cons(bindings->cdar()->car(), lambda_args);
+        bindings = bindings->cdr();
+    }
+    // (<name> <init-arg1> ... <init-arg N>)
+    lambda_args = cons(lambda_name, lambda_args);
+
+    // (lambda (params) body1 ... bodyN)
+    SchemeObject* the_lambda = 
+        cons(obj_creator_->make_symbol("lambda"), cons(lambda_params, body));
+    // (<the-lambda>)
+    letrec_vars = cons(the_lambda, letrec_vars);
+    // (<name> <the-lambda>)
+    letrec_vars = cons(lambda_name, letrec_vars);
+    // ((<name> <the-lambda>)
+    letrec_vars = cons(letrec_vars, obj_creator_->make_empty_list());
+
+    return obj_creator_->make_tagged_list("letrec", letrec_vars, lambda_args);
 }
 
 SchemeObject* SchemeEvaluator::convert_letrec_form(SchemeObject* args) {
@@ -321,8 +358,7 @@ SchemeObject* SchemeEvaluator::convert_letrec_form(SchemeObject* args) {
         var = vars->caar();
         val = vars->cdar()->car();
 
-        tmp_var = obj_creator_->make_symbol(
-                make_string("t", var_id, 3));
+        tmp_var = obj_creator_->make_symbol(make_string("t", var_id, 3));
         // Replace the value with unspecified
         vars->cdar()->set_car(obj_creator_->make_unspecified());
         // Make a set form with the temp
@@ -330,16 +366,16 @@ SchemeObject* SchemeEvaluator::convert_letrec_form(SchemeObject* args) {
         // make a new binding for inner let
         tmp_binding = cons(tmp_var, cons(val, obj_creator_->make_empty_list()));
 
-        // Add the set form to the list
+        // Add each to respective lists
         inner_let = cons(set_form, inner_let);
-        // Add the tmp binding to the list
         new_args = cons(tmp_binding, new_args);
 
         ++var_id;
         vars = vars->cdr();
     }
-    // Complete the inner let
+    // Complete inner let
     inner_let = cons(obj_creator_->make_symbol("let"), cons(new_args, inner_let));
+    // Complete outer let
     args->set_cdr(cons(inner_let, args->cdr()));
     args = cons(obj_creator_->make_symbol("let"), args);
 

@@ -21,6 +21,7 @@ private:
     SchemeObject* get_value_of_args(SchemeObject* args, Environment::Ptr env);
     
     SchemeObject* eval_let_form(SchemeObject* args, Environment::Ptr env);
+    SchemeObject* convert_named_let_form(SchemeObject* args, Environment::Ptr env);
     SchemeObject* convert_letrec_form(SchemeObject* args);
 
     SchemeObject* prepare_apply_args(SchemeObject* args_to_apply);
