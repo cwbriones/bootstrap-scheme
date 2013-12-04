@@ -6,7 +6,7 @@
 
 SchemeObject* SchemeCharToIntProcedure::func(SchemeObject* args) {
     SchemeObject* obj = args->car();
-    int value = static_cast<int>(obj->to_character()->value());
+    int value = static_cast<int>(obj->char_value());
 
     return obj_creator_->make_fixnum(value);
 }

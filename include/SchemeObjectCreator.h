@@ -41,7 +41,6 @@ public:
     }
     void setup_environment(Environment* env);
 private:
-
     void init_keywords();
     void init_type_predicates(Environment* env);
     void init_type_conversions(Environment* env);

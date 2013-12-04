@@ -77,7 +77,7 @@ void Scheme::write(SchemeObject* obj){
         case SchemeObject::CHARACTER:
             std::cout << "#\\";
 
-            switch(obj->to_character()->value()){
+            switch(obj->char_value()){
                 case '\n':
                     std::cout << "newline";
                     break;
@@ -88,7 +88,7 @@ void Scheme::write(SchemeObject* obj){
                     std::cout << "tab";
                     break;
                 default:
-                    std::cout << obj->to_character()->value();
+                    std::cout << obj->char_value();
             }
             break;
         case SchemeObject::STRING:

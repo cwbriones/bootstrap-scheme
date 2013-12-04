@@ -21,8 +21,10 @@ void SchemeObject::object_summary() {
 
 SchemeBoolean SchemeObject::the_false_object_ = 
     SchemeBoolean(SchemeObject::BOOLEAN, false);
+
 SchemeBoolean SchemeObject::the_true_object_ =
     SchemeBoolean(SchemeObject::BOOLEAN, true);
+
 SchemeObject SchemeObject::the_empty_list_ = SchemeObject(EMPTY_LIST);
 SchemeObject SchemeObject::the_unspecified_object_ = SchemeObject(UNSPECIFIED);
 
@@ -58,16 +60,19 @@ long SchemeObject::fixnum_value() {
     }
 }
 
+char SchemeObject::char_value() {
+    if (type_ == CHARACTER) {
+        return data.character.value;
+    }
+    return '\0';
+}
+
 SchemeFlonum* SchemeObject::to_flonum() {
     return static_cast<SchemeFlonum*>(this);
 }
 
 SchemeBoolean* SchemeObject::to_boolean() {
     return static_cast<SchemeBoolean*>(this);
-}
-
-SchemeCharacter* SchemeObject::to_character() {
-    return static_cast<SchemeCharacter*>(this);
 }
 
 SchemeString* SchemeObject::to_string() {
@@ -260,6 +265,10 @@ SchemeObject* SchemeObject::cdddr() {
 
 void SchemeObject::init_fixnum(long value) {
     data.fixnum.value = value;
+}
+
+void SchemeObject::init_char(char value) {
+    data.character.value = value;
 }
 
 //============================================================================

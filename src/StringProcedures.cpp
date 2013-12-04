@@ -7,7 +7,7 @@ SchemeObject* ListStringProcedure::func(SchemeObject* args) {
     args = args->car();
 
     while (!args->is_empty_list()) {
-        str += args->car()->to_character()->value();
+        str += args->car()->char_value();
 
         args = args->cdr();
     }

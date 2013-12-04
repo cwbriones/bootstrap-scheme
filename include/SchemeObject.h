@@ -9,10 +9,8 @@
 template <class T>
 class SchemePrimitive;
 
-typedef SchemePrimitive<int> SchemeFixnum;
 typedef SchemePrimitive<double> SchemeFlonum;
 typedef SchemePrimitive<bool> SchemeBoolean;
-typedef SchemePrimitive<char> SchemeCharacter;
 typedef SchemePrimitive<std::string> SchemeString;
 
 class SchemeSymbol;
@@ -53,9 +51,10 @@ public:
 
     // Casts
     long fixnum_value();
+    char char_value();
+
     SchemeFlonum* to_flonum();
     SchemeBoolean* to_boolean();
-    SchemeCharacter* to_character();
     SchemeString* to_string();
     SchemeSymbol* to_symbol();
     SchemePrimProcedure* to_prim_procedure();
@@ -115,6 +114,7 @@ protected:
 
     // Initialization
     void init_fixnum(long value);
+    void init_char(char value);
 
     Type type_ = UNSPECIFIED;
     int mark_ = 0;

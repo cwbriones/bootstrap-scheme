@@ -54,7 +54,9 @@ SchemeObject* SchemeObjectCreator::make_boolean(bool value) {
 }
 
 SchemeObject* SchemeObjectCreator::make_character(char value) {
-    SchemeObject* obj = new SchemeCharacter(SchemeObject::CHARACTER, value);
+    SchemeObject* obj = new SchemeObject(SchemeObject::CHARACTER);
+    obj->init_char(value);
+
     SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
