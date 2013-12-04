@@ -19,11 +19,11 @@ void SchemeObject::object_summary() {
         objects_created_ - objects_destroyed_ << std::endl;
 }
 
-SchemeBoolean SchemeObject::the_false_object_ = 
-    SchemeBoolean(SchemeObject::BOOLEAN, false);
+SchemeObject SchemeObject::the_false_object_ = 
+    SchemeObject(SchemeObject::BOOLEAN);
 
-SchemeBoolean SchemeObject::the_true_object_ =
-    SchemeBoolean(SchemeObject::BOOLEAN, true);
+SchemeObject SchemeObject::the_true_object_ =
+    SchemeObject(SchemeObject::BOOLEAN);
 
 SchemeObject SchemeObject::the_empty_list_ = SchemeObject(EMPTY_LIST);
 SchemeObject SchemeObject::the_unspecified_object_ = SchemeObject(UNSPECIFIED);
@@ -60,6 +60,13 @@ long SchemeObject::fixnum_value() {
     }
 }
 
+bool SchemeObject::boolean_value() {
+    if (type_ == BOOLEAN) {
+        return data.boolean.value;
+    }
+    return false;
+}
+
 char SchemeObject::char_value() {
     if (type_ == CHARACTER) {
         return data.character.value;
@@ -69,10 +76,6 @@ char SchemeObject::char_value() {
 
 SchemeFlonum* SchemeObject::to_flonum() {
     return static_cast<SchemeFlonum*>(this);
-}
-
-SchemeBoolean* SchemeObject::to_boolean() {
-    return static_cast<SchemeBoolean*>(this);
 }
 
 SchemeString* SchemeObject::to_string() {
@@ -200,7 +203,7 @@ bool SchemeObject::collectible() {
 }
 
 bool SchemeObject::is_true() {
-    return !this->is_false_obj();
+    return !(this == &the_false_object_);
 }
 
 SchemeObject* SchemeObject::car() {

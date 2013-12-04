@@ -52,15 +52,19 @@ public:
     // Casts
     long fixnum_value();
     char char_value();
+    bool boolean_value();
 
     SchemeFlonum* to_flonum();
-    SchemeBoolean* to_boolean();
     SchemeString* to_string();
     SchemeSymbol* to_symbol();
+
+    // Compound data types
     SchemePrimProcedure* to_prim_procedure();
     SchemeCompoundProcedure* to_comp_procedure();
     SchemeVector* to_vector();
     SchemeEnvironment* to_environment();
+
+    // IO Objects
     SchemeInputPort* to_input_port();
 
     // Boolean operations
@@ -68,10 +72,12 @@ public:
     bool is_tagged_list(SchemeObject* tag);
     bool is_self_evaluating();
 
+    // Singleton Check
     bool is_true_obj();
     bool is_false_obj();
     bool is_empty_list();
 
+    // Type check
     bool is_fixnum();
     bool is_flonum();
     bool is_boolean();
@@ -143,8 +149,8 @@ protected:
 
     // Singletons
     static SchemeObject the_unspecified_object_;
-    static SchemeBoolean the_true_object_;
-    static SchemeBoolean the_false_object_;
+    static SchemeObject the_true_object_;
+    static SchemeObject the_false_object_;
     static SchemeObject the_empty_list_;
 
     friend class SchemeObjectCreator;
