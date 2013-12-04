@@ -52,7 +52,7 @@ public:
     Type type() const;
 
     // Casts
-    SchemeFixnum* to_fixnum();
+    long fixnum_value();
     SchemeFlonum* to_flonum();
     SchemeBoolean* to_boolean();
     SchemeCharacter* to_character();
@@ -112,8 +112,11 @@ public:
     static void object_summary();
 protected:
     SchemeObject(SchemeObject::Type t);
-    Type type_ = UNSPECIFIED;
 
+    // Initialization
+    void init_fixnum(long value);
+
+    Type type_ = UNSPECIFIED;
     int mark_ = 0;
     int length_as_list_ = -1;
     bool is_proper_list_ = false;

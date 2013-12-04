@@ -31,10 +31,11 @@ SchemeObject* SchemeObjectCreator::make_unspecified() {
     return &SchemeObject::the_unspecified_object_;
 }
 
-SchemeObject* SchemeObjectCreator::make_fixnum(int value) {
-    SchemeObject* obj = new SchemeFixnum(SchemeObject::FIXNUM, value);
-    SchemeGarbageCollector::the_gc().add(obj);
+SchemeObject* SchemeObjectCreator::make_fixnum(long value) {
+    SchemeObject* obj = new SchemeObject(SchemeObject::FIXNUM);
+    obj->init_fixnum(value);
 
+    SchemeGarbageCollector::the_gc().add(obj);
     return obj;
 }
 

@@ -4,7 +4,7 @@
 #include "Procedures/VectorProcedures.h"
 
 SchemeObject* MakeVectorProcedure::func(SchemeObject* args) {
-    int size = args->car()->to_fixnum()->value();
+    int size = args->car()->fixnum_value();
 
     SchemeObject* init;
     if (args->cdr()->is_empty_list()) {
@@ -18,14 +18,14 @@ SchemeObject* MakeVectorProcedure::func(SchemeObject* args) {
 
 SchemeObject* VectorRefProcedure::func(SchemeObject* args) {
     SchemeVector* the_vector = args->car()->to_vector();
-    int index = args->cadr()->to_fixnum()->value();
+    int index = args->cadr()->fixnum_value();
 
     return the_vector->at(index);
 }
 
 SchemeObject* VectorSetProcedure::func(SchemeObject* args) {
     SchemeVector* the_vector = args->car()->to_vector();
-    int index = args->cadr()->to_fixnum()->value();
+    int index = args->cadr()->fixnum_value();
     
     the_vector->set(index, args->caddr());
 

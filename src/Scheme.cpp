@@ -66,7 +66,7 @@ void Scheme::write(SchemeObject* obj){
             std::cout << "#<unspecified>";
             break;
 		case SchemeObject::FIXNUM:
-			std::cout << obj->to_fixnum()->value();
+			std::cout << obj->fixnum_value();
 			break;
         case SchemeObject::FLONUM:
             std::cout <<  obj->to_flonum()->value();

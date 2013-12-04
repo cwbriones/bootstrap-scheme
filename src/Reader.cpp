@@ -1,14 +1,12 @@
-#include "SchemeEvaluator.h"
-
-#include "Reader.h"
-#include "SchemeObjectCreator.h"
-
-#include "Environment.h"
-
 #include <cstdlib>
 #include <unordered_set>
 #include <string>
 #include <vector>
+
+#include "SchemeEvaluator.h"
+#include "Reader.h"
+#include "Environment.h"
+#include "SchemeObjectCreator.h"
 
 SchemeReader::SchemeReader(SchemeObjectCreator* objcreator){
     objcreator_ = objcreator;
@@ -22,6 +20,7 @@ bool SchemeReader::load_into_environment(Environment::Ptr env) {
     SchemeEvaluator evaluator(objcreator_);
 
     SchemeObject* obj = read();
+
     while (obj) {
         evaluator.eval(obj, env);
         obj = read();
@@ -30,11 +29,11 @@ bool SchemeReader::load_into_environment(Environment::Ptr env) {
     return true;
 }
 
-void SchemeReader::eat_whitespace(){
+void SchemeReader::eat_whitespace() {
     char c;
     std::string tmp;
 
-	while (c = (instream_ >> std::ws).peek()){
+	while (c = (instream_ >> std::ws).peek()) {
 		if (c == ';'){ // Comments are also whitespace
             std::getline(instream_, tmp);
 		} else {
@@ -47,9 +46,9 @@ void SchemeReader::eat_expected_word(std::string word){
     int c = 0;
     std::string::iterator iter = word.begin();
 
-    while (iter != word.end()){
+    while (iter != word.end()) {
         c = instream_.get();
-        if (c != *iter){
+        if (c != *iter) {
             std::cerr << "unexpected character '" << (char)c << '\'' << std::endl;
             exit(1);
         }
@@ -58,27 +57,27 @@ void SchemeReader::eat_expected_word(std::string word){
 }
 
 
-bool SchemeReader::is_delimiter(char c){
+bool SchemeReader::is_delimiter(char c) {
 	return isspace(c) || c == EOF ||
 			c == '('  || c == ')' ||
 			c == '"'  || c == ';';
 }
 
-bool SchemeReader::is_start_of_symbol(char c){
+bool SchemeReader::is_start_of_symbol(char c) {
     return isdigit(c) || isalpha(c) ||
         ( (c != '#') && (c != '\\') &&
           (c != '`') && !is_delimiter(c) &&
           (c != '\'') );
 }
 
-void SchemeReader::peek_expecting_delimiter(){
-    if (!is_delimiter(instream_.peek())){
+void SchemeReader::peek_expecting_delimiter() {
+    if (!is_delimiter(instream_.peek())) {
         std::cerr << "character not followed by delimiter." << std::endl;
         exit(1);
     }
 }
 
-SchemeObject* SchemeReader::read(){
+SchemeObject* SchemeReader::read() {
 	char c;
 	eat_whitespace();
 
@@ -96,7 +95,7 @@ SchemeObject* SchemeReader::read(){
     else if (c == '#') {
         c = instream_.get();
 
-        if (c == '\\'){
+        if (c == '\\') {
             return read_character();
         } else if (c == '(') {
             return read_vector();
@@ -120,7 +119,7 @@ SchemeObject* SchemeReader::read(){
         std::string number("");
         bool is_float = false;
 		// Read in a fixnum.
-		if (c == '-'){
+		if (c == '-') {
             number += c;
         } else {
 			instream_.unget();
@@ -167,13 +166,13 @@ SchemeObject* SchemeReader::read(){
 	exit(1);
 }
 
-SchemeObject* SchemeReader::read_pair(){
+SchemeObject* SchemeReader::read_pair() {
     SchemeObject* car_obj = nullptr;
     SchemeObject* cdr_obj = nullptr;
 
     eat_whitespace();
     char c = instream_.peek();
-    if (c == ')'){
+    if (c == ')') {
         instream_.get();
         return objcreator_->make_empty_list();
     }
@@ -182,7 +181,7 @@ SchemeObject* SchemeReader::read_pair(){
 
     eat_whitespace();
     c = instream_.get();
-    if (c == '.'){
+    if (c == '.') {
         // Dot notation, cons cell
         if (!is_delimiter(instream_.peek())) {
             std::cerr << "Unexpected character \"" << c 
@@ -195,7 +194,7 @@ SchemeObject* SchemeReader::read_pair(){
         eat_whitespace();
         c = instream_.get();
 
-        if (c != ')'){
+        if (c != ')') {
             std::cerr << "Unexpected character \"" << c 
                 << ". Was expecting closing ')'" << std::endl;
             exit(1);
@@ -225,7 +224,7 @@ SchemeObject* SchemeReader::read_vector() {
     }
 }
 
-SchemeObject* SchemeReader::read_string(){
+SchemeObject* SchemeReader::read_string() {
     std::string buffer;
     char c = '\0';
 
@@ -287,14 +286,12 @@ SchemeObject* SchemeReader::read_character() {
     return objcreator_->make_character(c);
 }
 
-SchemeObject* SchemeReader::read_char() 
-{
+SchemeObject* SchemeReader::read_char() {
     char c = instream_.get();
     return objcreator_->make_character(c);
 }
 
-SchemeObject* SchemeReader::peek_char() 
-{
+SchemeObject* SchemeReader::peek_char() {
     char c = instream_.peek();
     return objcreator_->make_character(c);
 }
@@ -307,7 +304,7 @@ SchemeObject* SchemeReader::read_symbol() {
         '>', '!', '?', ':', '$', '%', '_', '&', '~', '^', '.' , '#' };
     
     char c;
-    while ( (c = instream_.get()) && !is_delimiter(c) ){
+    while ( (c = instream_.get()) && !is_delimiter(c) ) {
         buffer += c;
     }
     if (is_delimiter(c)){

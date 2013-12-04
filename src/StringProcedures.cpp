@@ -16,7 +16,7 @@ SchemeObject* ListStringProcedure::func(SchemeObject* args) {
 }
 
 SchemeObject* StringRefProcedure::func(SchemeObject* args) {
-    int index = args->cadr()->to_fixnum()->value();
+    int index = args->cadr()->fixnum_value();
     args = args->car();
 
     char c = args->to_string()->value().at(index);

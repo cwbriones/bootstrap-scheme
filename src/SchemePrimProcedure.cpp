@@ -11,10 +11,10 @@ bool SchemePrimProcedure::check_arg_length(SchemeObject* args) {
 
 SchemeObject* SchemeAddProcedure::func(SchemeObject* args) {
 
-    int accum = 0;
+    long accum = 0;
 
     while (!args->is_empty_list()) {
-        accum += args->car()->to_fixnum()->value();
+        accum += args->car()->fixnum_value();
         args = args->cdr();
     }
     return obj_creator_->make_fixnum(accum);
@@ -22,11 +22,11 @@ SchemeObject* SchemeAddProcedure::func(SchemeObject* args) {
 
 SchemeObject* SchemeSubProcedure::func(SchemeObject* args) {
 
-    int accum = args->car()->to_fixnum()->value();
+    long accum = args->car()->fixnum_value();
     args = args->cdr();
 
     while (!args->is_empty_list()) {
-        accum -= args->car()->to_fixnum()->value();
+        accum -= args->car()->fixnum_value();
         args = args->cdr();
     }
     return obj_creator_->make_fixnum(accum);
@@ -34,10 +34,10 @@ SchemeObject* SchemeSubProcedure::func(SchemeObject* args) {
 
 SchemeObject* SchemeMultProcedure::func(SchemeObject* args) {
 
-    int accum = 1;
+    long accum = 1;
 
     while (!args->is_empty_list()) {
-        accum *= args->car()->to_fixnum()->value();
+        accum *= args->car()->fixnum_value();
         args = args->cdr();
     }
     return obj_creator_->make_fixnum(accum);
@@ -45,11 +45,11 @@ SchemeObject* SchemeMultProcedure::func(SchemeObject* args) {
 
 SchemeObject* SchemeDivProcedure::func(SchemeObject* args) {
 
-    int accum = args->car()->to_fixnum()->value();
+    long accum = args->car()->fixnum_value();
     args = args->cdr();
 
     while (!args->is_empty_list()) {
-        accum /= args->car()->to_fixnum()->value();
+        accum /= args->car()->fixnum_value();
         args = args->cdr();
     }
     return obj_creator_->make_fixnum(accum);
@@ -58,13 +58,13 @@ SchemeObject* SchemeDivProcedure::func(SchemeObject* args) {
 SchemeObject* SchemeLessThanProcedure::func(SchemeObject* args) {
 
     bool retval = true;
-    int value = args->car()->to_fixnum()->value();
-    int nextval;
+    long value = args->car()->fixnum_value();
+    long nextval;
 
     args = args->cdr();
 
     while (!args->is_empty_list()) {
-        nextval = args->car()->to_fixnum()->value();
+        nextval = args->car()->fixnum_value();
         retval = value < nextval;
 
         if (!retval) {
@@ -79,13 +79,13 @@ SchemeObject* SchemeLessThanProcedure::func(SchemeObject* args) {
 SchemeObject* SchemeGreaterThanProcedure::func(SchemeObject* args) {
 
     bool retval = true;
-    int value = args->car()->to_fixnum()->value();
-    int nextval;
+    long value = args->car()->fixnum_value();
+    long nextval;
 
     args = args->cdr();
 
     while (!args->is_empty_list()) {
-        nextval = args->car()->to_fixnum()->value();
+        nextval = args->car()->fixnum_value();
         retval = value > nextval;
 
         if (!retval) {
@@ -100,11 +100,11 @@ SchemeObject* SchemeGreaterThanProcedure::func(SchemeObject* args) {
 SchemeObject* SchemeEqualsProcedure::func(SchemeObject* args) {
 
     bool retval = true;
-    int value = args->car()->to_fixnum()->value();
+    long value = args->car()->fixnum_value();
     args = args->cdr();
 
     while (!args->is_empty_list()) {
-        retval = retval && (value == args->car()->to_fixnum()->value());
+        retval = retval && (value == args->car()->fixnum_value());
         if (!retval) {
             break;
         }
@@ -115,16 +115,16 @@ SchemeObject* SchemeEqualsProcedure::func(SchemeObject* args) {
 
 SchemeObject* SchemeQuotientProcedure::func(SchemeObject* args) {
 
-    int m = args->car()->to_fixnum()->value();
-    int n = args->cadr()->to_fixnum()->value();
+    long m = args->car()->fixnum_value();
+    long n = args->cadr()->fixnum_value();
 
     return obj_creator_->make_fixnum(m / n);
 }
 
 SchemeObject* SchemeModuloProcedure::func(SchemeObject* args) {
 
-    int m = args->car()->to_fixnum()->value();
-    int n = args->cadr()->to_fixnum()->value();
+    long m = args->car()->fixnum_value();
+    long n = args->cadr()->fixnum_value();
 
     return obj_creator_->make_fixnum(m % n);
 }
@@ -148,7 +148,7 @@ SchemeObject* RandomProcedure::func(SchemeObject* args) {
         return obj_creator_->make_flonum(result);
 
     } else if (top->is_fixnum()) {
-        long value = top->to_fixnum()->value();
+        long value = top->fixnum_value();
         std::uniform_int_distribution<long> int_dist(0, value);
         long result = int_dist(generator_);
 

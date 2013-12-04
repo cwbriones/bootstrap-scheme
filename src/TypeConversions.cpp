@@ -13,7 +13,7 @@ SchemeObject* SchemeCharToIntProcedure::func(SchemeObject* args) {
 
 SchemeObject* SchemeIntToCharProcedure::func(SchemeObject* args) {
     SchemeObject* obj = args->car();
-    char value = static_cast<char>(obj->to_fixnum()->value());
+    char value = static_cast<char>(obj->fixnum_value());
 
     return obj_creator_->make_character(value);
 }
@@ -29,7 +29,7 @@ SchemeObject* SchemeStringToIntProcedure::func(SchemeObject* args) {
 
 SchemeObject* SchemeIntToStringProcedure::func(SchemeObject* args) {
     std::stringstream ss;
-    int value = args->car()->to_fixnum()->value();
+    int value = args->car()->fixnum_value();
     ss << value;
 
     return obj_creator_->make_string(ss.str());

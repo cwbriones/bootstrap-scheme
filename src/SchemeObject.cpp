@@ -49,8 +49,13 @@ SchemeObject::Type SchemeObject::type() const {
     return type_;
 }
 
-SchemeFixnum* SchemeObject::to_fixnum() {
-    return static_cast<SchemeFixnum*>(this);
+long SchemeObject::fixnum_value() {
+    if (type_ == FIXNUM) {
+        return data.fixnum.value;
+    }
+    else if (type_ == FLONUM) {
+        return static_cast<long>(data.flonum.value);
+    }
 }
 
 SchemeFlonum* SchemeObject::to_flonum() {
@@ -251,6 +256,10 @@ SchemeObject* SchemeObject::caddr() {
 
 SchemeObject* SchemeObject::cdddr() {
     return cdr()->cdr()->cdr();
+}
+
+void SchemeObject::init_fixnum(long value) {
+    data.fixnum.value = value;
 }
 
 //============================================================================
