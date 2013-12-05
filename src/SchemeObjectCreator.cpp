@@ -40,9 +40,10 @@ SchemeObject* SchemeObjectCreator::make_fixnum(long value) {
 }
 
 SchemeObject* SchemeObjectCreator::make_flonum(double value) {
-    SchemeObject* obj = new SchemeFlonum(SchemeObject::FLONUM, value);
-    SchemeGarbageCollector::the_gc().add(obj);
+    SchemeObject* obj = new SchemeObject(SchemeObject::FLONUM);
+    obj->init_flonum(value);
 
+    SchemeGarbageCollector::the_gc().add(obj);
     return obj;
 }
 

@@ -51,10 +51,10 @@ public:
 
     // Casts
     long fixnum_value();
+    double flonum_value();
     char char_value();
     bool boolean_value();
 
-    SchemeFlonum* to_flonum();
     SchemeString* to_string();
     SchemeSymbol* to_symbol();
 
@@ -120,6 +120,7 @@ protected:
 
     // Initialization
     void init_fixnum(long value);
+    void init_flonum(double value);
     void init_char(char value);
 
     Type type_ = UNSPECIFIED;

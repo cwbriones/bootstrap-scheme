@@ -141,7 +141,7 @@ SchemeObject* RandomProcedure::func(SchemeObject* args) {
     SchemeObject* top = args->car();
 
     if (top->is_flonum()) {
-        double value = top->to_flonum()->value();
+        double value = top->flonum_value();
         std::uniform_real_distribution<double> float_dist(0.0, value);
         double result = float_dist(generator_);
 

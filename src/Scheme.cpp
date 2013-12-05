@@ -69,7 +69,7 @@ void Scheme::write(SchemeObject* obj){
 			std::cout << obj->fixnum_value();
 			break;
         case SchemeObject::FLONUM:
-            std::cout <<  obj->to_flonum()->value();
+            std::cout <<  obj->flonum_value();
             break;
         case SchemeObject::BOOLEAN:
             std::cout << '#' << ((obj->is_true_obj()) ? 't' : 'f');

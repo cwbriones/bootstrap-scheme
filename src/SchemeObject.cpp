@@ -54,10 +54,12 @@ SchemeObject::Type SchemeObject::type() const {
 long SchemeObject::fixnum_value() {
     if (type_ == FIXNUM) {
         return data.fixnum.value;
-    }
-    else if (type_ == FLONUM) {
+    } else if (type_ == FLONUM) {
         return static_cast<long>(data.flonum.value);
+    } else if (type_ == CHARACTER) {
+        return static_cast<long>(data.character.value);
     }
+    return 0;
 }
 
 bool SchemeObject::boolean_value() {
@@ -70,12 +72,19 @@ bool SchemeObject::boolean_value() {
 char SchemeObject::char_value() {
     if (type_ == CHARACTER) {
         return data.character.value;
+    } else if (type_ == FIXNUM) {
+        return static_cast<char>(data.fixnum.value);
     }
     return '\0';
 }
 
-SchemeFlonum* SchemeObject::to_flonum() {
-    return static_cast<SchemeFlonum*>(this);
+double SchemeObject::flonum_value() {
+    if (type_ == FLONUM) {
+        return data.flonum.value;
+    } else if (type_ == FIXNUM) {
+        return static_cast<double>(data.fixnum.value);
+    }
+    return 0;
 }
 
 SchemeString* SchemeObject::to_string() {
@@ -267,10 +276,17 @@ SchemeObject* SchemeObject::cdddr() {
 }
 
 void SchemeObject::init_fixnum(long value) {
+    type_ = FIXNUM;
     data.fixnum.value = value;
 }
 
+void SchemeObject::init_flonum(double value) {
+    type_ = FLONUM;
+    data.flonum.value = value;
+}
+
 void SchemeObject::init_char(char value) {
+    type_ = CHARACTER;
     data.character.value = value;
 }
 
