@@ -65,88 +65,14 @@ SchemeObject* sub(SchemeObject*, SchemeObjectCreator*);
 SchemeObject* mul(SchemeObject*, SchemeObjectCreator*);
 SchemeObject* div(SchemeObject*, SchemeObjectCreator*);
     
+SchemeObject* equals(SchemeObject*, SchemeObjectCreator*);
+SchemeObject* less_than(SchemeObject*, SchemeObjectCreator*);
+SchemeObject* greater_than(SchemeObject*, SchemeObjectCreator*);
+
+SchemeObject* quotient(SchemeObject*, SchemeObjectCreator*);
+SchemeObject* modulo(SchemeObject*, SchemeObjectCreator*);
+
 } /* namespace ArithmeticProcedures */
-
-class SchemeAddProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeAddProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeSubProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeSubProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeMultProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeMultProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeDivProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeDivProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeLessThanProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeLessThanProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeGreaterThanProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeGreaterThanProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeEqualsProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeEqualsProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator) {}
-    friend class SchemeObjectCreator;
-};
- 
-class SchemeQuotientProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeQuotientProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 2) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeModuloProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeModuloProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 2) {}
-    friend class SchemeObjectCreator;
-};
 
 class SchemePredicateProcedure : public SchemePrimProcedure {
 public:

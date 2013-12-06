@@ -205,40 +205,17 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
     
     // Arithmetic Operators
     make_procedure_in_env(env, "+", ArithmeticProcedures::add);
+    make_procedure_in_env(env, "-", ArithmeticProcedures::sub);
+    make_procedure_in_env(env, "*", ArithmeticProcedures::mul);
+    make_procedure_in_env(env, "/", ArithmeticProcedures::div);
 
-    env->define_variable_value(
-            make_symbol("-")->to_symbol(), 
-            new SchemeSubProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("*")->to_symbol(), 
-            new SchemeMultProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("/")->to_symbol(), 
-            new SchemeDivProcedure(this)
-        );
+    make_procedure_in_env(env, "=", ArithmeticProcedures::equals);
+    make_procedure_in_env(env, "<", ArithmeticProcedures::less_than);
+    make_procedure_in_env(env, ">", ArithmeticProcedures::greater_than);
 
-    env->define_variable_value(
-            make_symbol("<")->to_symbol(), 
-            new SchemeLessThanProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol(">")->to_symbol(), 
-            new SchemeGreaterThanProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("=")->to_symbol(), 
-            new SchemeEqualsProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("quotient")->to_symbol(),
-            new SchemeQuotientProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("modulo")->to_symbol(), 
-            new SchemeModuloProcedure(this)
-        );
+    make_procedure_in_env(env, "quotient", ArithmeticProcedures::quotient);
+    make_procedure_in_env(env, "modulo", ArithmeticProcedures::modulo);
+    
     // List operations
     env->define_variable_value(
             make_symbol("length")->to_symbol(),

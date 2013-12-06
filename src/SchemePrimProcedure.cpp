@@ -17,24 +17,7 @@ SchemeObject* add(SchemeObject* args, SchemeObjectCreator* creator) {
     return creator->make_fixnum(accum);
 }
 
-} /* namespace ArithmeticProcedures */
-
-bool SchemePrimProcedure::check_arg_length(SchemeObject* args) {
-    return false;
-}
-
-SchemeObject* SchemeAddProcedure::func(SchemeObject* args) {
-
-    long accum = 0;
-
-    while (!args->is_empty_list()) {
-        accum += args->car()->fixnum_value();
-        args = args->cdr();
-    }
-    return obj_creator_->make_fixnum(accum);
-}
-
-SchemeObject* SchemeSubProcedure::func(SchemeObject* args) {
+SchemeObject* sub(SchemeObject* args, SchemeObjectCreator* creator) {
 
     long accum = args->car()->fixnum_value();
     args = args->cdr();
@@ -43,10 +26,10 @@ SchemeObject* SchemeSubProcedure::func(SchemeObject* args) {
         accum -= args->car()->fixnum_value();
         args = args->cdr();
     }
-    return obj_creator_->make_fixnum(accum);
+    return creator->make_fixnum(accum);
 }
 
-SchemeObject* SchemeMultProcedure::func(SchemeObject* args) {
+SchemeObject* mul(SchemeObject* args, SchemeObjectCreator* creator) {
 
     long accum = 1;
 
@@ -54,10 +37,10 @@ SchemeObject* SchemeMultProcedure::func(SchemeObject* args) {
         accum *= args->car()->fixnum_value();
         args = args->cdr();
     }
-    return obj_creator_->make_fixnum(accum);
+    return creator->make_fixnum(accum);
 }
 
-SchemeObject* SchemeDivProcedure::func(SchemeObject* args) {
+SchemeObject* div(SchemeObject* args, SchemeObjectCreator* creator) {
 
     long accum = args->car()->fixnum_value();
     args = args->cdr();
@@ -66,10 +49,10 @@ SchemeObject* SchemeDivProcedure::func(SchemeObject* args) {
         accum /= args->car()->fixnum_value();
         args = args->cdr();
     }
-    return obj_creator_->make_fixnum(accum);
+    return creator->make_fixnum(accum);
 }
 
-SchemeObject* SchemeLessThanProcedure::func(SchemeObject* args) {
+SchemeObject* less_than(SchemeObject* args, SchemeObjectCreator* creator) {
 
     bool retval = true;
     long value = args->car()->fixnum_value();
@@ -87,10 +70,10 @@ SchemeObject* SchemeLessThanProcedure::func(SchemeObject* args) {
         value = nextval;
         args = args->cdr();
     }
-    return obj_creator_->make_boolean(retval);
+    return creator->make_boolean(retval);
 }
 
-SchemeObject* SchemeGreaterThanProcedure::func(SchemeObject* args) {
+SchemeObject* greater_than(SchemeObject* args, SchemeObjectCreator* creator) {
 
     bool retval = true;
     long value = args->car()->fixnum_value();
@@ -108,10 +91,10 @@ SchemeObject* SchemeGreaterThanProcedure::func(SchemeObject* args) {
         value = nextval;
         args = args->cdr();
     }
-    return obj_creator_->make_boolean(retval);
+    return creator->make_boolean(retval);
 }
 
-SchemeObject* SchemeEqualsProcedure::func(SchemeObject* args) {
+SchemeObject* equals(SchemeObject* args, SchemeObjectCreator* creator) {
 
     bool retval = true;
     long value = args->car()->fixnum_value();
@@ -124,23 +107,29 @@ SchemeObject* SchemeEqualsProcedure::func(SchemeObject* args) {
         }
         args = args->cdr();
     }
-    return obj_creator_->make_boolean(retval);
+    return creator->make_boolean(retval);
 }
 
-SchemeObject* SchemeQuotientProcedure::func(SchemeObject* args) {
+SchemeObject* quotient(SchemeObject* args, SchemeObjectCreator* creator) {
 
     long m = args->car()->fixnum_value();
     long n = args->cadr()->fixnum_value();
 
-    return obj_creator_->make_fixnum(m / n);
+    return creator->make_fixnum(m / n);
 }
 
-SchemeObject* SchemeModuloProcedure::func(SchemeObject* args) {
+SchemeObject* modulo(SchemeObject* args, SchemeObjectCreator* creator) {
 
     long m = args->car()->fixnum_value();
     long n = args->cadr()->fixnum_value();
 
-    return obj_creator_->make_fixnum(m % n);
+    return creator->make_fixnum(m % n);
+}
+
+} /* namespace ArithmeticProcedures */
+
+bool SchemePrimProcedure::check_arg_length(SchemeObject* args) {
+    return false;
 }
 
 SchemeObject* SchemePredicateProcedure::func(SchemeObject* args) {
