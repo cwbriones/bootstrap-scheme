@@ -132,10 +132,6 @@ bool SchemePrimProcedure::check_arg_length(SchemeObject* args) {
     return false;
 }
 
-SchemeObject* SchemePredicateProcedure::func(SchemeObject* args) {
-    return obj_creator_->make_boolean(args->car()->type() & target_type_);
-}
-
 RandomProcedure::RandomProcedure() : SchemePrimProcedure(nullptr, 1) {
     generator_.seed(static_cast<unsigned int>(time(0)));
 }
@@ -202,27 +198,37 @@ SchemeObject* set_cdr(SchemeObject* args, SchemeObjectCreator* creator) {
 
 } /* namespace ListProcedures */
 
-//============================================================================
-// Polymorphic Equality Testing
-//============================================================================
+namespace PredicateProcedures {
 
-SchemeObject* SchemePolyEqProcedure::func(SchemeObject* args) {
-    if (args->car() != args->cadr()) {
-        return &the_false_object_;
-    }
-    return &the_true_object_;
+SchemeObject* list_check(SchemeObject* args, SchemeObjectCreator* creator) {
+    return creator->make_boolean(args->car()->is_proper_list());
 }
 
-//============================================================================
-// Boolean Operations
-//============================================================================
-
-SchemeObject* SchemeNotProcedure::func(SchemeObject* args) {
-    if (args->car()->is_true()) {
-        return &the_false_object_;
-    }
-    return &the_true_object_;
+SchemeObject* type_check(
+        SchemeObject* args, 
+        SchemeObjectCreator* creator,
+        uint32_t type)
+{
+    return creator->make_boolean(args->car()->type() & type);
 }
+    
+NewPrimProcedure::procedure_t create_type_check(uint32_t type) {
+    return std::bind(
+            type_check,
+            std::placeholders::_1,
+            std::placeholders::_2,
+            type);
+}
+
+SchemeObject* obj_equiv(SchemeObject* args, SchemeObjectCreator* creator) {
+    return creator->make_boolean(args->car() == args->cadr());
+}
+
+SchemeObject* boolean_not(SchemeObject* args, SchemeObjectCreator* creator) {
+    return creator->make_boolean(args->car()->is_false_obj());
+}
+
+} /* namespace PredicateProcedures */
 
 //============================================================================
 // Apply and Eval

@@ -54,10 +54,6 @@
 
 (define (list . x) x)
 
-(define (list? x)
-  (if (null? x) #t
-    (if (pair? x) (list? (cdr x)) #f)))
-
 (define (build-list n proc)
   (define (iter m max-value)
       (if (= m max-value) '()

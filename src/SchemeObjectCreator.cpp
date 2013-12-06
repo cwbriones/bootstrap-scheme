@@ -286,55 +286,57 @@ void SchemeObjectCreator::init_input_output(Environment* env) {
 }
 
 void SchemeObjectCreator::init_type_predicates(Environment* env) {
-    env->define_variable_value(
-            make_symbol("null?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::EMPTY_LIST)
-        );
-    env->define_variable_value(
-            make_symbol("integer?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::FIXNUM)
-        );
-    env->define_variable_value(
-            make_symbol("boolean?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::BOOLEAN)
-        );
-    env->define_variable_value(
-            make_symbol("char?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::CHARACTER)
-        );
-    env->define_variable_value(
-            make_symbol("symbol?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::SYMBOL)
-        );
-    env->define_variable_value(
-            make_symbol("string?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::STRING)
-        );
-    env->define_variable_value(
-            make_symbol("pair?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::PAIR)
-        );
-    env->define_variable_value(
-            make_symbol("flonum?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::FLONUM)
-        );
-    env->define_variable_value(
-            make_symbol("procedure?")->to_symbol(),
-            new SchemePredicateProcedure(this, 
-                SchemeObject::PRIMPROCEDURE | SchemeObject::COMPPROCEDURE)
-        );
-    env->define_variable_value(
-            make_symbol("vector?")->to_symbol(),
-            new SchemePredicateProcedure(this, SchemeObject::VECTOR)
-        );
-    env->define_variable_value(
-            make_symbol("eq?")->to_symbol(),
-            new SchemePolyEqProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("not")->to_symbol(),
-            new SchemeNotProcedure(this)
-        );
+
+    make_procedure_in_env(env, "eq?", PredicateProcedures::obj_equiv);
+    make_procedure_in_env(env, "not", PredicateProcedures::boolean_not, 1);
+
+    // Single type checks
+    auto null_check = 
+        PredicateProcedures::create_type_check(SchemeObject::EMPTY_LIST);
+    auto fixnum_check = 
+        PredicateProcedures::create_type_check(SchemeObject::FIXNUM);
+    auto flonum_check = 
+        PredicateProcedures::create_type_check(SchemeObject::FLONUM);
+    auto boolean_check = 
+        PredicateProcedures::create_type_check(SchemeObject::BOOLEAN);
+    auto char_check = 
+        PredicateProcedures::create_type_check(SchemeObject::CHARACTER);
+    auto string_check = 
+        PredicateProcedures::create_type_check(SchemeObject::STRING);
+    auto pair_check = 
+        PredicateProcedures::create_type_check(SchemeObject::PAIR);
+    auto symbol_check = 
+        PredicateProcedures::create_type_check(SchemeObject::SYMBOL);
+    auto vector_check = 
+        PredicateProcedures::create_type_check(SchemeObject::VECTOR);
+    auto input_check = 
+        PredicateProcedures::create_type_check(SchemeObject::INPUT_PORT);
+    auto output_check = 
+        PredicateProcedures::create_type_check(SchemeObject::OUTPUT_PORT);
+    
+    // Compound checks
+    auto procedure_check = PredicateProcedures::create_type_check(
+                SchemeObject::NEWPROCEDURE | SchemeObject::COMPPROCEDURE
+                );
+    auto io_check = PredicateProcedures::create_type_check(
+            SchemeObject::OUTPUT_PORT | SchemeObject::INPUT_PORT
+            );
+
+    // Binding
+    make_procedure_in_env(env, "null?", null_check, 1);
+    make_procedure_in_env(env, "integer?", fixnum_check, 1);
+    make_procedure_in_env(env, "real?", flonum_check, 1);
+    make_procedure_in_env(env, "boolean?", boolean_check, 1);
+    make_procedure_in_env(env, "char?", char_check, 1);
+    make_procedure_in_env(env, "string?", string_check, 1);
+    make_procedure_in_env(env, "pair?", pair_check, 1);
+    make_procedure_in_env(env, "symbol?", symbol_check, 1);
+    make_procedure_in_env(env, "vector?", vector_check, 1);
+    make_procedure_in_env(env, "procedure?", procedure_check, 1);
+    make_procedure_in_env(env, "output-port?", output_check, 1);
+    make_procedure_in_env(env, "input-port?", input_check, 1);
+    make_procedure_in_env(env, "io-port?", io_check, 1);
+    make_procedure_in_env(env, "list?", PredicateProcedures::list_check, 1);
 }
 
 void SchemeObjectCreator::init_type_conversions(Environment* env) {

@@ -74,19 +74,6 @@ SchemeObject* modulo(SchemeObject*, SchemeObjectCreator*);
 
 } /* namespace ArithmeticProcedures */
 
-class SchemePredicateProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemePredicateProcedure(SchemeObjectCreator* creator, uint16_t target) :
-        SchemePrimProcedure(creator, 1),
-        target_type_(target) {}
-
-    friend class SchemeObjectCreator;
-
-    uint16_t target_type_;
-};
-
 #include <random>
 
 class RandomProcedure : public SchemePrimProcedure {
@@ -114,31 +101,20 @@ SchemeObject* set_cdr(SchemeObject* args, SchemeObjectCreator* creator);
     
 } /* namespace ListProcedures */
 
-//============================================================================
-// Polymorphic Equality Testing
-//============================================================================
+namespace PredicateProcedures {
 
-class SchemePolyEqProcedure : public SchemePrimProcedure { 
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemePolyEqProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 2) {}
-    friend class SchemeObjectCreator;
-};
+SchemeObject* list_check(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* type_check(
+        SchemeObject* args, 
+        SchemeObjectCreator* creator,
+        uint32_t type);
 
-//============================================================================
-// Boolean Operations
-//============================================================================
+NewPrimProcedure::procedure_t create_type_check(uint32_t type);
 
-class SchemeNotProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeNotProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
+SchemeObject* obj_equiv(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* boolean_not(SchemeObject* args, SchemeObjectCreator* creator);
+
+} /* namespace PredicateProcedures */
 
 //============================================================================
 // Apply and Eval
