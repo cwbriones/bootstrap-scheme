@@ -5,48 +5,14 @@
 
 class SchemeObjectCreator;
 
-class MakeVectorProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    MakeVectorProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 2) {}
-    friend class SchemeObjectCreator;
-};
+namespace VectorProcedures {
 
-class VectorRefProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    VectorRefProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 2) {}
-    friend class SchemeObjectCreator;
-};
+SchemeObject* make_vec(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* vec_ref(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* vec_set(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* vec_to_list(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* vec_length(SchemeObject* args, SchemeObjectCreator* creator);
+    
+} /* namespace VectorProcedures */
 
-class VectorSetProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    VectorSetProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 3) {}
-    friend class SchemeObjectCreator;
-};
-
-class VectorToListProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    VectorToListProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
-
-class VectorLengthProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    VectorLengthProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
 #endif /* VECTOR_PROCEDURES_H_ */

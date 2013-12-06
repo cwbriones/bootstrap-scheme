@@ -1,7 +1,9 @@
 #include "SchemeObjectCreator.h"
 #include "Procedures/StringProcedures.h"
 
-SchemeObject* ListStringProcedure::func(SchemeObject* args) {
+namespace StringProcedures {
+    
+SchemeObject* ListToString(SchemeObject* args, SchemeObjectCreator* creator) {
     std::string str("");
 
     args = args->car();
@@ -12,21 +14,23 @@ SchemeObject* ListStringProcedure::func(SchemeObject* args) {
         args = args->cdr();
     }
 
-    return obj_creator_->make_string(str);
+    return creator->make_string(str);
 }
 
-SchemeObject* StringRefProcedure::func(SchemeObject* args) {
+SchemeObject* StringRef(SchemeObject* args, SchemeObjectCreator* creator) {
     int index = args->cadr()->fixnum_value();
     args = args->car();
 
     char c = args->to_string()->value().at(index);
 
-    return obj_creator_->make_character(c);
+    return creator->make_character(c);
 }
 
-SchemeObject* StringLengthProcedure::func(SchemeObject* args) {
+SchemeObject* StringLength(SchemeObject* args, SchemeObjectCreator* creator) {
     args = args->car();
     int length = args->to_string()->value().size();
 
-    return obj_creator_->make_fixnum(length);
+    return creator->make_fixnum(length);
 }
+
+} /* namespace StringProcedures */

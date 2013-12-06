@@ -251,27 +251,13 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             new StandardEnvironmentProcedure(this)
         );
     // String operations
-    env->define_variable_value(
-            make_symbol("string-ref")->to_symbol(),
-            new StringRefProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("string-length")->to_symbol(),
-            new StringLengthProcedure(this)
-        );
+    make_procedure_in_env(env, "string-length", StringProcedures::StringLength, 1);
+    make_procedure_in_env(env, "string-ref", StringProcedures::StringRef, 2);
     // Vector Operations
-    env->define_variable_value(
-            make_symbol("make-vector")->to_symbol(),
-            new MakeVectorProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("vector-ref")->to_symbol(),
-            new VectorRefProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("vector-set!")->to_symbol(),
-            new VectorSetProcedure(this)
-        );
+    make_procedure_in_env(env, "make-vector", VectorProcedures::make_vec, 2);
+    make_procedure_in_env(env, "vector-ref", VectorProcedures::vec_ref, 2);
+    make_procedure_in_env(env, "vector-set!", VectorProcedures::vec_set, 3);
+    make_procedure_in_env(env, "vector-length", VectorProcedures::vec_length, 1);
 
     init_type_predicates(env);
     init_type_conversions(env);
@@ -364,16 +350,6 @@ void SchemeObjectCreator::init_type_conversions(Environment* env) {
             make_symbol("symbol->string")->to_symbol(),
             new SchemeSymbolToStringProcedure(this)
         );
-    env->define_variable_value(
-            make_symbol("list->string")->to_symbol(),
-            new ListStringProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("vector->list")->to_symbol(),
-            new VectorToListProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("vector-length")->to_symbol(),
-            new VectorLengthProcedure(this)
-        );
+    make_procedure_in_env(env, "list->string", StringProcedures::ListToString, 1);
+    make_procedure_in_env(env, "vector->list", VectorProcedures::vec_to_list, 1);
 }

@@ -3,31 +3,12 @@
 
 #include "Procedures/SchemePrimProcedure.h"
 
-class ListStringProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    ListStringProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 2) {}
-    friend class SchemeObjectCreator;
-};
+namespace StringProcedures {
 
-class StringRefProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    StringRefProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 2) {}
-    friend class SchemeObjectCreator;
-};
+SchemeObject* ListToString(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* StringRef(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* StringLength(SchemeObject* args, SchemeObjectCreator* creator);
 
-class StringLengthProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    StringLengthProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
+} /* namespace StringProcedures */
 
 #endif // STRING_PROCEDURES_H
