@@ -89,6 +89,10 @@ double SchemeObject::flonum_value() {
     return 0;
 }
 
+NewPrimProcedure* SchemeObject::to_new_procedure() {
+    return static_cast<NewPrimProcedure*>(this);
+}
+
 SchemeString* SchemeObject::to_string() {
     return static_cast<SchemeString*>(this);
 }
@@ -162,6 +166,10 @@ bool SchemeObject::is_pair() {
 
 bool SchemeObject::is_symbol() {
     return type_ == Type::SYMBOL;
+}
+
+bool SchemeObject::is_new_procedure() {
+    return type_ == Type::NEWPROCEDURE;
 }
 
 bool SchemeObject::is_prim_procedure() {

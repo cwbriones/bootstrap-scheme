@@ -2,8 +2,38 @@
 #define SCHEMEPRIMPROCEDURE_H_
 
 #include "SchemeObject.h"
+#include <functional>
 
 class SchemeObjectCreator;
+
+class NewPrimProcedure : public SchemeObject {
+public:
+    typedef std::function<SchemeObject*(SchemeObject*, SchemeObjectCreator*)>
+        procedure_t;
+
+    NewPrimProcedure(SchemeObjectCreator* creator, 
+            procedure_t func,
+            int argc=-1) :
+        SchemeObject(NEWPROCEDURE),
+        func_(func),
+        argc_(argc),
+        obj_creator_(creator) {}
+
+    SchemeObject* apply(SchemeObject* args) {
+        return func_(args, obj_creator_);
+    }
+    
+    bool is_apply() { return false; }
+    bool is_eval() { return false; }
+private:
+    bool check_arg_length();
+
+    procedure_t func_;
+    int argc_;
+    SchemeObjectCreator* obj_creator_;
+
+    friend class SchemeObjectCreator;
+};
 
 class SchemePrimProcedure : public SchemeObject {
 public:
@@ -27,6 +57,15 @@ protected:
 //============================================================================
 // Arithmetic Operators
 //============================================================================
+
+namespace ArithmeticProcedures {
+
+SchemeObject* add(SchemeObject*, SchemeObjectCreator*);
+SchemeObject* sub(SchemeObject*, SchemeObjectCreator*);
+SchemeObject* mul(SchemeObject*, SchemeObjectCreator*);
+SchemeObject* div(SchemeObject*, SchemeObjectCreator*);
+    
+} /* namespace ArithmeticProcedures */
 
 class SchemeAddProcedure : public SchemePrimProcedure {
 public:

@@ -99,6 +99,28 @@ SchemeObject* SchemeObjectCreator::make_vector(std::vector<SchemeObject*>& objec
     return obj;
 }
 
+SchemeObject* SchemeObjectCreator::make_prim_procedure(
+        NewPrimProcedure::procedure_t func,
+        int argc)
+{
+    SchemeObject* obj = new NewPrimProcedure(this, func, argc);
+    SchemeGarbageCollector::the_gc().add(obj);
+
+    return obj;
+}
+
+void SchemeObjectCreator::make_procedure_in_env(
+        Environment* env,
+        const std::string& var,
+        NewPrimProcedure::procedure_t func,
+        int argc)
+{
+    env->define_variable_value(
+            make_symbol(var)->to_symbol(), 
+            make_prim_procedure(func, argc)
+        );
+}
+
 SchemeObject* SchemeObjectCreator::make_environment() {
     Environment::Ptr env = std::make_shared<Environment>();
     setup_environment(env.get());
@@ -177,14 +199,13 @@ void SchemeObjectCreator::init_keywords() {
 }
 
 void SchemeObjectCreator::setup_environment(Environment* env) {
-    // Arithmetic Operators
     // Note that by defining these in the environment
     // they are accessible to the garbage collector since it adds them
     // with the other bindings
-    env->define_variable_value(
-            make_symbol("+")->to_symbol(), 
-            new SchemeAddProcedure(this)
-        );
+    
+    // Arithmetic Operators
+    make_procedure_in_env(env, "+", ArithmeticProcedures::add);
+
     env->define_variable_value(
             make_symbol("-")->to_symbol(), 
             new SchemeSubProcedure(this)
@@ -197,6 +218,7 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
             make_symbol("/")->to_symbol(), 
             new SchemeDivProcedure(this)
         );
+
     env->define_variable_value(
             make_symbol("<")->to_symbol(), 
             new SchemeLessThanProcedure(this)

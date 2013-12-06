@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "SchemeEnvironment.h"
+#include "Procedures/SchemePrimProcedure.h"
 #include "Environment.h"
 
 class SchemeObject;
@@ -24,6 +25,16 @@ public:
     SchemeObject* make_vector(size_t size, SchemeObject* init);
     SchemeObject* make_vector(std::vector<SchemeObject*>& objects);
     SchemeObject* make_empty_list();
+
+    SchemeObject* make_prim_procedure(
+            NewPrimProcedure::procedure_t func, 
+            int argc=-1);
+
+    void make_procedure_in_env(
+            Environment* env,
+            const std::string& var,
+            NewPrimProcedure::procedure_t func,
+            int argc=-1);
 
     SchemeObject* make_environment();
     SchemeObject* make_interaction_environment();

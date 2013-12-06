@@ -43,8 +43,6 @@ void SchemeInputPort::close_file() {
     input_file_.close();
 }
 
-#include <iostream>
-
 SchemeObject* LoadProcedure::func(SchemeObject* args) {
     std::string fname = args->car()->to_string()->value();
     std::ifstream input_stream(fname);

@@ -5,6 +5,20 @@
 #include <vector>
 #include <ctime>
 
+namespace ArithmeticProcedures {
+
+SchemeObject* add(SchemeObject* args, SchemeObjectCreator* creator) {
+    long accum = 0;
+
+    while (!args->is_empty_list()) {
+        accum += args->car()->fixnum_value();
+        args = args->cdr();
+    }
+    return creator->make_fixnum(accum);
+}
+
+} /* namespace ArithmeticProcedures */
+
 bool SchemePrimProcedure::check_arg_length(SchemeObject* args) {
     return false;
 }

@@ -232,6 +232,11 @@ SchemeObject* SchemeEvaluator::eval(SchemeObject* exp, Environment::Ptr env) {
             }
             return prim->func(args);
 
+        } else if (proc->is_new_procedure()) {
+
+            NewPrimProcedure* prim = proc->to_new_procedure();
+            return prim->apply(args);
+        
         } else if (proc->is_comp_procedure()) {
 
             SchemeCompoundProcedure* comp = proc->to_comp_procedure();
