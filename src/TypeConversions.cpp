@@ -4,43 +4,42 @@
 
 #include <sstream>
 
-SchemeObject* SchemeCharToIntProcedure::func(SchemeObject* args) {
-    SchemeObject* obj = args->car();
-    int value = static_cast<int>(obj->char_value());
+namespace TypeConversions {
 
-    return obj_creator_->make_fixnum(value);
+SchemeObject* char_to_int(SchemeObject* args, SchemeObjectCreator* creator) {
+    return creator->make_fixnum(args->car()->fixnum_value());
 }
 
-SchemeObject* SchemeIntToCharProcedure::func(SchemeObject* args) {
-    SchemeObject* obj = args->car();
-    char value = static_cast<char>(obj->fixnum_value());
-
-    return obj_creator_->make_character(value);
+SchemeObject* int_to_char(SchemeObject* args, SchemeObjectCreator* creator) {
+    return creator->make_character(args->car()->char_value());
 }
 
-SchemeObject* SchemeStringToIntProcedure::func(SchemeObject* args) {
+SchemeObject* string_to_int(SchemeObject* args, SchemeObjectCreator* creator) {
     std::stringstream ss(args->car()->to_string()->value());
-    int value;
 
+    int value;
     ss >> value;
 
-    return obj_creator_->make_fixnum(value);
+    return creator->make_fixnum(value);
 }
 
-SchemeObject* SchemeIntToStringProcedure::func(SchemeObject* args) {
+SchemeObject* int_to_string(SchemeObject* args, SchemeObjectCreator* creator) {
     std::stringstream ss;
+
     int value = args->car()->fixnum_value();
     ss << value;
 
-    return obj_creator_->make_string(ss.str());
+    return creator->make_string(ss.str());
+}
+    
+SchemeObject* string_to_symbol(SchemeObject* args, SchemeObjectCreator* creator) {
+    SchemeObject* obj = args->car();
+    return creator->make_symbol(obj->to_string()->value());
 }
 
-SchemeObject* SchemeStringToSymbolProcedure::func(SchemeObject* args) {
+SchemeObject* symbol_to_string(SchemeObject* args, SchemeObjectCreator* creator) {
     SchemeObject* obj = args->car();
-    return obj_creator_->make_symbol(obj->to_string()->value());
+    return creator->make_string(obj->to_symbol()->value());
 }
 
-SchemeObject* SchemeSymbolToStringProcedure::func(SchemeObject* args) {
-    SchemeObject* obj = args->car();
-    return obj_creator_->make_string(obj->to_symbol()->value());
-}
+}   /* namespace TypeConversions */

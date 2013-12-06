@@ -3,58 +3,17 @@
 
 #include "SchemePrimProcedure.h"
 
-class SchemeCharToIntProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeCharToIntProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
+namespace TypeConversions {
 
-class SchemeIntToCharProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeIntToCharProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
+SchemeObject* char_to_int(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* int_to_char(SchemeObject* args, SchemeObjectCreator* creator);
 
-class SchemeStringToIntProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeStringToIntProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
+SchemeObject* string_to_int(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* int_to_string(SchemeObject* args, SchemeObjectCreator* creator);
+    
+SchemeObject* string_to_symbol(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* symbol_to_string(SchemeObject* args, SchemeObjectCreator* creator);
 
-class SchemeIntToStringProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeIntToStringProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeStringToSymbolProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeStringToSymbolProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeSymbolToStringProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeSymbolToStringProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
+} /* namespace TypeConversions */
 
 #endif /* TYPECONVERSIONS_H_ */

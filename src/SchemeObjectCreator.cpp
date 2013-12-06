@@ -322,34 +322,19 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
     make_procedure_in_env(env, "output-port?", output_check, 1);
     make_procedure_in_env(env, "input-port?", input_check, 1);
     make_procedure_in_env(env, "io-port?", io_check, 1);
+    // Special function since list checks are built-ins for SchemeObject
     make_procedure_in_env(env, "list?", PredicateProcedures::list_check, 1);
 }
 
 void SchemeObjectCreator::init_type_conversions(Environment* env) {
-    env->define_variable_value(
-            make_symbol("char->integer")->to_symbol(),
-            new SchemeCharToIntProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("integer->char")->to_symbol(),
-            new SchemeIntToCharProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("string->int")->to_symbol(),
-            new SchemeStringToIntProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("int->string")->to_symbol(),
-            new SchemeIntToStringProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("string->symbol")->to_symbol(),
-            new SchemeStringToSymbolProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("symbol->string")->to_symbol(),
-            new SchemeSymbolToStringProcedure(this)
-        );
+    make_procedure_in_env(env, "char->integer", TypeConversions::char_to_int, 1);
+    make_procedure_in_env(env, "integer->char", TypeConversions::int_to_char, 1);
+    make_procedure_in_env(env, "string->integer", TypeConversions::string_to_int, 1);
+    make_procedure_in_env(env, "integer->string", TypeConversions::int_to_string, 1);
+    make_procedure_in_env(env, "symbol->string", 
+            TypeConversions::symbol_to_string, 1);
+    make_procedure_in_env(env, "string->symbol", 
+            TypeConversions::string_to_symbol, 1);
     make_procedure_in_env(env, "list->string", StringProcedures::ListToString, 1);
     make_procedure_in_env(env, "vector->list", VectorProcedures::vec_to_list, 1);
 }
