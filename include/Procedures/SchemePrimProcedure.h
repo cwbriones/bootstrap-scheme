@@ -15,22 +15,22 @@ public:
             procedure_t func,
             int argc=-1) :
         SchemeObject(NEWPROCEDURE),
-        func_(func),
-        argc_(argc),
-        obj_creator_(creator) {}
+        argc_(argc)
+    {
+        func_ = std::bind2nd(func, creator);
+    }
 
     SchemeObject* apply(SchemeObject* args) {
-        return func_(args, obj_creator_);
+        return func_(args);
     }
     
     bool is_apply() { return false; }
     bool is_eval() { return false; }
 private:
     bool check_arg_length();
+    std::function<SchemeObject*(SchemeObject*)> func_;
 
-    procedure_t func_;
     int argc_;
-    SchemeObjectCreator* obj_creator_;
 
     friend class SchemeObjectCreator;
 };
@@ -103,59 +103,16 @@ private:
 // List Operations
 //============================================================================
 
-class SchemeLengthProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeLengthProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, -1) {}
-    friend class SchemeObjectCreator;
-};
+namespace ListProcedures {
 
-class SchemeConsProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeConsProcedure() :
-        SchemePrimProcedure(nullptr, 2) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeCarProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeCarProcedure() :
-        SchemePrimProcedure(nullptr, 1) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeCdrProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeCdrProcedure() :
-        SchemePrimProcedure(nullptr, 1) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeSetCarProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeSetCarProcedure() :
-        SchemePrimProcedure(nullptr, 1) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeSetCdrProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    SchemeSetCdrProcedure() :
-        SchemePrimProcedure(nullptr, 1) {}
-    friend class SchemeObjectCreator;
-};
+SchemeObject* length(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* cons(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* car(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* cdr(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* set_car(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* set_cdr(SchemeObject* args, SchemeObjectCreator* creator);
+    
+} /* namespace ListProcedures */
 
 //============================================================================
 // Polymorphic Equality Testing

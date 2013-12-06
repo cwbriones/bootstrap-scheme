@@ -213,34 +213,17 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
     make_procedure_in_env(env, "<", ArithmeticProcedures::less_than);
     make_procedure_in_env(env, ">", ArithmeticProcedures::greater_than);
 
-    make_procedure_in_env(env, "quotient", ArithmeticProcedures::quotient);
-    make_procedure_in_env(env, "modulo", ArithmeticProcedures::modulo);
+    make_procedure_in_env(env, "quotient", ArithmeticProcedures::quotient, 2);
+    make_procedure_in_env(env, "modulo", ArithmeticProcedures::modulo, 2);
     
     // List operations
-    env->define_variable_value(
-            make_symbol("length")->to_symbol(),
-            new SchemeLengthProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("cons")->to_symbol(),
-            new SchemeConsProcedure()
-        );
-    env->define_variable_value(
-            make_symbol("car")->to_symbol(),
-            new SchemeCarProcedure()
-        );
-    env->define_variable_value(
-            make_symbol("set-car!")->to_symbol(),
-            new SchemeSetCarProcedure()
-        );
-    env->define_variable_value(
-            make_symbol("cdr")->to_symbol(),
-            new SchemeCdrProcedure()
-        );
-    env->define_variable_value(
-            make_symbol("set-cdr!")->to_symbol(),
-            new SchemeSetCdrProcedure()
-        );
+    make_procedure_in_env(env, "length", ListProcedures::length, 1);
+    make_procedure_in_env(env, "cons", ListProcedures::cons, 1);
+    make_procedure_in_env(env, "car", ListProcedures::car, 1);
+    make_procedure_in_env(env, "cdr", ListProcedures::cdr, 1);
+    make_procedure_in_env(env, "set-car!", ListProcedures::set_car, 2);
+    make_procedure_in_env(env, "set-cdr!", ListProcedures::set_cdr, 2);
+
     env->define_variable_value(
             make_symbol("random")->to_symbol(),
             new RandomProcedure()

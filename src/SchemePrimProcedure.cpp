@@ -163,42 +163,44 @@ SchemeObject* RandomProcedure::func(SchemeObject* args) {
 // List Operations
 //============================================================================
 
-#include <iostream>
-
-SchemeObject* SchemeLengthProcedure::func(SchemeObject* args) {
+namespace ListProcedures {
+ 
+SchemeObject* length(SchemeObject* args, SchemeObjectCreator* creator) {
     if (args->is_proper_list()) {
-        return obj_creator_->make_fixnum(args->car()->length_as_list());
+        return creator->make_fixnum(args->car()->length_as_list());
     }
     return nullptr;
 }
 
-SchemeObject* SchemeConsProcedure::func(SchemeObject* args) {
+SchemeObject* cons(SchemeObject* args, SchemeObjectCreator* creator) {
     args->set_cdr(args->cadr());
 
     return args;
 }
 
-SchemeObject* SchemeCarProcedure::func(SchemeObject* args) {
+SchemeObject* car(SchemeObject* args, SchemeObjectCreator* creator) {
     return args->caar();
 }
 
-SchemeObject* SchemeCdrProcedure::func(SchemeObject* args) {
+SchemeObject* cdr(SchemeObject* args, SchemeObjectCreator* creator) {
     return args->cdar();
 }
 
-SchemeObject* SchemeSetCarProcedure::func(SchemeObject* args) {
+SchemeObject* set_car(SchemeObject* args, SchemeObjectCreator* creator) {
     SchemeObject* the_pair = args->car();;
     the_pair->set_car(args->cadr());
 
-    return obj_creator_->make_symbol("ok");
+    return creator->make_symbol("ok");
 }
 
-SchemeObject* SchemeSetCdrProcedure::func(SchemeObject* args) {
+SchemeObject* set_cdr(SchemeObject* args, SchemeObjectCreator* creator) {
     SchemeObject* the_pair = args->car();
     the_pair->set_cdr(args->cadr());
 
-    return obj_creator_->make_symbol("ok");
-}
+    return creator->make_symbol("ok");
+}   
+
+} /* namespace ListProcedures */
 
 //============================================================================
 // Polymorphic Equality Testing
