@@ -27,6 +27,7 @@ set(SOURCE_FILES
         src/VectorProcedures.cpp
         src/Environment.cpp
         src/EnvironmentProcedures.cpp
+        src/SchemeWriter.cpp
         src/main.cpp
 )
 add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})

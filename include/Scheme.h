@@ -6,8 +6,11 @@
 #include <unordered_map>
 
 #include "Environment.h"
+
 #include "SchemeEvaluator.h"
 #include "Reader.h"
+#include "SchemeWriter.h"
+
 #include "SchemeObjectCreator.h"
 
 class SchemeObject;
@@ -31,6 +34,8 @@ private:
     SchemeEvaluator evaluator_;
 
     // Print
+    SchemeWriter writer_;
+
 	void write(SchemeObject* obj);
     void write_pair(SchemeObject* obj);
     void write_vector(SchemeObject* obj);
