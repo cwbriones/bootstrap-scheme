@@ -28,6 +28,8 @@ SchemeObject SchemeObject::the_true_object_ =
 SchemeObject SchemeObject::the_empty_list_ = SchemeObject(EMPTY_LIST);
 SchemeObject SchemeObject::the_unspecified_object_ = SchemeObject(UNSPECIFIED);
 
+SchemeObject::SchemeObject() : SchemeObject(UNKNOWN) {}
+
 SchemeObject::SchemeObject(Type t) : type_(t) {
     objects_created_++;
 
@@ -116,7 +118,10 @@ SchemeInputPort* SchemeObject::to_input_port() {
 }
 
 int SchemeObject::length_as_list() {
-    return length_as_list_;
+    if (is_proper_list_) {
+        return length_as_list_;
+    }
+    return -1;
 }
 
 bool SchemeObject::is_true_obj() {
@@ -288,6 +293,20 @@ void SchemeObject::init_flonum(double value) {
 void SchemeObject::init_char(char value) {
     type_ = CHARACTER;
     data.character.value = value;
+}
+
+void SchemeObject::init_pair(SchemeObject* car, SchemeObject* cdr) {
+    type_ = PAIR;
+
+    data.pair.car = car;
+    data.pair.cdr = cdr;
+
+    is_proper_list_ = cdr->is_proper_list_;
+    length_as_list_ = -1;
+
+    if (is_proper_list_) {
+        length_as_list_ = cdr->length_as_list_ + 1;
+    }
 }
 
 //============================================================================

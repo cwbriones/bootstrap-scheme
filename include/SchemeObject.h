@@ -8,9 +8,6 @@
 // Forward Declarations needed
 template <class T>
 class SchemePrimitive;
-
-typedef SchemePrimitive<double> SchemeFlonum;
-typedef SchemePrimitive<bool> SchemeBoolean;
 typedef SchemePrimitive<std::string> SchemeString;
 
 class SchemeSymbol;
@@ -46,6 +43,7 @@ public:
                VECTOR = 1 << 12,
            INPUT_PORT = 1 << 13,
           OUTPUT_PORT = 1 << 14,
+              UNKNOWN = 1 << 15
     };
     Type type() const;
 
@@ -116,12 +114,14 @@ public:
 
     static void object_summary();
 protected:
+    SchemeObject();
     SchemeObject(SchemeObject::Type t);
 
     // Initialization
     void init_fixnum(long value);
     void init_flonum(double value);
     void init_char(char value);
+    void init_pair(SchemeObject* car, SchemeObject* cdr);
 
     Type type_ = UNSPECIFIED;
     int mark_ = 0;

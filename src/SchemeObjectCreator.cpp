@@ -32,7 +32,7 @@ SchemeObject* SchemeObjectCreator::make_unspecified() {
 }
 
 SchemeObject* SchemeObjectCreator::make_fixnum(long value) {
-    SchemeObject* obj = new SchemeObject(SchemeObject::FIXNUM);
+    SchemeObject* obj = new SchemeObject();
     obj->init_fixnum(value);
 
     SchemeGarbageCollector::the_gc().add(obj);
@@ -40,7 +40,7 @@ SchemeObject* SchemeObjectCreator::make_fixnum(long value) {
 }
 
 SchemeObject* SchemeObjectCreator::make_flonum(double value) {
-    SchemeObject* obj = new SchemeObject(SchemeObject::FLONUM);
+    SchemeObject* obj = new SchemeObject();
     obj->init_flonum(value);
 
     SchemeGarbageCollector::the_gc().add(obj);
@@ -55,9 +55,17 @@ SchemeObject* SchemeObjectCreator::make_boolean(bool value) {
 }
 
 SchemeObject* SchemeObjectCreator::make_character(char value) {
-    SchemeObject* obj = new SchemeObject(SchemeObject::CHARACTER);
+    SchemeObject* obj = new SchemeObject();
     obj->init_char(value);
 
+    SchemeGarbageCollector::the_gc().add(obj);
+
+    return obj;
+}
+
+SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cdr) {
+    SchemeObject* obj = new SchemeObject();
+    obj->init_pair(car, cdr);
     SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
@@ -66,16 +74,6 @@ SchemeObject* SchemeObjectCreator::make_character(char value) {
 SchemeObject* SchemeObjectCreator::make_string(std::string value) {
     SchemeObject* obj = new SchemeString(SchemeObject::STRING, value);
     SchemeGarbageCollector::the_gc().add(obj);
-
-    return obj;
-}
-
-SchemeObject* SchemeObjectCreator::make_pair(SchemeObject* car, SchemeObject* cdr) {
-    SchemeObject* obj = new SchemeObject(SchemeObject::PAIR);
-    SchemeGarbageCollector::the_gc().add(obj);
-
-    obj->set_car(car);
-    obj->set_cdr(cdr);
 
     return obj;
 }
