@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "SchemeObject.h"
+#include "SchemeWriter.h"
 #include "Reader.h"
 
 #include "Procedures/SchemePrimProcedure.h"
@@ -48,6 +49,24 @@ public:
 private:
     ReadProcedure(SchemeObjectCreator* creator) :
         SchemePrimProcedure(creator, 1) {}
+    friend class SchemeObjectCreator;
+};
+
+//============================================================================
+// Output
+//============================================================================
+
+class SchemeOutputPort : public SchemeObject {
+public:
+    void write(SchemeObject* obj);
+    void write_char(SchemeObject* obj);
+private:
+    SchemeOutputPort();
+    SchemeOutputPort(const std::string& fname);
+
+    std::ofstream out_;
+    SchemeWriter writer_;
+
     friend class SchemeObjectCreator;
 };
 

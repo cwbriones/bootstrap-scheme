@@ -64,3 +64,26 @@ SchemeObject* ReadProcedure::func(SchemeObject* args) {
 
     return obj_creator_->make_symbol("okay");
 }
+
+//============================================================================
+// Output
+//============================================================================
+
+SchemeOutputPort::SchemeOutputPort() :
+    SchemeObject(SchemeObject::OUTPUT_PORT),
+    out_(),
+    writer_()
+{}
+
+SchemeOutputPort::SchemeOutputPort(const std::string& fname) :
+    out_(fname),
+    writer_(out_)
+{}
+
+void SchemeOutputPort::write(SchemeObject* obj) {
+    writer_.write(obj);
+}
+
+void SchemeOutputPort::write_char(SchemeObject* obj) {
+    writer_.write_char(obj);
+}
