@@ -27,6 +27,7 @@ SchemeObject SchemeObject::the_true_object_ =
 
 SchemeObject SchemeObject::the_empty_list_ = SchemeObject(EMPTY_LIST);
 SchemeObject SchemeObject::the_unspecified_object_ = SchemeObject(UNSPECIFIED);
+SchemeObject SchemeObject::the_eof_object_ = SchemeObject(EOF_OBJECT);
 
 SchemeObject::SchemeObject() : SchemeObject(UNKNOWN) {}
 
@@ -40,7 +41,7 @@ SchemeObject::SchemeObject(Type t) : type_(t) {
         length_as_list_ = 0;
     }
 
-    if (type_ & (SYMBOL | BOOLEAN | UNSPECIFIED | EMPTY_LIST)) {
+    if (type_ & (SYMBOL | BOOLEAN | UNSPECIFIED | EMPTY_LIST | EOF_OBJECT)) {
         protect_from_gc();
     }
 }
@@ -140,6 +141,10 @@ bool SchemeObject::is_empty_list() {
     return this == &the_empty_list_;
 }
 
+bool SchemeObject::is_eof() {
+    return this == &the_eof_object_;
+}
+
 bool SchemeObject::is_fixnum() {
     return type_ == Type::FIXNUM;
 }
@@ -174,6 +179,14 @@ bool SchemeObject::is_prim_procedure() {
 
 bool SchemeObject::is_comp_procedure() {
     return type_ == Type::COMPPROCEDURE;
+}
+
+bool SchemeObject::is_input_port() {
+    return type_ == Type::INPUT_PORT;
+}
+
+bool SchemeObject::is_output_port() {
+    return type_ == Type::OUTPUT_PORT;
 }
 
 bool SchemeObject::is_proper_list() {

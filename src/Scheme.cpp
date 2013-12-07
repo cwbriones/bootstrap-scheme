@@ -55,7 +55,7 @@ bool Scheme::load_file(std::string fname) {
     std::cout << "Loading file \'" << fname << "\'."  << std::endl;
     SchemeObject* obj = file_reader.read();
 
-    while (obj) {
+    while (!obj->is_eof()) {
         evaluator_.eval(obj, Environment::get_global_environment());
         obj = file_reader.read();
     }

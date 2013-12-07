@@ -38,6 +38,8 @@ namespace InputProcedures {
 
 SchemeObject* load(SchemeObject* args, SchemeObjectCreator* creator);
 SchemeObject* read(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* read_char(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* peek_char(SchemeObject* args, SchemeObjectCreator* creator);
 
 }   /* namespace InputProcedures */
 

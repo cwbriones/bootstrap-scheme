@@ -179,9 +179,9 @@
   (iter 0 (string-length str))
 )
 
-(define (char<? . chars) (< (unary-map char->integer chars)))
-(define (char>? . chars) (> (unary-map char->integer chars)))
-(define (char=? . chars) (= (unary-map char->integer chars)))
+(define (char<? . chars) (apply < (unary-map char->integer chars)))
+(define (char>? . chars) (apply > (unary-map char->integer chars)))
+(define (char=? . chars) (apply = (unary-map char->integer chars)))
 
 (define (string-append . strs)
   (list->string (apply append (map string->list strs)))
@@ -282,3 +282,26 @@
       (merge test (merge-sort test (car halves)) (merge-sort test (cdr halves))))))
 
 (define (sort test lst) (merge-sort test lst))
+
+(define (read-line input-port)
+  (list->string
+      (let loop ((char (read-char input-port)))
+        (if (or (eof-object? char) (char=? #\newline char))
+          '()
+          (cons char (loop (read-char input-port)))
+        )
+      )))
+
+(define (read-lines input-port)
+    (let loop ((next-char (peek-char input-port)))
+      (if (eof-object? next-char)
+        '()
+        (cons (read-line input-port) (loop (peek-char input-port))))))
+
+(define (read-string input-port)
+  (list->string 
+  (let loop ((char (read-char input-port)))
+    (if (eof-object? char)
+      '()
+      (cons char (loop (read-char input-port)))
+    ))))

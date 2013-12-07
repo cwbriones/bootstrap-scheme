@@ -176,6 +176,10 @@ SchemeObject* SchemeObjectCreator::make_standard_output() {
     return &standard_output_;
 }
 
+SchemeObject* SchemeObjectCreator::make_eof() {
+    return &SchemeObject::the_eof_object_;
+}
+
 SchemeObject* SchemeObjectCreator::make_empty_list() {
     return &SchemeObject::the_empty_list_;
 }
@@ -291,6 +295,10 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
 
 void SchemeObjectCreator::init_input_output(Environment* env) {
     make_procedure_in_env(env, "load", InputProcedures::load, 1);
+    make_procedure_in_env(env, "read", InputProcedures::read, 1);
+    make_procedure_in_env(env, "read-char", InputProcedures::read_char, 1);
+    make_procedure_in_env(env, "peek-char", InputProcedures::peek_char, 1);
+
     make_procedure_in_env(env, "open-input-file",
             [](SchemeObject* args, SchemeObjectCreator* creator) {
                 return creator->make_input_port(args->car()->to_string()->value());
@@ -301,12 +309,12 @@ void SchemeObjectCreator::init_input_output(Environment* env) {
             }, 0);
     make_procedure_in_env(env, "close-input-port",
             [](SchemeObject* args, SchemeObjectCreator* creator) {
-                args->to_input_port()->close_file();
+                args->car()->to_input_port()->close_file();
                 return creator->make_symbol("ok");
             }, 1);
     make_procedure_in_env(env, "close-output-port",
             [](SchemeObject* args, SchemeObjectCreator* creator) {
-                args->to_output_port()->close_file();
+                args->car()->to_output_port()->close_file();
                 return creator->make_symbol("ok");
             }, 1);
 }
@@ -339,6 +347,8 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
         PredicateProcedures::create_type_check(SchemeObject::INPUT_PORT);
     auto output_check = 
         PredicateProcedures::create_type_check(SchemeObject::OUTPUT_PORT);
+    auto eof_check =
+        PredicateProcedures::create_type_check(SchemeObject::EOF_OBJECT);
     
     // Compound checks
     auto procedure_check = PredicateProcedures::create_type_check(
@@ -362,6 +372,7 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
     make_procedure_in_env(env, "output-port?", output_check, 1);
     make_procedure_in_env(env, "input-port?", input_check, 1);
     make_procedure_in_env(env, "io-port?", io_check, 1);
+    make_procedure_in_env(env, "eof-object?", eof_check, 1);
     // Special function since list checks are built-ins for SchemeObject
     make_procedure_in_env(env, "list?", PredicateProcedures::list_check, 1);
 }

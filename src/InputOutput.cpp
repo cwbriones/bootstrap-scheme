@@ -62,8 +62,40 @@ SchemeObject* load(SchemeObject* args, SchemeObjectCreator* creator) {
 }
 
 SchemeObject* read(SchemeObject* args, SchemeObjectCreator* creator) {
+    SchemeInputPort* port;
 
-    return creator->make_symbol("okay");
+    if (args->is_empty_list()) {
+        port = creator->make_standard_input()->to_input_port();
+    } else {
+        port = args->car()->to_input_port();
+    }
+
+    return port->read();
+}
+
+SchemeObject* read_char(SchemeObject* args, SchemeObjectCreator* creator) {
+    SchemeInputPort* port;
+
+    if (args->is_empty_list()) {
+        // Default to console
+        port = creator->make_standard_input()->to_input_port();
+    } else {
+        port = args->car()->to_input_port();
+    }
+
+    return port->read_char();
+}
+
+SchemeObject* peek_char(SchemeObject* args, SchemeObjectCreator* creator) {
+    SchemeInputPort* port;
+
+    if (args->is_empty_list()) {
+        port = creator->make_standard_input()->to_input_port();
+    } else {
+        port = args->car()->to_input_port();
+    }
+
+    return port->peek_char();
 }
 
 } /* namespace InputProcedures */

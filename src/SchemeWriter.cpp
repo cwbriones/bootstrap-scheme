@@ -78,6 +78,9 @@ void SchemeWriter::write(SchemeObject* obj) {
         case SchemeObject::OUTPUT_PORT:
             out_ << "#<output-port>";
             break;
+        case SchemeObject::EOF_OBJECT:
+            out_ << "#!eof";
+            break;
 		default:
 			std::cerr << "unknown type, cannot write." << std::endl;
 			exit(1);

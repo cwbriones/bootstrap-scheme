@@ -82,7 +82,7 @@ SchemeObject* SchemeReader::read() {
 	eat_whitespace();
 
     if (!instream_.good()) {
-        return nullptr;
+        return objcreator_->make_eof();
     }
 	c = instream_.get();
 
@@ -287,12 +287,22 @@ SchemeObject* SchemeReader::read_character() {
 }
 
 SchemeObject* SchemeReader::read_char() {
+    if (instream_ == std::cin) {
+        instream_.get();
+    }
     char c = instream_.get();
-    return objcreator_->make_character(c);
+    if (instream_.eof()) {
+        return objcreator_->make_eof();
+    } else {
+        return objcreator_->make_character(c);
+    }
 }
 
 SchemeObject* SchemeReader::peek_char() {
     char c = instream_.peek();
+    if (c == EOF) {
+        return objcreator_->make_eof();
+    }
     return objcreator_->make_character(c);
 }
 

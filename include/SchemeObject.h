@@ -44,6 +44,7 @@ public:
                VECTOR = 1 << 12,
            INPUT_PORT = 1 << 13,
           OUTPUT_PORT = 1 << 14,
+           EOF_OBJECT = 1 << 15,
               UNKNOWN = 1 << 16
     };
     Type type() const;
@@ -72,10 +73,11 @@ public:
     bool is_tagged_list(SchemeObject* tag);
     bool is_self_evaluating();
 
-    // Singleton Check
+    // Single Instance Check
     bool is_true_obj();
     bool is_false_obj();
     bool is_empty_list();
+    bool is_eof();
 
     // Type check
     bool is_fixnum();
@@ -87,8 +89,9 @@ public:
     bool is_symbol();
     bool is_prim_procedure();
     bool is_comp_procedure();
+    bool is_input_port();
+    bool is_output_port();
     bool is_proper_list();
-
     bool is_application();
     bool is_true();
     bool collectible();
@@ -150,11 +153,12 @@ protected:
         } pair;
     } data;
 
-    // Singletons
+    // Single Instances of their types
     static SchemeObject the_unspecified_object_;
     static SchemeObject the_true_object_;
     static SchemeObject the_false_object_;
     static SchemeObject the_empty_list_;
+    static SchemeObject the_eof_object_;
 
     friend class SchemeObjectCreator;
 
