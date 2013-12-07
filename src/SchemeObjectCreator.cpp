@@ -5,7 +5,6 @@
 #include "Procedures/TypeConversions.h"
 #include "Procedures/StringProcedures.h"
 #include "Procedures/VectorProcedures.h"
-#include "InputOutput.h"
 
 #include "SchemeObject.h"
 #include "SchemeObjectCreator.h"
@@ -16,9 +15,15 @@
 #include "SchemeVector.h"
 
 SchemeObjectCreator::SchemeObjectCreator() :
-    the_interaction_env_(Environment::get_global_environment()) 
+    the_interaction_env_(Environment::get_global_environment()),
+    standard_input_(this),
+    standard_output_()
 {
+    // Guard single instances
     the_interaction_env_.protect_from_gc();
+    standard_input_.protect_from_gc();
+    standard_output_.protect_from_gc();
+
     init_keywords();
 }
 
@@ -149,6 +154,28 @@ SchemeObject* SchemeObjectCreator::make_null_environment() {
     return obj;
 }
 
+SchemeObject* SchemeObjectCreator::make_input_port(const std::string& fname) {
+    SchemeObject* obj = new SchemeInputPort(this, fname);
+    SchemeGarbageCollector::the_gc().add(obj);
+
+    return obj;
+}
+
+SchemeObject* SchemeObjectCreator::make_output_port(const std::string& fname) {
+    SchemeObject* obj = new SchemeOutputPort(fname);
+    SchemeGarbageCollector::the_gc().add(obj);
+
+    return obj;
+}
+
+SchemeObject* SchemeObjectCreator::make_standard_input() {
+    return &standard_input_;
+}
+
+SchemeObject* SchemeObjectCreator::make_standard_output() {
+    return &standard_output_;
+}
+
 SchemeObject* SchemeObjectCreator::make_empty_list() {
     return &SchemeObject::the_empty_list_;
 }
@@ -264,6 +291,24 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
 
 void SchemeObjectCreator::init_input_output(Environment* env) {
     make_procedure_in_env(env, "load", InputProcedures::load, 1);
+    make_procedure_in_env(env, "open-input-file",
+            [](SchemeObject* args, SchemeObjectCreator* creator) {
+                return creator->make_input_port(args->car()->to_string()->value());
+            }, 0);
+    make_procedure_in_env(env, "open-output-file",
+            [](SchemeObject* args, SchemeObjectCreator* creator) {
+                return creator->make_output_port(args->car()->to_string()->value());
+            }, 0);
+    make_procedure_in_env(env, "close-input-port",
+            [](SchemeObject* args, SchemeObjectCreator* creator) {
+                args->to_input_port()->close_file();
+                return creator->make_symbol("ok");
+            }, 1);
+    make_procedure_in_env(env, "close-output-port",
+            [](SchemeObject* args, SchemeObjectCreator* creator) {
+                args->to_output_port()->close_file();
+                return creator->make_symbol("ok");
+            }, 1);
 }
 
 void SchemeObjectCreator::init_type_predicates(Environment* env) {

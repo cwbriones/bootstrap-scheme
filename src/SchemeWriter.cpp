@@ -72,6 +72,12 @@ void SchemeWriter::write(SchemeObject* obj) {
             write_vector(obj);
             out_ << ")";
             break;
+        case SchemeObject::INPUT_PORT:
+            out_ << "#<input-port>";
+            break;
+        case SchemeObject::OUTPUT_PORT:
+            out_ << "#<output-port>";
+            break;
 		default:
 			std::cerr << "unknown type, cannot write." << std::endl;
 			exit(1);

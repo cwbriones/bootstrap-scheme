@@ -49,6 +49,8 @@ class SchemeOutputPort : public SchemeObject {
 public:
     void write(SchemeObject* obj);
     void write_char(SchemeObject* obj);
+
+    void close_file();
 private:
     SchemeOutputPort();
     SchemeOutputPort(const std::string& fname);

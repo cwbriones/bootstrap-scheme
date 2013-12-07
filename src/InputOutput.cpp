@@ -13,7 +13,8 @@ SchemeInputPort::SchemeInputPort(SchemeObjectCreator* creator)  :
     SchemeObject(INPUT_PORT),
     reader_(creator) {}
 
-SchemeInputPort::SchemeInputPort(SchemeObjectCreator* creator, 
+SchemeInputPort::SchemeInputPort(
+        SchemeObjectCreator* creator, 
         const std::string& fname) :
     SchemeObject(INPUT_PORT),
     input_file_(fname),
@@ -78,6 +79,7 @@ SchemeOutputPort::SchemeOutputPort() :
 {}
 
 SchemeOutputPort::SchemeOutputPort(const std::string& fname) :
+    SchemeObject(SchemeObject::OUTPUT_PORT),
     out_(fname),
     writer_(out_)
 {}
@@ -88,4 +90,8 @@ void SchemeOutputPort::write(SchemeObject* obj) {
 
 void SchemeOutputPort::write_char(SchemeObject* obj) {
     writer_.write_char(obj);
+}
+
+void SchemeOutputPort::close_file() {
+    out_.close();
 }

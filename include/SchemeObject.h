@@ -65,6 +65,7 @@ public:
 
     // IO Objects
     SchemeInputPort* to_input_port();
+    SchemeOutputPort* to_output_port();
 
     // Boolean operations
     bool is_tagged_list(std::string tag);

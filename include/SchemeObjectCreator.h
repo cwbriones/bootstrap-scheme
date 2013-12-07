@@ -6,6 +6,8 @@
 
 #include "SchemeEnvironment.h"
 #include "Procedures/SchemePrimProcedure.h"
+
+#include "InputOutput.h"
 #include "Environment.h"
 
 class SchemeObject;
@@ -42,6 +44,12 @@ public:
     SchemeObject* make_interaction_environment();
     SchemeObject* make_null_environment();
 
+    // Input/Output
+    SchemeObject* make_input_port(const std::string& fname);
+    SchemeObject* make_output_port(const std::string& fname);
+    SchemeObject* make_standard_input();
+    SchemeObject* make_standard_output();
+
     SchemeObject* make_tagged_list(std::string tag, SchemeObject* obj);
     SchemeObject* make_tagged_list(
             std::string tag, SchemeObject* obj1, SchemeObject* obj2);
@@ -60,43 +68,12 @@ private:
     void init_input_output(Environment* env);
 
     // -----------------------------
-    // Symbols
+    // Single Instance Objects
     // -----------------------------
     
     SchemeEnvironment the_interaction_env_;
-
-    SchemeObject* quote_symbol = nullptr;
-    SchemeObject* define_symbol = nullptr;
-    SchemeObject* set_symbol = nullptr;
-    SchemeObject* ok_symbol = nullptr;
-    SchemeObject* if_symbol = nullptr;
-    SchemeObject* cons_symbol = nullptr;
-
-    // -----------------------------
-    // Primitive Procedures
-    // -----------------------------
-
-    // Arithmetic Operators
-    SchemeObject* addition_symbol = nullptr;
-    SchemeObject* subtract_symbol = nullptr;
-    SchemeObject* multiply_symbol = nullptr;
-    SchemeObject* divide_symbol = nullptr;
-    
-    // Type predicates
-    SchemeObject* null_predicate = nullptr;
-    SchemeObject* int_predicate = nullptr;
-    SchemeObject* char_predicate = nullptr;
-    SchemeObject* string_predicate = nullptr;
-    SchemeObject* pair_predicate = nullptr;
-    SchemeObject* proc_predicate = nullptr;
-    
-    // Type conversions
-    SchemeObject* char_to_int = nullptr;
-    SchemeObject* int_to_char = nullptr;
-    SchemeObject* num_to_string = nullptr;
-    SchemeObject* str_to_number = nullptr;
-    SchemeObject* symbol_to_str = nullptr;
-    SchemeObject* str_to_symbol = nullptr;
+    SchemeInputPort standard_input_;
+    SchemeOutputPort standard_output_;
 };
 
 #endif /* SCHEMEOBJECTCREATOR_H_ */

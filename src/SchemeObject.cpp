@@ -117,6 +117,10 @@ SchemeInputPort* SchemeObject::to_input_port() {
     return static_cast<SchemeInputPort*>(this);
 }
 
+SchemeOutputPort* SchemeObject::to_output_port() {
+    return static_cast<SchemeOutputPort*>(this);
+}
+
 int SchemeObject::length_as_list() {
     if (is_proper_list_) {
         return length_as_list_;
