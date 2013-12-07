@@ -34,23 +34,12 @@ private:
     friend class SchemeObjectCreator;
 };
 
-class LoadProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    LoadProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
+namespace InputProcedures {
 
-class ReadProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    ReadProcedure(SchemeObjectCreator* creator) :
-        SchemePrimProcedure(creator, 1) {}
-    friend class SchemeObjectCreator;
-};
+SchemeObject* load(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* read(SchemeObject* args, SchemeObjectCreator* creator);
+
+}   /* namespace InputProcedures */
 
 //============================================================================
 // Output

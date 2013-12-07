@@ -27,13 +27,15 @@ public:
     SchemeObject* make_empty_list();
 
     SchemeObject* make_prim_procedure(
-            NewPrimProcedure::procedure_t func, 
-            int argc=-1);
+            SchemePrimProcedure::procedure_t func, 
+            int argc=-1,
+            bool apply=false,
+            bool eval=false);
 
     void make_procedure_in_env(
             Environment* env,
             const std::string& var,
-            NewPrimProcedure::procedure_t func,
+            SchemePrimProcedure::procedure_t func,
             int argc=-1);
 
     SchemeObject* make_environment();

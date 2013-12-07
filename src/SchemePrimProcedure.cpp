@@ -128,32 +128,43 @@ SchemeObject* modulo(SchemeObject* args, SchemeObjectCreator* creator) {
 
 } /* namespace ArithmeticProcedures */
 
-bool SchemePrimProcedure::check_arg_length(SchemeObject* args) {
-    return false;
+void SchemePrimProcedure::check_arg_length(SchemeObject* args) {
+    if (argc_ >= 0 && args->length_as_list() != argc_) {
+        // This should throw an error here
+    }
 }
 
-RandomProcedure::RandomProcedure() : SchemePrimProcedure(nullptr, 1) {
-    generator_.seed(static_cast<unsigned int>(time(0)));
-}
+namespace MiscProcedure {
 
-SchemeObject* RandomProcedure::func(SchemeObject* args) {
+SchemeObject* random(SchemeObject* args, SchemeObjectCreator* creator) {
     SchemeObject* top = args->car();
+
+    std::default_random_engine generator;
 
     if (top->is_flonum()) {
         double value = top->flonum_value();
         std::uniform_real_distribution<double> float_dist(0.0, value);
-        double result = float_dist(generator_);
+        double result = float_dist(generator);
 
-        return obj_creator_->make_flonum(result);
+        return creator->make_flonum(result);
 
     } else if (top->is_fixnum()) {
         long value = top->fixnum_value();
         std::uniform_int_distribution<long> int_dist(0, value);
-        long result = int_dist(generator_);
+        long result = int_dist(generator);
 
-        return obj_creator_->make_fixnum(result);
+        return creator->make_fixnum(result);
     }
 }
+
+SchemeObject* null_proc(SchemeObject* args, SchemeObjectCreator* creator) {
+    // As a placeholder this should never be called, and if it is we
+    // should raise an error
+
+    return nullptr;
+}
+
+}   /* namespace MiscProcedure */
 
 //============================================================================
 // List Operations
@@ -212,7 +223,7 @@ SchemeObject* type_check(
     return creator->make_boolean(args->car()->type() & type);
 }
     
-NewPrimProcedure::procedure_t create_type_check(uint32_t type) {
+SchemePrimProcedure::procedure_t create_type_check(uint32_t type) {
     return std::bind(
             type_check,
             std::placeholders::_1,
@@ -229,17 +240,3 @@ SchemeObject* boolean_not(SchemeObject* args, SchemeObjectCreator* creator) {
 }
 
 } /* namespace PredicateProcedures */
-
-//============================================================================
-// Apply and Eval
-//============================================================================
-
-SchemeObject* SchemeApplyProcedure::func(SchemeObject* args) {
-    //TODO: This should be an error
-    return nullptr;
-}
-
-SchemeObject* SchemeEvalProcedure::func(SchemeObject* args) {
-    //TODO: This should be an error
-    return nullptr;
-}

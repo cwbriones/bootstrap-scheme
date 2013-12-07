@@ -6,52 +6,40 @@
 
 class SchemeObjectCreator;
 
-class NewPrimProcedure : public SchemeObject {
+class SchemePrimProcedure : public SchemeObject {
 public:
     typedef std::function<SchemeObject*(SchemeObject*, SchemeObjectCreator*)>
         procedure_t;
 
-    NewPrimProcedure(SchemeObjectCreator* creator, 
+    SchemePrimProcedure(SchemeObjectCreator* creator, 
             procedure_t func,
-            int argc=-1) :
-        SchemeObject(NEWPROCEDURE),
-        argc_(argc)
+            int argc=-1,
+            bool apply=false,
+            bool eval=false) :
+            
+        SchemeObject(PRIMPROCEDURE),
+        argc_(argc),
+        apply_(apply),
+        eval_(eval)
     {
-        func_ = std::bind2nd(func, creator);
+        func_ = std::bind(func, std::placeholders::_1, creator);
     }
 
     SchemeObject* apply(SchemeObject* args) {
         return func_(args);
     }
     
-    bool is_apply() { return false; }
-    bool is_eval() { return false; }
+    bool is_apply() { return apply_; }
+    bool is_eval() { return eval_; }
 private:
-    bool check_arg_length();
+    void check_arg_length(SchemeObject* args);
     std::function<SchemeObject*(SchemeObject*)> func_;
-
     int argc_;
+
+    const bool apply_ = false;
+    const bool eval_ = false;
 
     friend class SchemeObjectCreator;
-};
-
-class SchemePrimProcedure : public SchemeObject {
-public:
-    SchemePrimProcedure(SchemeObjectCreator* creator, int argc=-1) :
-        SchemeObject(SchemeObject::PRIMPROCEDURE),
-        argc_(argc),
-        obj_creator_(creator) {}
-
-    virtual ~SchemePrimProcedure(){}
-    virtual SchemeObject* func(SchemeObject* args) = 0;
-
-    virtual bool is_apply(){ return false;}
-    virtual bool is_eval(){ return false;}
-protected:
-    int argc_;
-    SchemeObjectCreator* obj_creator_ = nullptr;
-
-    bool check_arg_length(SchemeObject* args);
 };
 
 //============================================================================
@@ -76,15 +64,12 @@ SchemeObject* modulo(SchemeObject*, SchemeObjectCreator*);
 
 #include <random>
 
-class RandomProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-private:
-    RandomProcedure();
-    std::default_random_engine generator_;
+namespace MiscProcedure {
 
-    friend class SchemeObjectCreator;
-};
+SchemeObject* null_proc(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* random(SchemeObject* args, SchemeObjectCreator* creator);
+
+}   /* namespace MiscProcedure */
 
 //============================================================================
 // List Operations
@@ -109,34 +94,11 @@ SchemeObject* type_check(
         SchemeObjectCreator* creator,
         uint32_t type);
 
-NewPrimProcedure::procedure_t create_type_check(uint32_t type);
+SchemePrimProcedure::procedure_t create_type_check(uint32_t type);
 
 SchemeObject* obj_equiv(SchemeObject* args, SchemeObjectCreator* creator);
 SchemeObject* boolean_not(SchemeObject* args, SchemeObjectCreator* creator);
 
 } /* namespace PredicateProcedures */
 
-//============================================================================
-// Apply and Eval
-//============================================================================
-
-class SchemeApplyProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-    virtual bool is_apply(){ return true;}
-private:
-    SchemeApplyProcedure() :
-        SchemePrimProcedure(nullptr, -1) {}
-    friend class SchemeObjectCreator;
-};
-
-class SchemeEvalProcedure : public SchemePrimProcedure {
-public:
-    virtual SchemeObject* func(SchemeObject* args);
-    virtual bool is_eval(){ return true;}
-private:
-    SchemeEvalProcedure() :
-        SchemePrimProcedure(nullptr, 2) {}
-    friend class SchemeObjectCreator;
-};
 #endif /* SCHEMEPRIMPROCEDURE_H_ */

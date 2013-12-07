@@ -3,7 +3,6 @@
 #include "Procedures/SchemePrimProcedure.h"
 #include "Procedures/SchemeCompoundProcedure.h"
 #include "Procedures/TypeConversions.h"
-#include "Procedures/EnvironmentProcedures.h"
 #include "Procedures/StringProcedures.h"
 #include "Procedures/VectorProcedures.h"
 #include "InputOutput.h"
@@ -100,10 +99,12 @@ SchemeObject* SchemeObjectCreator::make_vector(std::vector<SchemeObject*>& objec
 }
 
 SchemeObject* SchemeObjectCreator::make_prim_procedure(
-        NewPrimProcedure::procedure_t func,
-        int argc)
+        SchemePrimProcedure::procedure_t func,
+        int argc,
+        bool apply,
+        bool eval)
 {
-    SchemeObject* obj = new NewPrimProcedure(this, func, argc);
+    SchemeObject* obj = new SchemePrimProcedure(this, func, argc, apply, eval);
     SchemeGarbageCollector::the_gc().add(obj);
 
     return obj;
@@ -112,13 +113,19 @@ SchemeObject* SchemeObjectCreator::make_prim_procedure(
 void SchemeObjectCreator::make_procedure_in_env(
         Environment* env,
         const std::string& var,
-        NewPrimProcedure::procedure_t func,
+        SchemePrimProcedure::procedure_t func,
         int argc)
 {
-    env->define_variable_value(
-            make_symbol(var)->to_symbol(), 
-            make_prim_procedure(func, argc)
-        );
+    SchemeObject* proc;
+
+    if (var == "apply") {
+        proc = make_prim_procedure(func, argc, true, false);
+    } else if (var == "eval") {
+        proc = make_prim_procedure(func, argc, false, true);
+    } else {
+        proc = make_prim_procedure(func, argc, false, false);
+    }
+    env->define_variable_value(make_symbol(var)->to_symbol(), proc);
 }
 
 SchemeObject* SchemeObjectCreator::make_environment() {
@@ -160,10 +167,7 @@ SchemeObject* SchemeObjectCreator::make_tagged_list(
 
     return make_pair(
         make_symbol(tag), 
-        make_pair(
-            obj1,
-            make_pair(obj2, make_empty_list())
-        )
+        make_pair(obj1, make_pair(obj2, make_empty_list()))
     );
 }
 
@@ -224,32 +228,26 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
     make_procedure_in_env(env, "set-car!", ListProcedures::set_car, 2);
     make_procedure_in_env(env, "set-cdr!", ListProcedures::set_cdr, 2);
 
-    env->define_variable_value(
-            make_symbol("random")->to_symbol(),
-            new RandomProcedure()
-        );
+    make_procedure_in_env(env, "random", MiscProcedure::random, 1);
+    
     // Apply/Eval
-    env->define_variable_value(
-            make_symbol("apply")->to_symbol(),
-            new SchemeApplyProcedure()
-        );
-    env->define_variable_value(
-            make_symbol("eval")->to_symbol(),
-            new SchemeEvalProcedure()
-        );
+    make_procedure_in_env(env, "apply", MiscProcedure::null_proc);
+    make_procedure_in_env(env, "eval", MiscProcedure::null_proc);
+    
     // Environment operations
-    env->define_variable_value(
-            make_symbol("null-environment")->to_symbol(),
-            new NullEnvironmentProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("interaction-environment")->to_symbol(),
-            new InteractionEnvironmentProcedure(this)
-        );
-    env->define_variable_value(
-            make_symbol("environment")->to_symbol(),
-            new StandardEnvironmentProcedure(this)
-        );
+    make_procedure_in_env(env, "null-environment",
+            [](SchemeObject* args, SchemeObjectCreator* creator){
+                return creator->make_null_environment();
+            }, 0);
+    make_procedure_in_env(env, "environment",
+            [](SchemeObject* args, SchemeObjectCreator* creator){
+                return creator->make_environment();
+            }, 0);
+    make_procedure_in_env(env, "interaction-environment",
+            [](SchemeObject* args, SchemeObjectCreator* creator){
+                return creator->make_interaction_environment();
+            }, 0);
+
     // String operations
     make_procedure_in_env(env, "string-length", StringProcedures::StringLength, 1);
     make_procedure_in_env(env, "string-ref", StringProcedures::StringRef, 2);
@@ -265,10 +263,7 @@ void SchemeObjectCreator::setup_environment(Environment* env) {
 }
 
 void SchemeObjectCreator::init_input_output(Environment* env) {
-    env->define_variable_value(
-            make_symbol("load")->to_symbol(),
-            new LoadProcedure(this)
-        );
+    make_procedure_in_env(env, "load", InputProcedures::load, 1);
 }
 
 void SchemeObjectCreator::init_type_predicates(Environment* env) {
@@ -302,7 +297,7 @@ void SchemeObjectCreator::init_type_predicates(Environment* env) {
     
     // Compound checks
     auto procedure_check = PredicateProcedures::create_type_check(
-                SchemeObject::NEWPROCEDURE | SchemeObject::COMPPROCEDURE
+                SchemeObject::PRIMPROCEDURE | SchemeObject::COMPPROCEDURE
                 );
     auto io_check = PredicateProcedures::create_type_check(
             SchemeObject::OUTPUT_PORT | SchemeObject::INPUT_PORT

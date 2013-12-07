@@ -58,7 +58,6 @@ void SchemeWriter::write(SchemeObject* obj) {
         case SchemeObject::SYMBOL:
             out_ << obj->to_symbol()->value();
             break;
-        case SchemeObject::NEWPROCEDURE:
         case SchemeObject::PRIMPROCEDURE:
             out_ << "#<compiled-procedure>";
             break;

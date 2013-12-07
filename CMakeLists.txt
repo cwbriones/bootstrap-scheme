@@ -26,7 +26,6 @@ set(SOURCE_FILES
         src/TypeConversions.cpp
         src/VectorProcedures.cpp
         src/Environment.cpp
-        src/EnvironmentProcedures.cpp
         src/SchemeWriter.cpp
         src/main.cpp
 )

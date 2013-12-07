@@ -43,25 +43,29 @@ void SchemeInputPort::close_file() {
     input_file_.close();
 }
 
-SchemeObject* LoadProcedure::func(SchemeObject* args) {
+namespace InputProcedures {
+    
+SchemeObject* load(SchemeObject* args, SchemeObjectCreator* creator) {
     std::string fname = args->car()->to_string()->value();
     std::ifstream input_stream(fname);
 
     if (input_stream) {
-        SchemeReader reader(obj_creator_, input_stream);
+        SchemeReader reader(creator, input_stream);
         bool success =
             reader.load_into_environment(Environment::get_global_environment());
         if (success) {
-            return obj_creator_->make_symbol(fname.append(" loaded."));
+            return creator->make_symbol(fname.append(" loaded."));
         }
     }
-    return obj_creator_->make_symbol("failed to load file " + fname);
+    return creator->make_symbol("failed to load file " + fname);
 }
 
-SchemeObject* ReadProcedure::func(SchemeObject* args) {
+SchemeObject* read(SchemeObject* args, SchemeObjectCreator* creator) {
 
-    return obj_creator_->make_symbol("okay");
+    return creator->make_symbol("okay");
 }
+
+} /* namespace InputProcedures */
 
 //============================================================================
 // Output

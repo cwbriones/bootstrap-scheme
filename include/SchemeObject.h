@@ -44,7 +44,6 @@ public:
                VECTOR = 1 << 12,
            INPUT_PORT = 1 << 13,
           OUTPUT_PORT = 1 << 14,
-         NEWPROCEDURE = 1 << 15,
               UNKNOWN = 1 << 16
     };
     Type type() const;
@@ -55,7 +54,6 @@ public:
     char char_value();
     bool boolean_value();
 
-    NewPrimProcedure* to_new_procedure();
     SchemeString* to_string();
     SchemeSymbol* to_symbol();
 
@@ -86,7 +84,6 @@ public:
     bool is_string();
     bool is_pair();
     bool is_symbol();
-    bool is_new_procedure();
     bool is_prim_procedure();
     bool is_comp_procedure();
     bool is_proper_list();
