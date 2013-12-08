@@ -52,10 +52,10 @@ SchemeObject* load(SchemeObject* args, SchemeObjectCreator* creator) {
 
     if (input_stream) {
         SchemeReader reader(creator, input_stream);
-        bool success =
+        SchemeObject* value =
             reader.load_into_environment(Environment::get_global_environment());
-        if (success) {
-            return creator->make_symbol(fname.append(" loaded."));
+        if (!value->is_eof()) {
+            return value;
         }
     }
     return creator->make_symbol("failed to load file " + fname);

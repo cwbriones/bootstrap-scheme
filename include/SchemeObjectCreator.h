@@ -27,6 +27,7 @@ public:
     SchemeObject* make_vector(size_t size, SchemeObject* init);
     SchemeObject* make_vector(std::vector<SchemeObject*>& objects);
     SchemeObject* make_eof();
+    SchemeObject* make_list(const std::vector<SchemeObject*>& objects);
     SchemeObject* make_empty_list();
 
     SchemeObject* make_prim_procedure(

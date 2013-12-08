@@ -183,8 +183,21 @@ SchemeObject* SchemeObjectCreator::make_eof() {
 SchemeObject* SchemeObjectCreator::make_empty_list() {
     return &SchemeObject::the_empty_list_;
 }
+    
+SchemeObject* SchemeObjectCreator::make_list(
+        const std::vector<SchemeObject*>& objects)
+{
+    SchemeObject* list = make_empty_list();
+    for (auto iter = objects.crbegin(); iter != objects.crend(); ++iter) {
+        list = make_pair(*iter, list);
+    }
+    return list;
+}
 
-SchemeObject* SchemeObjectCreator::make_tagged_list(std::string tag, SchemeObject* obj) {
+SchemeObject* SchemeObjectCreator::make_tagged_list(
+        std::string tag, 
+        SchemeObject* obj) 
+{
     return make_pair(
         make_symbol(tag), 
         make_pair(obj, make_empty_list())

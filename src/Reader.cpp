@@ -16,17 +16,18 @@ SchemeReader::SchemeReader(SchemeObjectCreator* objcreator, std::istream& instre
     objcreator_(objcreator), instream_(instream) {
 }
 
-bool SchemeReader::load_into_environment(Environment::Ptr env) {
+SchemeObject* SchemeReader::load_into_environment(Environment::Ptr env) {
     SchemeEvaluator evaluator(objcreator_);
 
     SchemeObject* obj = read();
+    SchemeObject* result = obj;
 
-    while (obj) {
-        evaluator.eval(obj, env);
+    while (!obj->is_eof()) {
+        result = evaluator.eval(obj, env);
         obj = read();
     }
 
-    return true;
+    return result;
 }
 
 void SchemeReader::eat_whitespace() {

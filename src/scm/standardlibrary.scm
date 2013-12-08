@@ -3,6 +3,8 @@
 
 (define (even? n) (= (modulo n 2) 0))
 (define (odd? n) (not (even? n)))
+(define (zero? x) (= 0 x))
+(define (negative? x) (> 0 x))
 
 (define (boolean->integer a) (if a 1 0))
 
@@ -46,8 +48,6 @@
 (define (cddadr x) (cdr (cdr (car (cdr x)))))
 (define (cdddar x) (cdr (cdr (cdr (car x)))))
 (define (cddddr x) (cdr (cdr (cdr (cdr x)))))
-
-(define (zero? x) (= 0 x))
 
 (define (<= a b) (not (> a b)))
 (define (>= a b) (not (< a b)))

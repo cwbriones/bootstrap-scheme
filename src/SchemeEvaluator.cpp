@@ -111,6 +111,11 @@ SchemeObject* SchemeEvaluator::eval(SchemeObject* exp, Environment::Ptr env) {
                 exp->cadr(),
                 exp->cddr());
 
+    } else if (exp->is_tagged_list("let*")) {
+
+        exp = convert_let_star(exp->cdr(), env);
+        return eval(exp, env);
+
     } else if (exp->is_tagged_list("let")) {
 
         exp = eval_let_form(exp->cdr(), env);
@@ -118,7 +123,7 @@ SchemeObject* SchemeEvaluator::eval(SchemeObject* exp, Environment::Ptr env) {
 
     } else if (exp->is_tagged_list("letrec")) {
 
-        exp = convert_letrec_form(exp->cdr());
+        exp = convert_letrec(exp->cdr());
         return eval(exp, env);
 
     } else if (exp->is_tagged_list("if")) {
@@ -244,6 +249,7 @@ SchemeObject* SchemeEvaluator::eval(SchemeObject* exp, Environment::Ptr env) {
             exit(1);
         }
     } else { 
+        std::cerr << exp->type() << std::endl;
         std::cerr << "Error: cannot evaluate unknown expression type." << std::endl;
         exit(1);
     }
@@ -279,7 +285,7 @@ SchemeObject* SchemeEvaluator::eval_let_form(
         Environment::Ptr env) 
 {
     if (args->car()->is_symbol()) {
-        return convert_named_let_form(args, env);
+        return convert_named_let(args, env);
     }
     SchemeObject* body = args->cdr();
     // point args to the list of (variable, value) pairs
@@ -301,7 +307,64 @@ SchemeObject* SchemeEvaluator::eval_let_form(
     return lambda;
 }
 
-SchemeObject* SchemeEvaluator::convert_named_let_form(
+SchemeObject* SchemeEvaluator::convert_let_star(
+        SchemeObject* args,
+        Environment::Ptr env)
+{
+    /*
+     * Converts to nested lambdas, e.g.
+     *
+     * (let* ((x0 a0) (x1 a1) (x2 x2)) [- body -])
+     *       --->
+     * ((lambda (x0) ((lambda (x1) ((lambda (x2) [- body -]) a2)) a1)) a0)
+     */
+
+    SchemeObject* body = args->cdr();
+    // point args to the list of (variable, value) pairs
+    args = args->car();
+
+    if (args->is_empty_list()) {
+        return cons(obj_creator_->make_symbol("begin"), body);
+    }
+
+    std::vector<std::pair<SchemeObject*,SchemeObject*>> var_val_pairs;
+    var_val_pairs.reserve(args->length_as_list());
+
+    while (!args->is_empty_list()) {
+        var_val_pairs.push_back(
+                std::make_pair(args->caar(), args->cdar()->car()));
+        args = args->cdr();
+    }
+
+    // pop off the bottom and process it
+    auto cur_pair = var_val_pairs.back();
+    var_val_pairs.pop_back();
+
+    SchemeObject* empty_list = obj_creator_->make_empty_list();
+    SchemeObject* lambda_sym = obj_creator_->make_symbol("lambda");
+
+    SchemeObject* param = cons(cur_pair.first, empty_list);
+
+    SchemeObject* lambda = cons(lambda_sym, cons(param, body));
+    lambda = cons(lambda, cons(cur_pair.second, empty_list));
+
+    while (!var_val_pairs.empty()) {
+        auto cur_pair = var_val_pairs.back();
+        var_val_pairs.pop_back();
+
+        param = cons(cur_pair.first, empty_list);
+        // Nest by making the body the last lambda
+        body = lambda;
+
+        lambda = obj_creator_->make_tagged_list("lambda", param, lambda);
+        lambda = cons(lambda, cons(cur_pair.second, empty_list));
+    }
+
+    return lambda;
+    // return obj_creator_->make_tagged_list("quote", lambda);
+}
+
+SchemeObject* SchemeEvaluator::convert_named_let(
         SchemeObject* args, 
         Environment::Ptr env) 
 {
@@ -337,7 +400,7 @@ SchemeObject* SchemeEvaluator::convert_named_let_form(
     return obj_creator_->make_tagged_list("letrec", letrec_vars, lambda_args);
 }
 
-SchemeObject* SchemeEvaluator::convert_letrec_form(SchemeObject* args) {
+SchemeObject* SchemeEvaluator::convert_letrec(SchemeObject* args) {
     /*
      * (letrec ([x1 e1] ... [xn en]) body)
      *      ---->

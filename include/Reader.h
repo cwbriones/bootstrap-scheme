@@ -20,7 +20,7 @@ class SchemeReader {
         SchemeObject* read_char();
         SchemeObject* peek_char();
 
-        bool load_into_environment(Environment::Ptr env);
+        SchemeObject* load_into_environment(Environment::Ptr env);
     private:
         std::istream& instream_ = std::cin;
         SchemeObjectCreator* objcreator_ = nullptr;
