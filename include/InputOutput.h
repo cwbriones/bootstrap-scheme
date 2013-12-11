@@ -41,12 +41,17 @@ public:
 
     void close_file();
     bool eof();
+
+    const std::string& filename() const {
+        return fname_;
+    }
 private:
     SchemeInputPort(SchemeObjectCreator* creator);
     SchemeInputPort(SchemeObjectCreator* creator, const std::string& fname);
 
     std::ifstream input_file_;
     SchemeReader reader_;
+    std::string fname_;
 
     friend class SchemeObjectCreator;
 };
@@ -70,14 +75,26 @@ public:
     void write_char(SchemeObject* obj);
 
     void close_file();
+
+    const std::string& filename() const {
+        return fname_;
+    }
 private:
     SchemeOutputPort();
     SchemeOutputPort(const std::string& fname);
 
     std::ofstream out_;
     SchemeWriter writer_;
+    std::string fname_;
 
     friend class SchemeObjectCreator;
 };
+
+namespace OutputProcedures {
+
+SchemeObject* write(SchemeObject* args, SchemeObjectCreator* creator);
+SchemeObject* write_char(SchemeObject* args, SchemeObjectCreator* creator);
+
+}
 
 #endif /* INPUT_OUTPUT_H_ */

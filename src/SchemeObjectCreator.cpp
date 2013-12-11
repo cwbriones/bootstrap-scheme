@@ -329,6 +329,9 @@ void SchemeObjectCreator::init_input_output(Environment* env) {
     make_procedure_in_env(env, "read-char", InputProcedures::read_char, 1);
     make_procedure_in_env(env, "peek-char", InputProcedures::peek_char, 1);
 
+    make_procedure_in_env(env, "write", OutputProcedures::write, 2);
+    make_procedure_in_env(env, "write-char", OutputProcedures::write_char, 2);
+
     make_procedure_in_env(env, "open-input-file",
             [](SchemeObject* args, SchemeObjectCreator* creator) {
                 return creator->make_input_port(args->car()->to_string()->value());

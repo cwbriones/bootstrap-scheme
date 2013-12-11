@@ -28,14 +28,16 @@
 
 SchemeInputPort::SchemeInputPort(SchemeObjectCreator* creator)  :
     SchemeObject(INPUT_PORT),
-    reader_(creator) {}
+    reader_(creator),
+    fname_("") {}
 
 SchemeInputPort::SchemeInputPort(
         SchemeObjectCreator* creator, 
         const std::string& fname) :
     SchemeObject(INPUT_PORT),
     input_file_(fname),
-    reader_(creator, input_file_) {}
+    reader_(creator, input_file_),
+    fname_(fname) {}
 
 SchemeObject* SchemeInputPort::read() 
 {
@@ -124,13 +126,15 @@ SchemeObject* peek_char(SchemeObject* args, SchemeObjectCreator* creator) {
 SchemeOutputPort::SchemeOutputPort() :
     SchemeObject(SchemeObject::OUTPUT_PORT),
     out_(),
-    writer_()
+    writer_(),
+    fname_("")
 {}
 
 SchemeOutputPort::SchemeOutputPort(const std::string& fname) :
     SchemeObject(SchemeObject::OUTPUT_PORT),
     out_(fname),
-    writer_(out_)
+    writer_(out_),
+    fname_(fname)
 {}
 
 void SchemeOutputPort::write(SchemeObject* obj) {
@@ -144,3 +148,41 @@ void SchemeOutputPort::write_char(SchemeObject* obj) {
 void SchemeOutputPort::close_file() {
     out_.close();
 }
+
+namespace OutputProcedures {
+    
+SchemeObject* write(SchemeObject* args, SchemeObjectCreator* creator) {
+    SchemeOutputPort* port;
+    
+    SchemeObject* item = args->car();
+    args = args->cdr();
+
+    if (args->is_empty_list()) {
+        // Default to console
+        port = creator->make_standard_output()->to_output_port();
+    } else {
+        port = args->car()->to_output_port();
+    }
+    port->write(item);
+
+    return creator->make_symbol("ok");
+}
+
+SchemeObject* write_char(SchemeObject* args, SchemeObjectCreator* creator) {
+    SchemeOutputPort* port;
+
+    SchemeObject* item = args->car();
+    args = args->cdr();
+
+    if (args->is_empty_list()) {
+        // Default to console
+        port = creator->make_standard_output()->to_output_port();
+    } else {
+        port = args->car()->to_output_port();
+    }
+    port->write_char(item);
+
+    return creator->make_symbol("ok");
+}
+
+} /* namespace OutputProcedures */

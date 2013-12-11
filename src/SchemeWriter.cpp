@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "InputOutput.h"
 #include "SchemeObject.h"
 #include "SchemeWriter.h"
 #include "SchemeVector.h"
@@ -90,10 +91,12 @@ void SchemeWriter::write(SchemeObject* obj) {
             out_ << ")";
             break;
         case SchemeObject::INPUT_PORT:
-            out_ << "#<input-port>";
+            out_ << "#<input-port at \"" << obj->to_input_port()->filename()
+                 << "\">";
             break;
         case SchemeObject::OUTPUT_PORT:
-            out_ << "#<output-port>";
+            out_ << "#<output-port at \"" << obj->to_output_port()->filename()
+                 << "\">";
             break;
         case SchemeObject::EOF_OBJECT:
             out_ << "#!eof";
